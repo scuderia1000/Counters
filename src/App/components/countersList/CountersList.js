@@ -66,6 +66,7 @@ const CountersList = (props) => {
 
     const keyExtractor = (item, index) => item.id;
 
+
     return (
         <View>
             <FlatList renderItem={renderItem}
