@@ -42,6 +42,7 @@ class AddCounter extends Component {
         this.setState({[type]: value});
     };
 
+
     renderDefaultsFields = () => {
         const { defaultFieldsType } = this.state;
         return Object.keys(defaultFieldsType).map((key, index) => {
