@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, TouchableOpacity, Text, Alert, Modal, TouchableHighlight } from 'react-native';
+import { View, TouchableOpacity, Text } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 
 // own components
@@ -30,32 +30,30 @@ class Home extends Component {
     };
 
     handleAddCounter = () => {
-
+        this.props.navigation.navigate('AddCounter');
     };
 
     render() {
         return(
             <View style={styles.container}>
-                <TouchableOpacity
-                    style={styles.buttonAdd}
-                    onPress={this.handleAddCounter}>
-                    <Icon
-                        name='counter'
-                        type='material-community'
-                        color='white' />
-                    <Text style={styles.buttonAddCaption}>Добавить счетчик</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.buttonAdd}
-                    onPress={() => {
-                        this.setModalVisible(!this.state.modalVisible);
-                    }}>
-                    <Icon
-                        name='plus'
-                        type='material-community'
-                        color='white' />
-                    <Text style={styles.buttonAddCaption}>Внести данные</Text>
-                </TouchableOpacity>
+                <View style={styles.buttonsContainer}>
+                    <TouchableOpacity style={styles.buttonAdd}
+                                      onPress={this.handleAddCounter}>
+                        <Icon name='counter'
+                              type='material-community'
+                              color='white' />
+                        <Text style={styles.buttonAddCaption}>Добавить счетчик</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.buttonAdd}
+                                      onPress={() => {
+                                          this.setModalVisible(!this.state.modalVisible);
+                                      }}>
+                        <Icon name='plus'
+                              type='material-community'
+                              color='white' />
+                        <Text style={styles.buttonAddCaption}>Внести данные</Text>
+                    </TouchableOpacity>
+                </View>
                 <CountersModal visible={this.state.modalVisible}
                                setModalVisible={this.setModalVisible} />
             </View>

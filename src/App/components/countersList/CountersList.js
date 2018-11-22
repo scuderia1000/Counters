@@ -5,7 +5,7 @@ import { Divider } from 'react-native-elements';
 // own component
 import CountersListItem from './CountersListItem';
 // styles
-import styles from './CountersListStyles';
+import styles from './styles/CountersListStyles';
 
 const fakeData = [
     {
@@ -48,6 +48,30 @@ const fakeData = [
         id: 10,
         title: 'Счетчик электроэнергии'
     },
+    {
+        id: 11,
+        title: 'Счетчик воды'
+    },
+    {
+        id: 12,
+        title: 'Счетчик электроэнергии'
+    },
+    {
+        id: 13,
+        title: 'Счетчик воды'
+    },
+    {
+        id: 14,
+        title: 'Счетчик электроэнергии'
+    },
+    {
+        id: 15,
+        title: 'Счетчик воды'
+    },
+    {
+        id: 16,
+        title: 'Счетчик электроэнергии'
+    },
 
 ];
 
@@ -66,13 +90,18 @@ const CountersList = (props) => {
 
     const keyExtractor = (item, index) => item.id;
 
+    const renderDivider = () => {
+        return (
+            <Divider/>
+        )
+    };
 
     return (
         <View>
             <FlatList renderItem={renderItem}
                       data={fakeData}
                       keyExtractor={item => item.id.toString()}
-                      ItemSeparatorComponent={<Divider/>}
+                      ItemSeparatorComponent={renderDivider}
             />
         </View>
     )

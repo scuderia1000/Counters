@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import { View, TouchableOpacity, Text, Alert, Modal, TouchableHighlight } from 'react-native';
 // own component
 import CountersList from '../../components/countersList/CountersList';
+// styles
+import styles from './CountersModalStyles';
+import { colors } from '../../constants/Colors';
+import common from '../../styles/CommonStyles';
 
 const CountersModal = (props) => {
 
@@ -15,15 +19,13 @@ const CountersModal = (props) => {
             transparent={false}
             visible={props.visible}
             onRequestClose={closeModal}>
-            <View style={{marginTop: 22}}>
-                <View>
-                    <Text>Hello World!</Text>
-                    <CountersList/>
-                    <TouchableHighlight
-                        onPress={closeModal}>
-                        <Text>Hide Modal</Text>
-                    </TouchableHighlight>
-                </View>
+            <View style={styles.container}>
+                <CountersList/>
+            </View>
+            <View style={styles.closeButtonContainer}>
+                <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+                    <Text style={common.text}>Закрыть</Text>
+                </TouchableOpacity>
             </View>
         </Modal>
     )

@@ -1,17 +1,21 @@
 import { StyleSheet } from 'react-native';
-import colors from '../../constants/Colors';
+import { colors } from '../../constants/Colors';
 import common from '../../constants/Styles';
 
 export default StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'space-around',
-        backgroundColor: colors.backgroundColor,
+        justifyContent: 'center',
+        backgroundColor: colors.backgroundCommon,
+    },
+    buttonsContainer: {
+        flex: 0.2,
+        justifyContent: 'space-between'
     },
     buttonAdd: {
         borderRadius: 10,
-        backgroundColor: '#5E8EFF',
+        backgroundColor: colors.main,
         ...common.center,
         flexDirection: 'row',
         padding: 10,
