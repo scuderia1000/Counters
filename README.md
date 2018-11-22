@@ -1,2 +1,2 @@
 # Counters
-Reac Native app
+React Native app
