@@ -8,7 +8,7 @@ import common from '../../constants/Styles';
 
 export default StyleSheet.create({
     container: {
-
+        backgroundColor: colors.backgroundCommon,
     },
     input: {
 

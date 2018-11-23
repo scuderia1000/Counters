@@ -4,6 +4,7 @@ import { Button, Icon } from 'react-native-elements';
 
 // own components
 import CountersModal from '../CountersModal/CountersModal';
+import CommonButton from '../../components/buttons/CommonButton';
 
 //style
 import styles from './HomeStyles';
@@ -37,22 +38,14 @@ class Home extends Component {
         return(
             <View style={styles.container}>
                 <View style={styles.buttonsContainer}>
-                    <TouchableOpacity style={styles.buttonAdd}
-                                      onPress={this.handleAddCounter}>
-                        <Icon name='counter'
-                              type='material-community'
-                              color='white' />
-                        <Text style={styles.buttonAddCaption}>Добавить счетчик</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.buttonAdd}
-                                      onPress={() => {
-                                          this.setModalVisible(!this.state.modalVisible);
-                                      }}>
-                        <Icon name='plus'
-                              type='material-community'
-                              color='white' />
-                        <Text style={styles.buttonAddCaption}>Внести данные</Text>
-                    </TouchableOpacity>
+                    <CommonButton style={{borderRadius: 10}}
+                                  onPress={this.handleAddCounter}
+                                  caption={'Добавить счетчик'}
+                                  icon={{name: 'counter', type: 'material-community', color: 'white'}}/>
+                    <CommonButton style={{borderRadius: 10}}
+                                  onPress={() => this.setModalVisible(!this.state.modalVisible)}
+                                  caption={'Внести данные'}
+                                  icon={{name: 'plus', type: 'material-community', color: 'white'}}/>
                 </View>
                 <CountersModal visible={this.state.modalVisible}
                                setModalVisible={this.setModalVisible} />

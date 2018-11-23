@@ -9,7 +9,7 @@ import common from '../../constants/Styles';
 export default StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'flex-start',
+        justifyContent: 'space-between',
     },
     field: {
 
