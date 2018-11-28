@@ -1,10 +1,10 @@
 import React from 'react';
-import { createStackNavigator } from 'react-navigation';
+import { createStackNavigator, createAppContainer } from 'react-navigation';
 
 import Home from '../screens/Home/Home';
 import AddCounter from '../screens/AddCounter/AddCounter';
 
-export default createStackNavigator(
+const MainNavigator = createStackNavigator(
     {
         Home: Home,
         AddCounter: AddCounter
@@ -12,3 +12,5 @@ export default createStackNavigator(
         initialRouteName: 'Home'
     }
 );
+
+export default createAppContainer(MainNavigator);

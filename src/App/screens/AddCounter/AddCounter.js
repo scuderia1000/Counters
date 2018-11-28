@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { View, TouchableOpacity, Text, KeyboardAvoidingView, ScrollView  } from 'react-native';
 // libraries
 import { FormLabel, FormInput, FormValidationMessage, Divider } from 'react-native-elements';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview'
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
 // own component
 import CounterField from '../../components/counterField/CounterField';
 import CommonButton from '../../components/buttons/CommonButton';
@@ -12,11 +12,9 @@ import styles from './AddCounterStyles';
 
 const TARIFF_COMPONENT = {
     name: {
-        // label: 'Название тарифа',
         placeholder: 'Название тарифа...',
     },
     amount: {
-        // label: 'Ставка тарифа',
         keyboardType: 'numeric',
         placeholder: 'Ставка тарифа...',
         style: {
@@ -27,32 +25,32 @@ const TARIFF_COMPONENT = {
 
 class AddCounter extends Component {
     static navigationOptions = {
-        title: 'Создать счетчик'
+        title: 'Создать счетчик',
+        headerRight: <Text style={{fontSize: 16, fontWeight: "bold", marginRight: 5}}>Готово</Text>
     };
 
     constructor(props) {
         super(props);
-        this._nodes = new Map();
+        this.inputsRefs = [];
         this.getFieldsComponents = this.getFieldsComponents.bind(this);
         this.renderDefaultsFields = this.renderDefaultsFields.bind(this);
         this.state = {
             defaultFields: {
                 counterName: {
-                    // label: 'Название',
                     placeholder: 'Название счетчика...',
                     autoFocus: true,
                 },
                 personalAccount: {
-                    // label: '№ счета/договора',
                     placeholder: '№ счета/договора...',
                 },
                 fio: {
-                    // label: 'ФИО',
                     placeholder: 'ФИО, с кем заключен договор...',
                 },
                 address: {
-                    // label: 'Адрес',
                     placeholder: 'Адрес...',
+                },
+                emailAddress: {
+                    placeholder: 'E-mail, куда отправлять данные...',
                     style: {
                         marginBottom: 15
                     }
@@ -84,14 +82,7 @@ class AddCounter extends Component {
     getFieldsComponents = (fields = {}, isContainsDeleteButton = false) => {
         const { defaultFields } = this.state;
         const defaultFieldsLength = Object.keys(defaultFields).length;
-        // const self = this;
-        /*Object.keys(fields).map((key, i) => {
-            if (isContainsDeleteButton) {
-                this.refs[i + defaultFieldsLength] = React.createRef();
-            } else {
-                this.refs[i] = React.createRef();
-            }
-        });*/
+
         return Object.keys(fields).map((key, i) => {
             const label = fields[key].label,
                 placeholder = fields[key].placeholder,
@@ -102,6 +93,8 @@ class AddCounter extends Component {
             if (isContainsDeleteButton) {
                 index = index + defaultFieldsLength;
             }
+
+            this.inputsRefs[index] = React.createRef();
             return [
                 <CounterField key={`${key}_${i}`}
                               style={style}
@@ -109,7 +102,7 @@ class AddCounter extends Component {
                               label={label}
                               keyboardType={keyboardType}
                               placeholder={placeholder}
-                              ref={c => this._nodes.set(index, c)}
+                              ref={this.inputsRefs[index]}
                               autoFocus={autoFocus} />,
                 !style && <Divider key={`divider_${index}`}/>
             ]
@@ -141,10 +134,9 @@ class AddCounter extends Component {
     };
 
     render() {
-        console.log(this._nodes);
         return (
             <View style={styles.container}>
-                <KeyboardAwareScrollView getTextInputRefs={() => { return this.refs}}
+                <KeyboardAwareScrollView getTextInputRefs={() => { return this.inputsRefs }}
                     // style={styles.container}
                     // contentContainerStyle={styles.container}
                 >

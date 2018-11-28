@@ -9,5 +9,8 @@ export default StyleSheet.create({
     center: {
         alignItems: 'center',
         justifyContent: 'center'
+    },
+    text: {
+        color: 'white'
     }
 })
