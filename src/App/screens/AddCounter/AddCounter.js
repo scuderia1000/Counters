@@ -65,13 +65,6 @@ class AddCounter extends Component {
         };
     }
 
-
-
-    handleOnChange = (type, value) => {
-        this.setState({[type]: value});
-    };
-
-
     renderDefaultsFields = () => {
         const { defaultFields, customFields } = this.state;
         const defaultFieldsComponents = this.getFieldsComponents(defaultFields);
@@ -103,7 +96,8 @@ class AddCounter extends Component {
                               keyboardType={keyboardType}
                               placeholder={placeholder}
                               ref={this.inputsRefs[index]}
-                              autoFocus={autoFocus} />,
+                              autoFocus={autoFocus}
+                              onChange={this.handleOnChangeField} />,
                 !style && <Divider key={`divider_${index}`}/>
             ]
         });
@@ -133,7 +127,18 @@ class AddCounter extends Component {
         });
     };
 
+    handleOnChangeField = (field, value) => {
+        this.setState((state, props) => {
+            return {fieldsValues: {...state.fieldsValues, [field]: value}};
+        });
+    };
+
+    handleCreateCounter = () => {
+
+    };
+
     render() {
+        console.log(this.state.fieldsValues)
         return (
             <View style={styles.container}>
                 <KeyboardAwareScrollView getTextInputRefs={() => { return this.inputsRefs }}

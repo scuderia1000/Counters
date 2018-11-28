@@ -7,7 +7,7 @@ import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elemen
 // styles
 import styles from './CounterFieldStyles';
 
-const CounterField = React.forwardRef(({ type, label, keyboardType, index, placeholder, style, autoFocus }, ref) => (
+const CounterField = React.forwardRef(({ type, label, keyboardType, index, placeholder, style, autoFocus, onChange }, ref) => (
         <View key={`${type}_${index}`} style={[styles.container, style]}>
             {label && <FormLabel>{label}</FormLabel>}
             <FormInput inputStyle={styles.input}
@@ -16,7 +16,7 @@ const CounterField = React.forwardRef(({ type, label, keyboardType, index, place
                        autoFocus={autoFocus}
                        ref={ref}
                        onChangeText={value => {
-                           this.handleOnChange(type, value);
+                           onChange(type, value);
                        }}/>
         </View>
 ));
