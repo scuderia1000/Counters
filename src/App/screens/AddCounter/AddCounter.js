@@ -1,5 +1,6 @@
 // react
 import React, { Component } from 'react';
+import {connect} from "react-redux";
 import { View, TouchableOpacity, Text, KeyboardAvoidingView, ScrollView  } from 'react-native';
 // libraries
 import { FormLabel, FormInput, FormValidationMessage, Divider } from 'react-native-elements';
@@ -7,6 +8,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
 // own component
 import CounterField from '../../components/counterField/CounterField';
 import CommonButton from '../../components/buttons/CommonButton';
+import { createCounter } from './actions/AddCounterActions';
 // styles
 import styles from './AddCounterStyles';
 
@@ -26,7 +28,7 @@ const TARIFF_COMPONENT = {
 class AddCounter extends Component {
     static navigationOptions = {
         title: 'Создать счетчик',
-        headerRight: <Text style={{fontSize: 16, fontWeight: "bold", marginRight: 5}}>Готово</Text>
+        headerRight: <Text style={{fontSize: 16, fontWeight: "bold", marginRight: 5}} onPress={this.handleCreateCounter}>Готово</Text>
     };
 
     constructor(props) {
@@ -134,11 +136,11 @@ class AddCounter extends Component {
     };
 
     handleCreateCounter = () => {
-
+        const { fieldsValues } = this.state;
+        this.props.createCounter(fieldsValues);
     };
 
     render() {
-        console.log(this.state.fieldsValues)
         return (
             <View style={styles.container}>
                 <KeyboardAwareScrollView getTextInputRefs={() => { return this.inputsRefs }}
@@ -154,4 +156,12 @@ class AddCounter extends Component {
         )
     }
 }
-export default AddCounter;
+
+const mapStateToProps = state => ({});
+const dispatchers = dispatch => ({
+    createCounter: (counterData) => {
+        dispatch(createCounter(counterData));
+    },
+});
+
+export default connect(mapStateToProps, dispatchers)(AddCounter);
