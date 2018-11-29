@@ -1,2 +1,2 @@
 # Counters
-React Native app
+React Native app with Redux
