@@ -20,5 +20,6 @@ export default StyleSheet.create({
     buttonCaption: {
         color: 'white',
         fontSize: 18,
-    }
+    },
+
 });

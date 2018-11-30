@@ -5,6 +5,9 @@ export default {
     },
     text: {
         fontSize: 18
+    },
+    disabled: {
+        opacity: 0.5
     }
 
 }

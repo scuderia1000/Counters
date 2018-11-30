@@ -7,12 +7,13 @@ import { Button, Icon } from 'react-native-elements';
 
 // styles
 import styles from './CommonButtonStyles';
+import common from '../../constants/Styles';
 
-const CommonButton = ({ caption = '', style = {}, captionStyle = {}, onPress = () => {}, icon = {} }) => {
+const CommonButton = ({ caption = '', style = {}, captionStyle = {}, onPress = () => {}, icon = {}, disabled = false }) => {
     return (
-        <TouchableOpacity style={[styles.button, style]}
+        <TouchableOpacity style={[styles.button, disabled && common.disabled, style]}
                           onPress={onPress}>
-            {Object.keys(icon).length &&
+            {!!Object.keys(icon).length &&
                 <Icon name={icon.name}
                       type={icon.type}
                       color={icon.color} />

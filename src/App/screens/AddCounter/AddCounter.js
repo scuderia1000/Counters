@@ -1,7 +1,7 @@
 // react
 import React, { Component } from 'react';
 import {connect} from "react-redux";
-import { View, TouchableOpacity, Text, KeyboardAvoidingView, ScrollView  } from 'react-native';
+import { View, TouchableOpacity, Text, KeyboardAvoidingView, ScrollView, Button } from 'react-native';
 // libraries
 import { FormLabel, FormInput, FormValidationMessage, Divider } from 'react-native-elements';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
@@ -15,10 +15,12 @@ import styles from './AddCounterStyles';
 const TARIFF_COMPONENT = {
     name: {
         placeholder: 'Название тарифа...',
+        errorText: 'Введите название',
     },
     amount: {
         keyboardType: 'numeric',
         placeholder: 'Ставка тарифа...',
+        errorText: 'Введите ставку тарифа',
         style: {
             marginBottom: 15
         }
@@ -26,9 +28,17 @@ const TARIFF_COMPONENT = {
 };
 
 class AddCounter extends Component {
-    static navigationOptions = {
-        title: 'Создать счетчик',
-        headerRight: <Text style={{fontSize: 16, fontWeight: "bold", marginRight: 5}} onPress={this.handleCreateCounter}>Готово</Text>
+    static navigationOptions = ({ navigation }) => {
+        return {
+            title: 'Создать счетчик',
+            headerRight: (
+                <CommonButton style={{marginRight: 10, height: 38, borderRadius: 4}}
+                              caption='Готово'
+                              captionStyle={{fontSize: 16, fontWeight: "bold"}}
+                              onPress={() => navigation.state.params.createCounter()}/>
+
+            )
+        }
     };
 
     constructor(props) {
@@ -41,18 +51,25 @@ class AddCounter extends Component {
                 counterName: {
                     placeholder: 'Название счетчика...',
                     autoFocus: true,
+                    required: true,
+                    errorText: 'Введите название',
                 },
                 personalAccount: {
                     placeholder: '№ счета/договора...',
+                    errorText: 'Введите №',
                 },
                 fio: {
                     placeholder: 'ФИО, с кем заключен договор...',
+                    errorText: 'Введите ФИО',
+
                 },
                 address: {
                     placeholder: 'Адрес...',
+                    errorText: 'Введите адрес',
                 },
                 emailAddress: {
                     placeholder: 'E-mail, куда отправлять данные...',
+                    errorText: 'Введите e-mail',
                     style: {
                         marginBottom: 15
                     }
@@ -63,8 +80,13 @@ class AddCounter extends Component {
             customFields: {},
             isRequiredFieldsFilled: false,
             fieldsValues: {},
-            refs: []
+            refs: [],
+            errors: []
         };
+    }
+
+    componentDidMount() {
+        this.props.navigation.setParams({ createCounter: this.handleCreateCounter})
     }
 
     renderDefaultsFields = () => {
@@ -75,15 +97,12 @@ class AddCounter extends Component {
     };
 
     getFieldsComponents = (fields = {}, isContainsDeleteButton = false) => {
-        const { defaultFields } = this.state;
+        const { defaultFields, errors } = this.state;
         const defaultFieldsLength = Object.keys(defaultFields).length;
 
         return Object.keys(fields).map((key, i) => {
-            const label = fields[key].label,
-                placeholder = fields[key].placeholder,
-                keyboardType = fields[key].keyboardType,
-                style = fields[key].style,
-                autoFocus = fields[key].autoFocus;
+            const fieldStyle = fields[key].style || '';
+
             let index = i;
             if (isContainsDeleteButton) {
                 index = index + defaultFieldsLength;
@@ -92,19 +111,17 @@ class AddCounter extends Component {
             this.inputsRefs[index] = React.createRef();
             return [
                 <CounterField key={`${key}_${i}`}
-                              style={style}
                               type={key}
-                              label={label}
-                              keyboardType={keyboardType}
-                              placeholder={placeholder}
+                              field={fields[key]}
+                              index={index}
                               ref={this.inputsRefs[index]}
-                              autoFocus={autoFocus}
-                              onChange={this.handleOnChangeField} />,
-                !style && <Divider key={`divider_${index}`}/>
+                              errors={errors}
+                              onChange={this.handleFieldChange} />
             ]
         });
     };
 
+    // !!fieldStyle && <Divider key={`divider_${index}`}/>
     handleAddTariff = () => {
         const { customFields = {} } = this.state;
         let tariffNumber = 0;
@@ -129,16 +146,44 @@ class AddCounter extends Component {
         });
     };
 
-    handleOnChangeField = (field, value) => {
+    handleFieldChange = (field, value) => {
         this.setState((state, props) => {
-            return {fieldsValues: {...state.fieldsValues, [field]: value}};
+            return {
+                fieldsValues: {
+                    ...state.fieldsValues,
+                    [field]: value
+                },
+                errors: []
+            };
         });
     };
 
     handleCreateCounter = () => {
         const { fieldsValues } = this.state;
+        const requiredFields = this.getRequiredFields();
+        const filledFieldsNames = Object.keys(fieldsValues);
+
+        if (requiredFields.length && !requiredFields.every(name => filledFieldsNames.includes(name))) {
+            const errorFieldsNames = requiredFields.filter(name => !filledFieldsNames.includes(name));
+            this.setState({
+                errors: errorFieldsNames
+            });
+            return false;
+        }
         this.props.createCounter(fieldsValues);
     };
+
+    getRequiredFields() {
+        const { defaultFields, customFields } = this.state;
+        const allFields = {...defaultFields, ...customFields};
+        const requiredFields = [];
+        Object.keys(allFields).forEach(fieldName => {
+            if (allFields[fieldName].hasOwnProperty('required') && allFields[fieldName].required) {
+                requiredFields.push(fieldName);
+            }
+        });
+        return requiredFields;
+    }
 
     render() {
         return (
