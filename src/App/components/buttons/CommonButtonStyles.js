@@ -13,13 +13,16 @@ export default StyleSheet.create({
         // borderRadius: 10,
         backgroundColor: colors.main,
         ...common.center,
-        flexDirection: 'row',
         padding: 10,
-        height: 50,
+        height: 48,
     },
     buttonCaption: {
         color: 'white',
         fontSize: 18,
     },
-
+    captionContainer: {
+        flexDirection: 'row',
+        ...common.center,
+        width: '100%',
+    }
 });

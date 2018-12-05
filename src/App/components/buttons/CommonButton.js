@@ -13,12 +13,14 @@ const CommonButton = ({ caption = '', style = {}, captionStyle = {}, onPress = (
     return (
         <TouchableOpacity style={[styles.button, disabled && common.disabled, style]}
                           onPress={onPress}>
-            {!!Object.keys(icon).length &&
-                <Icon name={icon.name}
-                      type={icon.type}
-                      color={icon.color} />
-            }
-            <Text style={[styles.buttonCaption, captionStyle]}>{caption}</Text>
+            <View style={styles.captionContainer}>
+                {!!Object.keys(icon).length &&
+                    <Icon name={icon.name}
+                          type={icon.type}
+                          color={icon.color} iconStyle={{marginRight: 5}} />
+                }
+                <Text style={[styles.buttonCaption, captionStyle]}>{caption}</Text>
+            </View>
         </TouchableOpacity>
     )
 };

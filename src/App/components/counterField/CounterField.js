@@ -23,8 +23,6 @@ const CounterField = React.forwardRef(({ field = {}, type, index, onChange, erro
                        onChangeText={value => {
                            onChange(type, value);
                        }}/>
-            {/*<Divider key={`divider_${index}`} style={styles.divider} />*/}
-            {/*<Text style={styles.divider}>testregdg</Text>*/}
             {!!errors.length && errors.includes(type) && <FormValidationMessage labelStyle={styles.errorContainer}>{errorText}</FormValidationMessage>}
         </View>
     )

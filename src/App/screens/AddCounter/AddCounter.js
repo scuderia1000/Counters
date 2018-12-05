@@ -44,6 +44,7 @@ class AddCounter extends Component {
     constructor(props) {
         super(props);
         this.inputsRefs = [];
+        this.scrollView = React.createRef();
         this.getFieldsComponents = this.getFieldsComponents.bind(this);
         this.renderDefaultsFields = this.renderDefaultsFields.bind(this);
         this.state = {
@@ -53,6 +54,19 @@ class AddCounter extends Component {
                     autoFocus: true,
                     required: true,
                     errorText: 'Введите название',
+                    style: {
+                        marginBottom: 15
+                    }
+                },
+                tariffName: {
+                    ...TARIFF_COMPONENT.name,
+                    required: true,
+                },
+                tariff: {
+                    ...TARIFF_COMPONENT.amount,
+                    style: {
+                        marginBottom: 15
+                    }
                 },
                 personalAccount: {
                     placeholder: '№ счета/договора...',
@@ -74,8 +88,6 @@ class AddCounter extends Component {
                         marginBottom: 15
                     }
                 },
-                tariffName: {...TARIFF_COMPONENT.name},
-                tariff: {...TARIFF_COMPONENT.amount}
             },
             customFields: {},
             isRequiredFieldsFilled: false,
@@ -86,7 +98,20 @@ class AddCounter extends Component {
     }
 
     componentDidMount() {
-        this.props.navigation.setParams({ createCounter: this.handleCreateCounter})
+        const { navigation } = this.props;
+        navigation.setParams({ createCounter: this.handleCreateCounter});
+        const counterId = navigation.getParam('id', 'NO ID');
+        if (counterId) {
+
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevState.customFields !== this.state.customFields) {
+            setTimeout(() => {
+                this.scrollToBottom();
+            }, 0);
+        }
     }
 
     renderDefaultsFields = () => {
@@ -101,7 +126,7 @@ class AddCounter extends Component {
         const defaultFieldsLength = Object.keys(defaultFields).length;
 
         return Object.keys(fields).map((key, i) => {
-            const fieldStyle = fields[key].style || '';
+            // const fieldStyle = fields[key].style || '';
 
             let index = i;
             if (isContainsDeleteButton) {
@@ -158,19 +183,33 @@ class AddCounter extends Component {
         });
     };
 
+    validate = () => {
+        const { fieldsValues } = this.state;
+        const valuesKeys = Object.keys(fieldsValues);
+        const requiredFields = this.getRequiredFields();
+        let errorFields = [];
+
+        if (requiredFields.length) {
+            errorFields = requiredFields.filter(fieldName => !valuesKeys.includes(fieldName) || !fieldsValues[fieldName]);
+        }
+
+        return {
+            errorFields: errorFields
+        }
+    };
+
     handleCreateCounter = () => {
         const { fieldsValues } = this.state;
-        const requiredFields = this.getRequiredFields();
-        const filledFieldsNames = Object.keys(fieldsValues);
+        const { errorFields = [] } = this.validate();
 
-        if (requiredFields.length && !requiredFields.every(name => filledFieldsNames.includes(name))) {
-            const errorFieldsNames = requiredFields.filter(name => !filledFieldsNames.includes(name));
+        if (errorFields.length) {
             this.setState({
-                errors: errorFieldsNames
+                errors: errorFields
             });
             return false;
         }
         this.props.createCounter(fieldsValues);
+        this.props.navigation.goBack();
     };
 
     getRequiredFields() {
@@ -185,10 +224,18 @@ class AddCounter extends Component {
         return requiredFields;
     }
 
+    scrollToBottom = () => {
+        if (this.scrollView && this.scrollView.current) {
+            this.scrollView.current.scrollTo({x: 0, y: 100000});
+        }
+    };
+
     render() {
+
         return (
             <View style={styles.container}>
                 <KeyboardAwareScrollView getTextInputRefs={() => { return this.inputsRefs }}
+                                         ref={this.scrollView}
                     // style={styles.container}
                     // contentContainerStyle={styles.container}
                 >
@@ -202,7 +249,9 @@ class AddCounter extends Component {
     }
 }
 
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({
+    counters: state.counters,
+});
 const dispatchers = dispatch => ({
     createCounter: (counterData) => {
         dispatch(createCounter(counterData));

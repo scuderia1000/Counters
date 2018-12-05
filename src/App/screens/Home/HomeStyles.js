@@ -6,11 +6,20 @@ export default StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
         backgroundColor: colors.backgroundCommon,
     },
     buttonsContainer: {
-        flex: 0.2,
-        justifyContent: 'space-between'
+        padding: 5,
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        position: 'absolute',
+        bottom: 0,
     },
+    countersListContainer: {
+        alignItems: 'flex-start',
+        width: '100%',
+        flex: 0.9,
+    }
 });

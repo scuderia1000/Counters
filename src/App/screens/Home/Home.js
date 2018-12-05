@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
-import { View, TouchableOpacity, Text } from 'react-native';
-import { Button, Icon } from 'react-native-elements';
+import {View, TouchableOpacity, Text, FlatList} from 'react-native';
+import {connect} from "react-redux";
+import {Button, Divider, Icon} from 'react-native-elements';
 
 // own components
 import CountersModal from '../CountersModal/CountersModal';
 import CommonButton from '../../components/buttons/CommonButton';
-
+import fakeData from '../../constants/FakeData';
+import CountersListItem from '../../components/countersList/CountersListItem';
 //style
 import styles from './HomeStyles';
+import {createCounter} from "../AddCounter/actions/AddCounterActions";
 
 class Home extends Component {
     static navigationOptions = {
@@ -30,19 +33,63 @@ class Home extends Component {
 
     };
 
-    handleAddCounter = () => {
-        this.props.navigation.navigate('AddCounter');
+    handleAddCounter = (id) => {
+        this.props.navigation.navigate(
+            'AddCounter',
+            {
+                id: id,
+            }
+        );
+    };
+
+    openCounterData = (id) => {
+
+    };
+
+    editCounter = (id) => {
+        this.handleAddCounter(id);
+    };
+
+    renderItem = ({item}) => (
+        <CountersListItem
+            id={item.id}
+            onPressItem={this.openCounterData}
+            onLongPress={this.editCounter}
+            title={item.counterName}
+        />
+    );
+
+    renderDivider = () => {
+        return (
+            <Divider/>
+        )
     };
 
     render() {
+        const { list = {} } = this.props.counters;
+        const countersKeys = Object.keys(list);
+        let countersArray = [];
+        if (countersKeys.length) {
+            countersArray = countersKeys.map(key => list[key]);
+        }
+
         return(
             <View style={styles.container}>
+                <View style={styles.countersListContainer}>
+                    <FlatList renderItem={this.renderItem}
+                              data={countersArray}
+                              // data={fakeData}
+                              keyExtractor={item => item.id.toString()}
+                              ItemSeparatorComponent={this.renderDivider}
+                              style={{width: '100%'}}
+                    />
+                </View>
                 <View style={styles.buttonsContainer}>
-                    <CommonButton style={{borderRadius: 10}}
+                    <CommonButton style={{borderRadius: 5, flex: 0.48}}
                                   onPress={this.handleAddCounter}
-                                  caption={'Добавить счетчик'}
+                                  caption={'Создать счетчик'}
                                   icon={{name: 'counter', type: 'material-community', color: 'white'}}/>
-                    <CommonButton style={{borderRadius: 10}}
+                    <CommonButton style={{borderRadius: 5, flex: 0.48}}
                                   onPress={() => this.setModalVisible(!this.state.modalVisible)}
                                   caption={'Внести данные'}
                                   icon={{name: 'plus', type: 'material-community', color: 'white'}}/>
@@ -53,5 +100,9 @@ class Home extends Component {
         )
     }
 }
-
-export default Home;
+const mapStateToProps = state => ({
+    counters: state.counters,
+});
+const dispatchers = dispatch => ({
+});
+export default connect(mapStateToProps, dispatchers)(Home);
