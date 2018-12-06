@@ -37,7 +37,7 @@ class Home extends Component {
         this.props.navigation.navigate(
             'AddCounter',
             {
-                id: id,
+                counterId: id,
             }
         );
     };

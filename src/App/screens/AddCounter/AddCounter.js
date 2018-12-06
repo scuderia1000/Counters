@@ -9,6 +9,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
 import CounterField from '../../components/counterField/CounterField';
 import CommonButton from '../../components/buttons/CommonButton';
 import { createCounter } from './actions/AddCounterActions';
+import { cloneObject } from "../../constants/FunctionConst";
 // styles
 import styles from './AddCounterStyles';
 
@@ -93,16 +94,21 @@ class AddCounter extends Component {
             isRequiredFieldsFilled: false,
             fieldsValues: {},
             refs: [],
-            errors: []
+            errors: [],
+            counterId: ''
         };
     }
 
     componentDidMount() {
-        const { navigation } = this.props;
+        const { navigation, counters } = this.props;
         navigation.setParams({ createCounter: this.handleCreateCounter});
-        const counterId = navigation.getParam('id', 'NO ID');
-        if (counterId) {
-
+        const counterId = navigation.getParam('counterId', 'NO ID');
+        if (typeof counterId === 'string' && counters.list && counters.list[counterId]) {
+            const fieldsValues = cloneObject(counters.list[counterId]);
+            this.setState({
+                fieldsValues: {...fieldsValues},
+                counterId: counterId
+            })
         }
     }
 
@@ -122,7 +128,7 @@ class AddCounter extends Component {
     };
 
     getFieldsComponents = (fields = {}, isContainsDeleteButton = false) => {
-        const { defaultFields, errors } = this.state;
+        const { defaultFields, errors, fieldsValues } = this.state;
         const defaultFieldsLength = Object.keys(defaultFields).length;
 
         return Object.keys(fields).map((key, i) => {
@@ -139,6 +145,7 @@ class AddCounter extends Component {
                               type={key}
                               field={fields[key]}
                               index={index}
+                              value={fieldsValues[key]}
                               ref={this.inputsRefs[index]}
                               errors={errors}
                               onChange={this.handleFieldChange} />
@@ -199,7 +206,7 @@ class AddCounter extends Component {
     };
 
     handleCreateCounter = () => {
-        const { fieldsValues } = this.state;
+        const { fieldsValues, counterId } = this.state;
         const { errorFields = [] } = this.validate();
 
         if (errorFields.length) {
@@ -208,7 +215,7 @@ class AddCounter extends Component {
             });
             return false;
         }
-        this.props.createCounter(fieldsValues);
+        this.props.createCounter(fieldsValues, counterId);
         this.props.navigation.goBack();
     };
 
@@ -253,8 +260,8 @@ const mapStateToProps = state => ({
     counters: state.counters,
 });
 const dispatchers = dispatch => ({
-    createCounter: (counterData) => {
-        dispatch(createCounter(counterData));
+    createCounter: (counterData, id) => {
+        dispatch(createCounter(counterData, id));
     },
 });
 

@@ -7,7 +7,7 @@ export default (state = initState, action) => {
     switch (action.type) {
         case ADD_COUNTER.CREATE: {
             const oldCounters = state.list && cloneObject(state.list) || {};
-            const newCounters = {...action.payload, ...oldCounters};
+            const newCounters = {...oldCounters, ...action.payload};
             const sortedCounters = {};
             const keys = Object.keys(newCounters);
             keys.sort((key1, key2) => newCounters[key1].createTime - newCounters[key2].createTime)
