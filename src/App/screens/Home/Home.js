@@ -80,7 +80,7 @@ class Home extends Component {
                               data={countersArray}
                               // data={fakeData}
                               keyExtractor={item => item.id.toString()}
-                              ItemSeparatorComponent={this.renderDivider}
+                              // ItemSeparatorComponent={this.renderDivider}
                               style={{width: '100%'}}
                     />
                 </View>
