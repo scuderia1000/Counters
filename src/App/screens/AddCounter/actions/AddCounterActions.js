@@ -1,5 +1,5 @@
 import uuid from 'uuid';
-import { ADD_COUNTER } from "../../../constants/AddCounterConst";
+import { COUNTER, TARIFF } from "../../../constants/ActionConst";
 
 export const createCounter = (counterData, id) => {
     let counterId = '';
@@ -14,11 +14,23 @@ export const createCounter = (counterData, id) => {
 
     return (dispatch, getState) => {
         dispatch({
-            type: ADD_COUNTER.CREATE,
+            type: COUNTER.CREATE,
             payload: {
                 [counterId]: {
                     ...counterData
                 }
+            }
+        })
+    }
+};
+
+export const createCounterTariff = (counterId, data) => {
+
+    return (dispatch, getState) => {
+        dispatch({
+            type: TARIFF.CREATE,
+            payload: {
+
             }
         })
     }

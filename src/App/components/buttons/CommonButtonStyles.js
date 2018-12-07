@@ -16,10 +16,6 @@ export default StyleSheet.create({
         padding: 10,
         height: 48,
     },
-    buttonCaption: {
-        color: 'white',
-        fontSize: 18,
-    },
     captionContainer: {
         flexDirection: 'row',
         ...common.center,

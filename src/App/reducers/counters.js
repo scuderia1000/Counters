@@ -1,11 +1,25 @@
-import { ADD_COUNTER } from "../constants/AddCounterConst";
+import { COUNTER } from "../constants/ActionConst";
 import { cloneObject } from "../constants/FunctionConst";
 
-const initState = {};
+const initState = {
+    list: {
+        '1': {
+            id: 1,
+            createTime: new Date().getTime(),
+            counterName: 'Test 1',
+            tariffName: 'Tariff 1',
+            tariff: 15,
+            personalAccount: '1234567890',
+            fio: 'Иванов Иван иванович',
+            address: 'Harvard 12-89',
+            emailAddress: 'test@test.test',
+        }
+    }
+};
 
 export default (state = initState, action) => {
     switch (action.type) {
-        case ADD_COUNTER.CREATE: {
+        case COUNTER.CREATE: {
             const oldCounters = state.list && cloneObject(state.list) || {};
             const newCounters = {...oldCounters, ...action.payload};
             const sortedCounters = {};

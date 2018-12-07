@@ -1,14 +1,13 @@
 // react
 import React, { Component } from 'react';
 import {connect} from "react-redux";
-import { View, TouchableOpacity, Text, KeyboardAvoidingView, ScrollView, Button } from 'react-native';
+import { View } from 'react-native';
 // libraries
-import { FormLabel, FormInput, FormValidationMessage, Divider } from 'react-native-elements';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
 // own component
 import CounterField from '../../components/counterField/CounterField';
 import CommonButton from '../../components/buttons/CommonButton';
-import { createCounter } from './actions/AddCounterActions';
+import { createCounter, createCounterTariff } from './actions/AddCounterActions';
 import { cloneObject } from "../../constants/FunctionConst";
 // styles
 import styles from './AddCounterStyles';
@@ -132,8 +131,6 @@ class AddCounter extends Component {
         const defaultFieldsLength = Object.keys(defaultFields).length;
 
         return Object.keys(fields).map((key, i) => {
-            // const fieldStyle = fields[key].style || '';
-
             let index = i;
             if (isContainsDeleteButton) {
                 index = index + defaultFieldsLength;
@@ -153,7 +150,6 @@ class AddCounter extends Component {
         });
     };
 
-    // !!fieldStyle && <Divider key={`divider_${index}`}/>
     handleAddTariff = () => {
         const { customFields = {} } = this.state;
         let tariffNumber = 0;
@@ -262,6 +258,9 @@ const mapStateToProps = state => ({
 const dispatchers = dispatch => ({
     createCounter: (counterData, id) => {
         dispatch(createCounter(counterData, id));
+    },
+    createCounterTariff: (counterId, tariffsData) => {
+        dispatch(createCounterTariff(counterId, tariffsData));
     },
 });
 

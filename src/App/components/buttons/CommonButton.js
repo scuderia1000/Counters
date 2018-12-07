@@ -7,7 +7,7 @@ import { Button, Icon } from 'react-native-elements';
 
 // styles
 import styles from './CommonButtonStyles';
-import common from '../../constants/Styles';
+import common from '../../styles/CommonStyles';
 
 const CommonButton = ({ caption = '', style = {}, captionStyle = {}, onPress = () => {}, icon = {}, disabled = false }) => {
     return (
@@ -19,7 +19,7 @@ const CommonButton = ({ caption = '', style = {}, captionStyle = {}, onPress = (
                           type={icon.type}
                           color={icon.color} iconStyle={{marginRight: 5}} />
                 }
-                <Text style={[styles.buttonCaption, captionStyle]}>{caption}</Text>
+                <Text style={[common.buttonCaption, captionStyle]}>{caption}</Text>
             </View>
         </TouchableOpacity>
     )

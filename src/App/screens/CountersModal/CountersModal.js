@@ -7,27 +7,29 @@ import styles from './CountersModalStyles';
 import { colors } from '../../constants/Colors';
 import common from '../../styles/CommonStyles';
 
-const CountersModal = (props) => {
+export default function CountersModal(props) {
+    const { countersList, setModalVisible, visible, addCounterData } = props;
 
     const closeModal = () => {
-        props.setModalVisible(false);
+        setModalVisible(false);
     };
 
     return (
         <Modal
             animationType="slide"
             transparent={false}
-            visible={props.visible}
+            visible={visible}
             onRequestClose={closeModal}>
             <View style={styles.container}>
-                <CountersList/>
+                <CountersList countersList={countersList}
+                              addCounterData={addCounterData}
+                              setModalVisible={setModalVisible}/>
             </View>
             <View style={styles.closeButtonContainer}>
                 <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
-                    <Text style={common.text}>Закрыть</Text>
+                    <Text style={common.buttonCaption}>Закрыть</Text>
                 </TouchableOpacity>
             </View>
         </Modal>
     )
 };
-export default CountersModal;

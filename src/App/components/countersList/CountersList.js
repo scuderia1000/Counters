@@ -8,16 +8,21 @@ import fakeData from '../../constants/FakeData';
 // styles
 import styles from './styles/CountersListStyles';
 
-const CountersList = (props) => {
-    const onPressItem = (id) => {
+export default function CountersList (props) {
+    const { countersList, addCounterData, closeModal, setModalVisible } = props;
 
+
+
+    const onPressItem = (id) => {
+        setModalVisible(false);
+        addCounterData(id);
     };
 
     const renderItem = ({item}) => (
         <CountersListItem
             id={item.id}
-            onPressItem={onPressItem}
-            title={item.title}
+            onPressItem={() => onPressItem(item.id)}
+            title={item.counterName}
         />
     );
 
@@ -32,11 +37,10 @@ const CountersList = (props) => {
     return (
         <View>
             <FlatList renderItem={renderItem}
-                      data={fakeData}
+                      data={countersList}
                       keyExtractor={item => item.id.toString()}
                       ItemSeparatorComponent={renderDivider}
             />
         </View>
     )
 };
-export default CountersList;

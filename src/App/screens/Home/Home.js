@@ -20,6 +20,7 @@ class Home extends Component {
     constructor(props) {
         super(props);
         this.setModalVisible = this.setModalVisible.bind(this);
+        this.handleAddCounterData = this.handleAddCounterData.bind(this);
         this.state = {
             modalVisible: false,
         };
@@ -29,8 +30,13 @@ class Home extends Component {
         this.setState({modalVisible: visible});
     }
 
-    handleAddCounterData = () => {
-
+    handleAddCounterData = (id) => {
+        this.props.navigation.navigate(
+            'CounterDataInput',
+            {
+                counterId: id,
+            }
+        );
     };
 
     handleAddCounter = (id) => {
@@ -59,12 +65,6 @@ class Home extends Component {
         />
     );
 
-    renderDivider = () => {
-        return (
-            <Divider/>
-        )
-    };
-
     render() {
         const { list = {} } = this.props.counters;
         const countersKeys = Object.keys(list);
@@ -73,14 +73,14 @@ class Home extends Component {
             countersArray = countersKeys.map(key => list[key]);
         }
 
+        const countersList = Object.keys(list).map(key => list[key]);
+
         return(
             <View style={styles.container}>
                 <View style={styles.countersListContainer}>
                     <FlatList renderItem={this.renderItem}
                               data={countersArray}
-                              // data={fakeData}
                               keyExtractor={item => item.id.toString()}
-                              // ItemSeparatorComponent={this.renderDivider}
                               style={{width: '100%'}}
                     />
                 </View>
@@ -95,7 +95,10 @@ class Home extends Component {
                                   icon={{name: 'plus', type: 'material-community', color: 'white'}}/>
                 </View>
                 <CountersModal visible={this.state.modalVisible}
-                               setModalVisible={this.setModalVisible} />
+                               setModalVisible={this.setModalVisible}
+                               countersList={countersList}
+                               addCounterData={this.handleAddCounterData}
+                />
             </View>
         )
     }
