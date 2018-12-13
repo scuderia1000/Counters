@@ -1,9 +1,10 @@
 // react
 import React, { Component } from 'react';
+import {connect} from "react-redux";
 // libraries
 import {View, TouchableOpacity, Text, FlatList} from 'react-native';
 // own component
-
+import CounterField from '../../components/counterField/CounterField';
 // styles
 import styles from './CounterDataInputStyles';
 
@@ -20,4 +21,9 @@ class CounterDataInput extends Component {
         )
     }
 }
-export default CounterDataInput;
+const mapStateToProps = state => ({
+    counters: state.counters,
+});
+const dispatchers = dispatch => ({
+});
+export default connect(mapStateToProps, dispatchers)(CounterDataInput);

@@ -1,5 +1,5 @@
 import uuid from 'uuid';
-import { COUNTER, TARIFF } from "../../../constants/ActionConst";
+import { COUNTER } from "../../../constants/ActionConst";
 
 export const createCounter = (counterData, id) => {
     let counterId = '';
@@ -23,6 +23,7 @@ export const createCounter = (counterData, id) => {
         })
     }
 };
+/*
 
 export const createCounterTariff = (counterId, data) => {
 
@@ -34,4 +35,4 @@ export const createCounterTariff = (counterId, data) => {
             }
         })
     }
-};
+};*/

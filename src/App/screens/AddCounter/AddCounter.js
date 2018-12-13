@@ -7,25 +7,11 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
 // own component
 import CounterField from '../../components/counterField/CounterField';
 import CommonButton from '../../components/buttons/CommonButton';
-import { createCounter, createCounterTariff } from './actions/AddCounterActions';
+import { createCounter } from './actions/AddCounterActions';
 import { cloneObject } from "../../constants/FunctionConst";
+import InterfaceBuilder, { TARIFF_COMPONENT } from './constatnts/InterfaceBuilder';
 // styles
 import styles from './AddCounterStyles';
-
-const TARIFF_COMPONENT = {
-    name: {
-        placeholder: 'Название тарифа...',
-        errorText: 'Введите название',
-    },
-    amount: {
-        keyboardType: 'numeric',
-        placeholder: 'Ставка тарифа...',
-        errorText: 'Введите ставку тарифа',
-        style: {
-            marginBottom: 15
-        }
-    }
-};
 
 class AddCounter extends Component {
     static navigationOptions = ({ navigation }) => {
@@ -46,54 +32,18 @@ class AddCounter extends Component {
         this.inputsRefs = [];
         this.scrollView = React.createRef();
         this.getFieldsComponents = this.getFieldsComponents.bind(this);
-        this.renderDefaultsFields = this.renderDefaultsFields.bind(this);
+        this.renderFields = this.renderFields.bind(this);
+        this.handleChangeTariff = this.handleChangeTariff.bind(this);
+        this.handleFieldChange = this.handleFieldChange.bind(this);
         this.state = {
-            defaultFields: {
-                counterName: {
-                    placeholder: 'Название счетчика...',
-                    autoFocus: true,
-                    required: true,
-                    errorText: 'Введите название',
-                    style: {
-                        marginBottom: 15
-                    }
-                },
-                tariffName: {
-                    ...TARIFF_COMPONENT.name,
-                    required: true,
-                },
-                tariff: {
-                    ...TARIFF_COMPONENT.amount,
-                    style: {
-                        marginBottom: 15
-                    }
-                },
-                personalAccount: {
-                    placeholder: '№ счета/договора...',
-                    errorText: 'Введите №',
-                },
-                fio: {
-                    placeholder: 'ФИО, с кем заключен договор...',
-                    errorText: 'Введите ФИО',
-
-                },
-                address: {
-                    placeholder: 'Адрес...',
-                    errorText: 'Введите адрес',
-                },
-                emailAddress: {
-                    placeholder: 'E-mail, куда отправлять данные...',
-                    errorText: 'Введите e-mail',
-                    style: {
-                        marginBottom: 15
-                    }
-                },
-            },
-            customFields: {},
+            customTariffsFields: [],
             isRequiredFieldsFilled: false,
+            requiredFields: {},
             fieldsValues: {},
+            tariffsValues: [],
             refs: [],
-            errors: [],
+            errorsDefault: [],
+            errorsTariff: [],
             counterId: ''
         };
     }
@@ -102,130 +52,129 @@ class AddCounter extends Component {
         const { navigation, counters } = this.props;
         navigation.setParams({ createCounter: this.handleCreateCounter});
         const counterId = navigation.getParam('counterId', 'NO ID');
+
         if (typeof counterId === 'string' && counters.list && counters.list[counterId]) {
             const fieldsValues = cloneObject(counters.list[counterId]);
             this.setState({
                 fieldsValues: {...fieldsValues},
                 counterId: counterId
             })
+        } else {
+            // по умолчанию д.б. 1 тарифф
+            this.handleAddTariff();
         }
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (prevState.customFields !== this.state.customFields) {
+        if (prevState.customTariffsFields.length !== this.state.customTariffsFields.length) {
             setTimeout(() => {
                 this.scrollToBottom();
             }, 0);
         }
     }
 
-    renderDefaultsFields = () => {
-        const { defaultFields, customFields } = this.state;
-        const defaultFieldsComponents = this.getFieldsComponents(defaultFields);
-        const customFieldsComponents = this.getFieldsComponents(customFields, true);
-        return defaultFieldsComponents.concat(customFieldsComponents);
-    };
+    renderFields = (fields) => {
+        // const { defaultFields, customFields, customTariffs } = this.state;
+        const fieldsComponents = this.getFieldsComponents(fields);
 
-    getFieldsComponents = (fields = {}, isContainsDeleteButton = false) => {
-        const { defaultFields, errors, fieldsValues } = this.state;
-        const defaultFieldsLength = Object.keys(defaultFields).length;
 
-        return Object.keys(fields).map((key, i) => {
-            let index = i;
-            if (isContainsDeleteButton) {
-                index = index + defaultFieldsLength;
-            }
-
-            this.inputsRefs[index] = React.createRef();
-            return [
-                <CounterField key={`${key}_${i}`}
-                              type={key}
-                              field={fields[key]}
-                              index={index}
-                              value={fieldsValues[key]}
-                              ref={this.inputsRefs[index]}
-                              errors={errors}
-                              onChange={this.handleFieldChange} />
-            ]
-        });
+        return fieldsComponents;
     };
 
     handleAddTariff = () => {
-        const { customFields = {} } = this.state;
-        let tariffNumber = 0;
-        const customTariffKeys = Object.keys(customFields);
-        if (customTariffKeys.length) {
-            customTariffKeys.forEach(key => {
-                if (key.includes('tariffName')) {
-                    tariffNumber++;
-                }
-            });
-        }
-        let newCustomFields = {
-            [`tariffName${tariffNumber}`]: {...TARIFF_COMPONENT.name, autoFocus: true},
-            [`tariff${tariffNumber}`]: {...TARIFF_COMPONENT.amount},
-        };
-        this.setState({
-            customFields: {
-            ...customFields,
-            ...newCustomFields
-            }
+        const { customTariffsFields = [] } = this.state;
+        const newTariffs = customTariffsFields.slice();
 
+        newTariffs.push({
+            name: {...TARIFF_COMPONENT.name, autoFocus: true},
+            amount: {...TARIFF_COMPONENT.amount},
+        });
+        this.setState({
+                customTariffsFields: newTariffs
+        });
+    };
+
+    handleChangeTariff = (field, value, index) => {
+        const { tariffsValues, errorsTariff } = this.state;
+        const newValues = tariffsValues.slice();
+        const values = newValues[index] || {};
+        values[field] = value;
+        newValues.splice(index, 1, values);
+
+        if (errorsTariff.includes(index) && !!value) {
+            errorsTariff.splice(errorsTariff.indexOf(index), 1);
+        }
+        this.setState((state, props) => {
+            return {
+                tariffsValues: newValues,
+                errorsTariff: errorsTariff,
+            }
         });
     };
 
     handleFieldChange = (field, value) => {
+        const { errorsDefault } = this.state;
+        if (errorsDefault.includes(field) && !!value) {
+            errorsDefault.splice(errorsDefault.indexOf(field), 1);
+        }
         this.setState((state, props) => {
             return {
                 fieldsValues: {
                     ...state.fieldsValues,
                     [field]: value
                 },
-                errors: []
+                errorsDefault: errorsDefault,
+
             };
         });
     };
 
-    validate = () => {
-        const { fieldsValues } = this.state;
+    checkRequiredFilled = () => {
+        const { fieldsValues, tariffsValues, customTariffsFields } = this.state;
+        const defaultFields = InterfaceBuilder.counter.fields;
+
+        const defaultRequiredFields = Object.keys(defaultFields).filter(key => defaultFields[key].required);
         const valuesKeys = Object.keys(fieldsValues);
-        const requiredFields = this.getRequiredFields();
         let errorFields = [];
-
-        if (requiredFields.length) {
-            errorFields = requiredFields.filter(fieldName => !valuesKeys.includes(fieldName) || !fieldsValues[fieldName]);
+        if (defaultRequiredFields.length) {
+            errorFields = defaultRequiredFields.filter(fieldName => !valuesKeys.includes(fieldName) || !fieldsValues[fieldName]);
         }
 
-        return {
-            errorFields: errorFields
+        // проверка тарифов
+        const defaultFieldsLength = Object.keys(defaultFields).length;
+        // реальные индексы на отрисованной форме
+        const tariffErrorsIndexes = [];
+        let index = defaultFieldsLength;
+        if (customTariffsFields.length) {
+            customTariffsFields.forEach((tariff, i) => {
+                 Object.keys(tariff).forEach(key => {
+                        if (tariff[key].required && (!tariffsValues.length || !tariffsValues[i] || !tariffsValues[i][key])) {
+                            tariffErrorsIndexes.push(index);
+                        }
+                        index++;
+                 });
+            });
         }
+
+        if (errorFields.length || tariffErrorsIndexes.length) {
+            this.setState({
+                errorsDefault: errorFields,
+                errorsTariff: tariffErrorsIndexes,
+
+            });
+            return false;
+        }
+
+        return true;
     };
 
     handleCreateCounter = () => {
         const { fieldsValues, counterId } = this.state;
-        const { errorFields = [] } = this.validate();
-
-        if (errorFields.length) {
-            this.setState({
-                errors: errorFields
-            });
-            return false;
+        if (this.checkRequiredFilled()) {
+            this.props.createCounter(fieldsValues, counterId);
+            this.props.navigation.goBack();
         }
-        this.props.createCounter(fieldsValues, counterId);
-        this.props.navigation.goBack();
     };
-
-    getRequiredFields() {
-        const { defaultFields, customFields } = this.state;
-        const allFields = {...defaultFields, ...customFields};
-        const requiredFields = [];
-        Object.keys(allFields).forEach(fieldName => {
-            if (allFields[fieldName].hasOwnProperty('required') && allFields[fieldName].required) {
-                requiredFields.push(fieldName);
-            }
-        });
-        return requiredFields;
-    }
 
     scrollToBottom = () => {
         if (this.scrollView && this.scrollView.current) {
@@ -233,8 +182,57 @@ class AddCounter extends Component {
         }
     };
 
-    render() {
+    getTariffComponents = () => {
+        const { customTariffsFields = [], errorsTariff, tariffsValues } = this.state;
+        const defaultFieldsLength = Object.keys(InterfaceBuilder.counter.fields).length;
 
+        const fields = [];
+        let index = defaultFieldsLength;
+        customTariffsFields.forEach(tariff => {
+
+            Object.keys(tariff).forEach((key) => {
+                this.inputsRefs[index] = React.createRef();
+                fields.push(
+                    <CounterField key={`${key}_${index}`}
+                                  type={key}
+                                  field={tariff[key]}
+                                  index={index}
+                        // value={fieldsValues[key]}
+                                  ref={this.inputsRefs[index]}
+                                  isError={!!errorsTariff.length && errorsTariff.includes(index)}
+                                  onChange={this.handleChangeTariff} />
+                );
+                index++;
+            });
+
+        });
+        return fields;
+    };
+
+    getFieldsComponents = (fields = {}) => {
+        const { errorsDefault, fieldsValues } = this.state;
+
+        return Object.keys(fields).map((key, i) => {
+            this.inputsRefs[i] = React.createRef();
+            return (
+                <CounterField key={`${key}_${i}`}
+                              type={key}
+                              field={fields[key]}
+                              index={i}
+                              value={fieldsValues[key]}
+                              ref={this.inputsRefs[i]}
+                              isError={!!errorsDefault.length && errorsDefault.includes(key)}
+                              onChange={this.handleFieldChange} />
+            )
+        });
+    };
+
+    render() {
+        const fields = InterfaceBuilder.counter.fields;
+        const fieldsComp = this.renderFields(fields);
+        const tariffsComp = this.getTariffComponents();
+
+        console.log(this.state.errors)
         return (
             <View style={styles.container}>
                 <KeyboardAwareScrollView getTextInputRefs={() => { return this.inputsRefs }}
@@ -242,7 +240,8 @@ class AddCounter extends Component {
                     // style={styles.container}
                     // contentContainerStyle={styles.container}
                 >
-                    {this.renderDefaultsFields()}
+                    {fieldsComp}
+                    {tariffsComp}
                 </KeyboardAwareScrollView>
                 <CommonButton onPress={this.handleAddTariff}
                               caption={'Добавить тариф'}
@@ -259,9 +258,9 @@ const dispatchers = dispatch => ({
     createCounter: (counterData, id) => {
         dispatch(createCounter(counterData, id));
     },
-    createCounterTariff: (counterId, tariffsData) => {
+/*    createCounterTariff: (counterId, tariffsData) => {
         dispatch(createCounterTariff(counterId, tariffsData));
-    },
+    },*/
 });
 
 export default connect(mapStateToProps, dispatchers)(AddCounter);

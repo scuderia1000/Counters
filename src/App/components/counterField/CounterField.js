@@ -8,7 +8,7 @@ import {FormLabel, FormInput, FormValidationMessage, Divider} from 'react-native
 import styles from './CounterFieldStyles';
 import { colors } from '../../constants/Colors';
 
-const CounterField = React.forwardRef(({ field = {}, type, index, onChange, errors = [], value }, ref) => {
+const CounterField = React.forwardRef(({ field = {}, type, index, onChange, isError = false, value }, ref) => {
     const { label = '', keyboardType = 'default', placeholder = '', style = {}, autoFocus = false, required = false, errorText = '' } = field;
     return(
         <View key={`${type}_${index}`} style={[styles.container, style]}>
@@ -22,9 +22,9 @@ const CounterField = React.forwardRef(({ field = {}, type, index, onChange, erro
                        underlineColorAndroid={colors.gray}
                        value={value}
                        onChangeText={value => {
-                           onChange(type, value);
+                           onChange(type, value, index);
                        }}/>
-            {!!errors.length && errors.includes(type) && <FormValidationMessage labelStyle={styles.errorContainer}>{errorText}</FormValidationMessage>}
+            {isError && <FormValidationMessage labelStyle={styles.errorContainer}>{errorText}</FormValidationMessage>}
         </View>
     )
 });
