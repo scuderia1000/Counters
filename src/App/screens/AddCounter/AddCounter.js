@@ -40,7 +40,7 @@ class AddCounter extends Component {
             isRequiredFieldsFilled: false,
             requiredFields: {},
             fieldsValues: {},
-            tariffsValues: [],
+            tariffsValues: {},
             refs: [],
             errorsDefault: [],
             errorsTariff: [],
@@ -96,10 +96,10 @@ class AddCounter extends Component {
 
     handleChangeTariff = (field, value, index) => {
         const { tariffsValues, errorsTariff } = this.state;
-        const newValues = tariffsValues.slice();
+        const newValues = cloneObject(tariffsValues);
         const values = newValues[index] || {};
         values[field] = value;
-        newValues.splice(index, 1, values);
+        newValues[index] = values;
 
         if (errorsTariff.includes(index) && !!value) {
             errorsTariff.splice(errorsTariff.indexOf(index), 1);
@@ -148,7 +148,7 @@ class AddCounter extends Component {
         if (customTariffsFields.length) {
             customTariffsFields.forEach((tariff, i) => {
                  Object.keys(tariff).forEach(key => {
-                        if (tariff[key].required && (!tariffsValues.length || !tariffsValues[i] || !tariffsValues[i][key])) {
+                        if (tariff[key].required && (!Object.keys(tariffsValues).length || !tariffsValues[index] || !tariffsValues[index][key])) {
                             tariffErrorsIndexes.push(index);
                         }
                         index++;
