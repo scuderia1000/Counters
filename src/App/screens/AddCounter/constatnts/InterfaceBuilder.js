@@ -35,16 +35,6 @@ export default {
                     marginBottom: 15
                 }
             },
-            /*tariffName: {
-                ...TARIFF_COMPONENT.name,
-                required: true,
-            },
-            tariff: {
-                ...TARIFF_COMPONENT.amount,
-                style: {
-                    marginBottom: 15
-                }
-            },*/
             personalAccount: {
                 placeholder: '№ счета/договора...',
                 errorText: 'Введите №',

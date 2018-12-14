@@ -4,14 +4,18 @@ import {connect} from "react-redux";
 import { View } from 'react-native';
 // libraries
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
+import uuid from "uuid";
+import { Header } from 'react-navigation';
 // own component
 import CounterField from '../../components/counterField/CounterField';
 import CommonButton from '../../components/buttons/CommonButton';
-import { createCounter } from './actions/AddCounterActions';
+import { createCounter, createCounterTariff } from './actions/AddCounterActions';
 import { cloneObject } from "../../constants/FunctionConst";
 import InterfaceBuilder, { TARIFF_COMPONENT } from './constatnts/InterfaceBuilder';
 // styles
 import styles from './AddCounterStyles';
+
+const defaultFieldsLength = Object.keys(InterfaceBuilder.counter.fields).length;
 
 class AddCounter extends Component {
     static navigationOptions = ({ navigation }) => {
@@ -32,7 +36,6 @@ class AddCounter extends Component {
         this.inputsRefs = [];
         this.scrollView = React.createRef();
         this.getFieldsComponents = this.getFieldsComponents.bind(this);
-        this.renderFields = this.renderFields.bind(this);
         this.handleChangeTariff = this.handleChangeTariff.bind(this);
         this.handleFieldChange = this.handleFieldChange.bind(this);
         this.state = {
@@ -49,14 +52,26 @@ class AddCounter extends Component {
     }
 
     componentDidMount() {
-        const { navigation, counters } = this.props;
+        const { navigation, counters, tariffs } = this.props;
         navigation.setParams({ createCounter: this.handleCreateCounter});
         const counterId = navigation.getParam('counterId', 'NO ID');
 
         if (typeof counterId === 'string' && counters.list && counters.list[counterId]) {
             const fieldsValues = cloneObject(counters.list[counterId]);
+
+            const tariffsCopy = cloneObject(tariffs.list[counterId]);
+            const tariffsValues = {};
+            const defaultFields = InterfaceBuilder.counter.fields;
+            let index = Object.keys(defaultFields).length;
+            Object.keys(tariffsCopy).forEach(tariffId => {
+                tariffsValues[index] = tariffsCopy[tariffId];
+                this.handleAddTariff();
+                index++;
+            });
+
             this.setState({
-                fieldsValues: {...fieldsValues},
+                fieldsValues: fieldsValues,
+                tariffsValues: tariffsValues,
                 counterId: counterId
             })
         } else {
@@ -66,31 +81,28 @@ class AddCounter extends Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (prevState.customTariffsFields.length !== this.state.customTariffsFields.length) {
+        const { errorsDefault, errorsTariff } = this.state;
+
+        if (prevState.customTariffsFields.length && prevState.customTariffsFields.length !== this.state.customTariffsFields.length) {
             setTimeout(() => {
                 this.scrollToBottom();
             }, 0);
         }
+        /*if ((errorsDefault.length || errorsTariff.length) &&
+            (prevState.errorsDefault.length !== errorsDefault.length || prevState.errorsTariff.length !== errorsTariff.length)) {
+            this.scrollToError();
+        }*/
     }
 
-    renderFields = (fields) => {
-        // const { defaultFields, customFields, customTariffs } = this.state;
-        const fieldsComponents = this.getFieldsComponents(fields);
-
-
-        return fieldsComponents;
-    };
-
-    handleAddTariff = () => {
-        const { customTariffsFields = [] } = this.state;
-        const newTariffs = customTariffsFields.slice();
-
-        newTariffs.push({
-            name: {...TARIFF_COMPONENT.name, autoFocus: true},
+    handleAddTariff = (e) => {
+        const newTariff = {
+            name: {...TARIFF_COMPONENT.name, autoFocus: !!e},
             amount: {...TARIFF_COMPONENT.amount},
-        });
-        this.setState({
-                customTariffsFields: newTariffs
+        };
+        this.setState((state) => {
+            return {
+                customTariffsFields: state.customTariffsFields.concat(newTariff)
+            }
         });
     };
 
@@ -104,24 +116,22 @@ class AddCounter extends Component {
         if (errorsTariff.includes(index) && !!value) {
             errorsTariff.splice(errorsTariff.indexOf(index), 1);
         }
-        this.setState((state, props) => {
-            return {
+        this.setState({
                 tariffsValues: newValues,
                 errorsTariff: errorsTariff,
-            }
         });
     };
 
-    handleFieldChange = (field, value) => {
+    handleFieldChange = (fieldName, value) => {
         const { errorsDefault } = this.state;
-        if (errorsDefault.includes(field) && !!value) {
-            errorsDefault.splice(errorsDefault.indexOf(field), 1);
+        if (errorsDefault.includes(fieldName) && !!value) {
+            errorsDefault.splice(errorsDefault.indexOf(fieldName), 1);
         }
         this.setState((state, props) => {
             return {
                 fieldsValues: {
                     ...state.fieldsValues,
-                    [field]: value
+                    [fieldName]: value
                 },
                 errorsDefault: errorsDefault,
 
@@ -141,7 +151,6 @@ class AddCounter extends Component {
         }
 
         // проверка тарифов
-        const defaultFieldsLength = Object.keys(defaultFields).length;
         // реальные индексы на отрисованной форме
         const tariffErrorsIndexes = [];
         let index = defaultFieldsLength;
@@ -151,8 +160,8 @@ class AddCounter extends Component {
                         if (tariff[key].required && (!Object.keys(tariffsValues).length || !tariffsValues[index] || !tariffsValues[index][key])) {
                             tariffErrorsIndexes.push(index);
                         }
-                        index++;
                  });
+                index++;
             });
         }
 
@@ -162,6 +171,9 @@ class AddCounter extends Component {
                 errorsTariff: tariffErrorsIndexes,
 
             });
+            setTimeout(() => {
+                this.scrollToError();
+            }, 0);
             return false;
         }
 
@@ -169,9 +181,11 @@ class AddCounter extends Component {
     };
 
     handleCreateCounter = () => {
-        const { fieldsValues, counterId } = this.state;
+        const { fieldsValues, tariffsValues, counterId } = this.state;
         if (this.checkRequiredFilled()) {
-            this.props.createCounter(fieldsValues, counterId);
+            const id = counterId ? counterId : uuid.v4();
+            this.props.createCounter(fieldsValues, id);
+            this.props.createCounterTariff(id, tariffsValues);
             this.props.navigation.goBack();
         }
     };
@@ -182,29 +196,49 @@ class AddCounter extends Component {
         }
     };
 
+    scrollToError() {
+        const { errorsDefault, errorsTariff } = this.state;
+        let errorFieldIndex = 0;
+
+        if (errorsDefault.length) {
+            const defaultFieldsKeys = Object.keys(InterfaceBuilder.counter.fields);
+            errorFieldIndex = defaultFieldsKeys.findIndex((key) => key === errorsDefault[0]);
+        } else if (errorsTariff.length) {
+            errorFieldIndex = errorsTariff[0];
+        }
+
+        this.inputsRefs[errorFieldIndex].current.focus();
+        this.inputsRefs[errorFieldIndex].current.measure( (fx, fy, width, height, px, py) => {
+            console.log(py)
+            console.log(Header.HEIGHT)
+            this.scrollView.current.scrollTo({x: 0, y: py - Header.HEIGHT});
+
+        });
+    }
+
     getTariffComponents = () => {
         const { customTariffsFields = [], errorsTariff, tariffsValues } = this.state;
-        const defaultFieldsLength = Object.keys(InterfaceBuilder.counter.fields).length;
 
         const fields = [];
         let index = defaultFieldsLength;
         customTariffsFields.forEach(tariff => {
 
             Object.keys(tariff).forEach((key) => {
-                this.inputsRefs[index] = React.createRef();
+                if (key === 'name') {
+                    this.inputsRefs[index] = React.createRef();
+                }
                 fields.push(
                     <CounterField key={`${key}_${index}`}
                                   type={key}
                                   field={tariff[key]}
                                   index={index}
-                        // value={fieldsValues[key]}
-                                  ref={this.inputsRefs[index]}
-                                  isError={!!errorsTariff.length && errorsTariff.includes(index)}
+                                  value={tariffsValues && tariffsValues[index] && tariffsValues[index][key]}
+                                  ref={key === 'name' && this.inputsRefs[index] || ''}
+                                  isError={!!errorsTariff.length && errorsTariff.includes(index) && tariff[key].required}
                                   onChange={this.handleChangeTariff} />
                 );
-                index++;
             });
-
+            index++;
         });
         return fields;
     };
@@ -229,10 +263,9 @@ class AddCounter extends Component {
 
     render() {
         const fields = InterfaceBuilder.counter.fields;
-        const fieldsComp = this.renderFields(fields);
+        const fieldsComp = this.getFieldsComponents(fields);
         const tariffsComp = this.getTariffComponents();
 
-        console.log(this.state.errors)
         return (
             <View style={styles.container}>
                 <KeyboardAwareScrollView getTextInputRefs={() => { return this.inputsRefs }}
@@ -253,14 +286,15 @@ class AddCounter extends Component {
 
 const mapStateToProps = state => ({
     counters: state.counters,
+    tariffs: state.tariffs,
 });
 const dispatchers = dispatch => ({
     createCounter: (counterData, id) => {
         dispatch(createCounter(counterData, id));
     },
-/*    createCounterTariff: (counterId, tariffsData) => {
+    createCounterTariff: (counterId, tariffsData) => {
         dispatch(createCounterTariff(counterId, tariffsData));
-    },*/
+    },
 });
 
 export default connect(mapStateToProps, dispatchers)(AddCounter);

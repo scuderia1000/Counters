@@ -1,38 +1,52 @@
 import uuid from 'uuid';
-import { COUNTER } from "../../../constants/ActionConst";
+import {COUNTER, TARIFF} from "../../../constants/ActionConst";
 
 export const createCounter = (counterData, id) => {
-    let counterId = '';
-    if (id) {
-        counterId = id;
-    } else {
-        counterId = uuid.v4();
-        counterData.id = counterId;
-        counterData.createTime = new Date().getTime();
-    }
-
+    counterData.id = id;
+    counterData.createTime = Date.now();
 
     return (dispatch, getState) => {
         dispatch({
             type: COUNTER.CREATE,
             payload: {
-                [counterId]: {
+                [id]: {
                     ...counterData
                 }
             }
         })
     }
 };
-/*
 
 export const createCounterTariff = (counterId, data) => {
+    const tariffData = {};
+    const keys = Object.keys(data);
+    if (keys.length) {
+        keys.forEach(tariffKey => {
+            const tariffId = data[tariffKey].tariffId || uuid.v4();
+            if (data[tariffKey].tariffId) {
+                tariffData[tariffId] = data[tariffKey];
+            } else {
+                tariffData[tariffId] = {
+                    tariffId: tariffId,
+                    counterId: counterId,
+                    createTime: Date.now() + Number(tariffKey),
+                };
+            }
+            Object.keys(data[tariffKey]).forEach(field => {
+                tariffData[tariffId] = {
+                    ...tariffData[tariffId],
+                    [field]: data[tariffKey][field]
+                }
+            });
+        });
+    }
 
     return (dispatch, getState) => {
         dispatch({
             type: TARIFF.CREATE,
             payload: {
-
+                [counterId]: tariffData
             }
         })
     }
-};*/
+};

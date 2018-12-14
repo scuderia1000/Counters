@@ -18,9 +18,10 @@ const CounterField = React.forwardRef(({ field = {}, type, index, onChange, isEr
                        placeholder={placeholder}
                        keyboardType={keyboardType}
                        autoFocus={autoFocus}
-                       ref={ref}
+                       textInputRef={ref}
                        underlineColorAndroid={colors.gray}
                        value={value}
+                       returnKeyType={'next'}
                        onChangeText={value => {
                            onChange(type, value, index);
                        }}/>
