@@ -1,7 +1,7 @@
 // react
 import React, { Component } from 'react';
 import {connect} from "react-redux";
-import { View } from 'react-native';
+import ReactNative, { View, findNodeHandle, ScrollView } from 'react-native';
 // libraries
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
 import uuid from "uuid";
@@ -35,6 +35,7 @@ class AddCounter extends Component {
         super(props);
         this.inputsRefs = [];
         this.scrollView = React.createRef();
+        this.view = React.createRef();
         this.getFieldsComponents = this.getFieldsComponents.bind(this);
         this.handleChangeTariff = this.handleChangeTariff.bind(this);
         this.handleFieldChange = this.handleFieldChange.bind(this);
@@ -208,11 +209,9 @@ class AddCounter extends Component {
         }
 
         this.inputsRefs[errorFieldIndex].current.focus();
-        this.inputsRefs[errorFieldIndex].current.measure( (fx, fy, width, height, px, py) => {
-            console.log(py)
-            console.log(Header.HEIGHT)
-            this.scrollView.current.scrollTo({x: 0, y: py - Header.HEIGHT});
-
+        this.inputsRefs[errorFieldIndex].current.measureLayout(ReactNative.findNodeHandle(this.scrollView.current), ( xPos, yPos, Width, Height ) =>
+        {
+            this.scrollView.current.scrollTo({x: 0, y: yPos});
         });
     }
 
@@ -267,9 +266,10 @@ class AddCounter extends Component {
         const tariffsComp = this.getTariffComponents();
 
         return (
-            <View style={styles.container}>
-                <KeyboardAwareScrollView getTextInputRefs={() => { return this.inputsRefs }}
-                                         ref={this.scrollView}
+            <View style={styles.container} >
+                <KeyboardAwareScrollView ref={this.scrollView}
+                    // getTextInputRefs={() => { return this.inputsRefs }}
+                    //                      ref={this.scrollView}
                     // style={styles.container}
                     // contentContainerStyle={styles.container}
                 >
