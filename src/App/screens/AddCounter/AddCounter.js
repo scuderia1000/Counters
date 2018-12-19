@@ -1,11 +1,10 @@
 // react
 import React, { Component } from 'react';
 import {connect} from "react-redux";
-import ReactNative, { View, findNodeHandle, ScrollView } from 'react-native';
+import ReactNative, { View, KeyboardAvoidingView, ScrollView } from 'react-native';
 // libraries
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
 import uuid from "uuid";
-import { Header } from 'react-navigation';
 // own component
 import CounterField from '../../components/counterField/CounterField';
 import CommonButton from '../../components/buttons/CommonButton';
@@ -37,17 +36,18 @@ class AddCounter extends Component {
         this.scrollView = React.createRef();
         this.view = React.createRef();
         this.getFieldsComponents = this.getFieldsComponents.bind(this);
-        this.handleChangeTariff = this.handleChangeTariff.bind(this);
+        this.handleFieldTariffChange = this.handleFieldTariffChange.bind(this);
         this.handleFieldChange = this.handleFieldChange.bind(this);
+        this.handleRemoveTariffField = this.handleRemoveTariffField.bind(this);
         this.state = {
-            customTariffsFields: [],
+            customTariffsFields: [], // {name: '', amount: ''}
             isRequiredFieldsFilled: false,
             requiredFields: {},
             fieldsValues: {},
-            tariffsValues: {},
+            tariffsValues: {}, // {index: {name: '', amount: ''}}
             refs: [],
             errorsDefault: [],
-            errorsTariff: [],
+            errorsTariff: [], // реальные индексы на форме
             counterId: ''
         };
     }
@@ -66,7 +66,7 @@ class AddCounter extends Component {
             let index = Object.keys(defaultFields).length;
             Object.keys(tariffsCopy).forEach(tariffId => {
                 tariffsValues[index] = tariffsCopy[tariffId];
-                this.handleAddTariff();
+                this.handleAddTariffFields();
                 index++;
             });
 
@@ -77,25 +77,19 @@ class AddCounter extends Component {
             })
         } else {
             // по умолчанию д.б. 1 тарифф
-            this.handleAddTariff();
+            this.handleAddTariffFields();
         }
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const { errorsDefault, errorsTariff } = this.state;
-
         if (prevState.customTariffsFields.length && prevState.customTariffsFields.length !== this.state.customTariffsFields.length) {
             setTimeout(() => {
                 this.scrollToBottom();
             }, 0);
         }
-        /*if ((errorsDefault.length || errorsTariff.length) &&
-            (prevState.errorsDefault.length !== errorsDefault.length || prevState.errorsTariff.length !== errorsTariff.length)) {
-            this.scrollToError();
-        }*/
     }
 
-    handleAddTariff = (e) => {
+    handleAddTariffFields = (e) => {
         const newTariff = {
             name: {...TARIFF_COMPONENT.name, autoFocus: !!e},
             amount: {...TARIFF_COMPONENT.amount},
@@ -107,7 +101,36 @@ class AddCounter extends Component {
         });
     };
 
-    handleChangeTariff = (field, value, index) => {
+    handleRemoveTariffField(index) {
+        const { customTariffsFields = [], errorsTariff = [], tariffsValues = {} } = this.state;
+        const fields = customTariffsFields.slice();
+        fields.splice(index - defaultFieldsLength, 1);
+
+        const values = {};
+        let indexCorrection = 0;
+        Object.keys(tariffsValues).forEach(key => {
+            if (Number(key) !== index) {
+                values[key - indexCorrection] = tariffsValues[key];
+            } else {
+                indexCorrection = 1;
+            }
+        });
+
+        const errors = errorsTariff.slice();
+        errors.splice(errors.indexOf(index), 1);
+
+        this.inputsRefs.splice(index, 1);
+
+        this.setState({
+            customTariffsFields: fields,
+            errorsTariff: errors,
+            tariffsValues: values,
+        })
+
+
+    }
+
+    handleFieldTariffChange = (field, value, index) => {
         const { tariffsValues, errorsTariff } = this.state;
         const newValues = cloneObject(tariffsValues);
         const values = newValues[index] || {};
@@ -220,7 +243,7 @@ class AddCounter extends Component {
 
         const fields = [];
         let index = defaultFieldsLength;
-        customTariffsFields.forEach(tariff => {
+        customTariffsFields.forEach((tariff, i) => {
 
             Object.keys(tariff).forEach((key) => {
                 if (key === 'name') {
@@ -234,7 +257,9 @@ class AddCounter extends Component {
                                   value={tariffsValues && tariffsValues[index] && tariffsValues[index][key]}
                                   ref={key === 'name' && this.inputsRefs[index] || ''}
                                   isError={!!errorsTariff.length && errorsTariff.includes(index) && tariff[key].required}
-                                  onChange={this.handleChangeTariff} />
+                                  onChange={this.handleFieldTariffChange}
+                                  onDelPress={this.handleRemoveTariffField}
+                                  hasDelButton={i > 0 && key === 'name'} />
                 );
             });
             index++;
@@ -267,16 +292,20 @@ class AddCounter extends Component {
 
         return (
             <View style={styles.container} >
-                <KeyboardAwareScrollView ref={this.scrollView}
-                    // getTextInputRefs={() => { return this.inputsRefs }}
-                    //                      ref={this.scrollView}
-                    // style={styles.container}
-                    // contentContainerStyle={styles.container}
+                {/*<KeyboardAvoidingView keyboardShouldPersistTaps={'always'} >
+                    <ScrollView ref={this.scrollView}>
+                        {fieldsComp}
+                        {tariffsComp}
+                    </ScrollView>
+                </KeyboardAvoidingView>*/}
+                <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}
+                                         ref={this.scrollView}
+                                         getTextInputRefs={() => { return this.inputsRefs }}
                 >
                     {fieldsComp}
                     {tariffsComp}
                 </KeyboardAwareScrollView>
-                <CommonButton onPress={this.handleAddTariff}
+                <CommonButton onPress={this.handleAddTariffFields}
                               caption={'Добавить тариф'}
                               icon={{name: 'plus', type: 'material-community', color: 'white'}}/>
             </View>

@@ -20,7 +20,7 @@ export default StyleSheet.create({
     },
     errorContainer: {
         position: 'absolute',
-        bottom: -10,
+        bottom: 0,
         marginTop: 0,
     },
     divider: {
@@ -29,5 +29,17 @@ export default StyleSheet.create({
         zIndex: 10,
         backgroundColor: 'red',
         height: 10,
+    },
+    inputContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    buttonContainer: {
+        width: 48,
+        height: 48,
+        justifyContent: 'flex-start',
+        marginRight: 5,
+        alignItems: 'flex-end',
     }
 })
