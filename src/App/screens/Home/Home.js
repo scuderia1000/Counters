@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
-import {View, TouchableOpacity, Text, FlatList} from 'react-native';
+import {View, FlatList} from 'react-native';
 import {connect} from "react-redux";
-import {Button, Divider, Icon} from 'react-native-elements';
 
 // own components
 import CountersModal from '../CountersModal/CountersModal';
 import CommonButton from '../../components/buttons/CommonButton';
-import fakeData from '../../constants/FakeData';
 import CountersListItem from '../../components/countersList/CountersListItem';
+import { editCounter, removeCounter, removeCounterTariffs } from './actions/HomeActions';
 //style
 import styles from './HomeStyles';
 import {createCounter} from "../AddCounter/actions/AddCounterActions";
@@ -39,13 +38,9 @@ class Home extends Component {
         );
     };
 
-    handleAddCounter = (id) => {
-        this.props.navigation.navigate(
-            'AddCounter',
-            {
-                counterId: id,
-            }
-        );
+    handleAddCounter = () => {
+        this.props.editCounter('');
+        this.props.navigation.navigate('AddCounter',);
     };
 
     openCounterData = (id) => {
@@ -53,7 +48,8 @@ class Home extends Component {
     };
 
     editCounter = (id) => {
-        this.handleAddCounter(id);
+        this.props.editCounter(id);
+        this.props.navigation.navigate('AddCounter');
     };
 
     renderItem = ({item}) => (
@@ -62,6 +58,10 @@ class Home extends Component {
             onPressItem={this.openCounterData}
             onLongPress={this.editCounter}
             title={item.counterName}
+            onDelPress={() => {
+                this.props.removeCounter(item.id);
+                this.props.removeCounterTariffs(item.id);
+            }}
         />
     );
 
@@ -107,5 +107,14 @@ const mapStateToProps = state => ({
     counters: state.counters,
 });
 const dispatchers = dispatch => ({
+    editCounter: (counterId) => {
+        dispatch(editCounter(counterId))
+    },
+    removeCounter: (counterId) => {
+        dispatch(removeCounter(counterId))
+    },
+    removeCounterTariffs: (counterId) => {
+        dispatch(removeCounterTariffs(counterId))
+    },
 });
 export default connect(mapStateToProps, dispatchers)(Home);

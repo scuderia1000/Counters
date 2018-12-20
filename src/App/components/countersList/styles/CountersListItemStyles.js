@@ -7,8 +7,10 @@ export default StyleSheet.create({
     container: {
         height: 46,
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         marginLeft: 15,
+        flexDirection: 'row',
     },
     titleText: {
         ...common.text

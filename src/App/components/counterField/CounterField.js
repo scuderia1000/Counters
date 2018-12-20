@@ -1,17 +1,16 @@
 // react
 import React from 'react';
-import { View, TouchableOpacity, Text, KeyboardAvoidingView, Button  } from 'react-native';
+import { View } from 'react-native';
 import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elements';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 // own component
-
+import RemoveButton from '../../components/buttons/RemoveButton';
 // styles
 import styles from './CounterFieldStyles';
 import { colors } from '../../constants/Colors';
 
 const CounterField = React.forwardRef(({ field = {}, type, index, onChange, isError = false, value,
-                                           hasDelButton = false, onDelPress = () => {} }, ref) => {
-    const { label = '', keyboardType = 'default', placeholder = '', style = {}, autoFocus = false, required = false, errorText = '' } = field;
+                                           hasDelButton = false, onDelPress = () => {}, autoFocus = false }, ref) => {
+    const { label = '', keyboardType = 'default', placeholder = '', style = {}, required = false, errorText = '' } = field;
     return(
         <View key={`${type}_${index}`} style={[styles.container, style]}>
             {!!label && <FormLabel>{label}</FormLabel>}
@@ -29,13 +28,8 @@ const CounterField = React.forwardRef(({ field = {}, type, index, onChange, isEr
                                onChange(type, value, index);
                            }}/>
                 {hasDelButton &&
-                    <TouchableOpacity style={styles.buttonContainer}
-                                      onPress={() => onDelPress(index)}>
-                        <Icon name={'close'}
-                              size={22}
-                              color={colors.gray}
-                        />
-                    </TouchableOpacity>
+                    <RemoveButton containerStyle={{justifyContent: 'flex-start'}}
+                                  onPress={() => onDelPress(index)}/>
                 }
             </View>
             {isError && <FormValidationMessage labelStyle={styles.errorContainer}>{errorText}</FormValidationMessage>}

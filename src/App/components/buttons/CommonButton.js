@@ -6,7 +6,7 @@ import { Button, Icon } from 'react-native-elements';
 // own component
 
 // styles
-import styles from './CommonButtonStyles';
+import styles from './styles/CommonButtonStyles';
 import common from '../../styles/CommonStyles';
 
 const CommonButton = ({ caption = '', style = {}, captionStyle = {}, onPress = () => {}, icon = {}, disabled = false }) => {

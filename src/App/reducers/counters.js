@@ -34,6 +34,22 @@ export default (state = initState, action) => {
                 }
             }
         }
+        case COUNTER.EDIT: {
+            return {
+                ...state,
+                counterId: action.payload
+            }
+        }
+        case COUNTER.REMOVE: {
+            const counterId = action.payload;
+            const countersList = state.list && cloneObject(state.list) || {};
+            delete countersList[counterId];
+
+            return {
+                ...state,
+                list: countersList
+            }
+        }
         default: return state;
     }
 }

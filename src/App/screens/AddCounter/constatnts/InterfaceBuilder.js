@@ -17,6 +17,11 @@ export const TARIFF_COMPONENT = {
         keyboardType: 'numeric',
         placeholder: 'Ставка тарифа...',
         errorText: 'Введите ставку тарифа',
+    },
+    value: {
+        keyboardType: 'numeric',
+        placeholder: 'Текущее значение...',
+        errorText: 'Введите текущее значение тарифа',
         style: {
             marginBottom: 15
         }

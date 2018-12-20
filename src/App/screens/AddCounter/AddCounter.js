@@ -48,16 +48,16 @@ class AddCounter extends Component {
             refs: [],
             errorsDefault: [],
             errorsTariff: [], // реальные индексы на форме
-            counterId: ''
         };
     }
 
     componentDidMount() {
         const { navigation, counters, tariffs } = this.props;
         navigation.setParams({ createCounter: this.handleCreateCounter});
-        const counterId = navigation.getParam('counterId', 'NO ID');
+        const { counterId } = counters;
+        // const counterId = navigation.getParam('counterId', 'NO ID');
 
-        if (typeof counterId === 'string' && counters.list && counters.list[counterId]) {
+        if (counterId && counters.list && counters.list[counterId]) {
             const fieldsValues = cloneObject(counters.list[counterId]);
 
             const tariffsCopy = cloneObject(tariffs.list[counterId]);
@@ -73,7 +73,6 @@ class AddCounter extends Component {
             this.setState({
                 fieldsValues: fieldsValues,
                 tariffsValues: tariffsValues,
-                counterId: counterId
             })
         } else {
             // по умолчанию д.б. 1 тарифф
@@ -93,6 +92,7 @@ class AddCounter extends Component {
         const newTariff = {
             name: {...TARIFF_COMPONENT.name, autoFocus: !!e},
             amount: {...TARIFF_COMPONENT.amount},
+            value: {...TARIFF_COMPONENT.value},
         };
         this.setState((state) => {
             return {
@@ -205,7 +205,8 @@ class AddCounter extends Component {
     };
 
     handleCreateCounter = () => {
-        const { fieldsValues, tariffsValues, counterId } = this.state;
+        const { fieldsValues, tariffsValues } = this.state;
+        const { counterId } = this.props.counters;
         if (this.checkRequiredFilled()) {
             const id = counterId ? counterId : uuid.v4();
             this.props.createCounter(fieldsValues, id);
@@ -259,6 +260,7 @@ class AddCounter extends Component {
                                   isError={!!errorsTariff.length && errorsTariff.includes(index) && tariff[key].required}
                                   onChange={this.handleFieldTariffChange}
                                   onDelPress={this.handleRemoveTariffField}
+                                  autoFocus={tariff[key].autoFocus}
                                   hasDelButton={i > 0 && key === 'name'} />
                 );
             });
@@ -269,6 +271,7 @@ class AddCounter extends Component {
 
     getFieldsComponents = (fields = {}) => {
         const { errorsDefault, fieldsValues } = this.state;
+        const { counterId } = this.props.counters;
 
         return Object.keys(fields).map((key, i) => {
             this.inputsRefs[i] = React.createRef();
@@ -276,6 +279,7 @@ class AddCounter extends Component {
                 <CounterField key={`${key}_${i}`}
                               type={key}
                               field={fields[key]}
+                              autoFocus={!counterId && fields[key].autoFocus}
                               index={i}
                               value={fieldsValues[key]}
                               ref={this.inputsRefs[i]}
@@ -292,12 +296,6 @@ class AddCounter extends Component {
 
         return (
             <View style={styles.container} >
-                {/*<KeyboardAvoidingView keyboardShouldPersistTaps={'always'} >
-                    <ScrollView ref={this.scrollView}>
-                        {fieldsComp}
-                        {tariffsComp}
-                    </ScrollView>
-                </KeyboardAvoidingView>*/}
                 <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}
                                          ref={this.scrollView}
                                          getTextInputRefs={() => { return this.inputsRefs }}
