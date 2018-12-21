@@ -7,6 +7,8 @@ import CountersModal from '../CountersModal/CountersModal';
 import CommonButton from '../../components/buttons/CommonButton';
 import CountersListItem from '../../components/countersList/CountersListItem';
 import { editCounter, removeCounter, removeCounterTariffs } from './actions/HomeActions';
+// const
+import { ADD_COUNTER } from '../../constants/ProjectConst';
 //style
 import styles from './HomeStyles';
 import {createCounter} from "../AddCounter/actions/AddCounterActions";
@@ -40,7 +42,7 @@ class Home extends Component {
 
     handleAddCounter = () => {
         this.props.editCounter('');
-        this.props.navigation.navigate('AddCounter',);
+        this.props.navigation.navigate('AddCounter', {title: ADD_COUNTER.TITLE.CREATE});
     };
 
     openCounterData = (id) => {
@@ -49,7 +51,7 @@ class Home extends Component {
 
     editCounter = (id) => {
         this.props.editCounter(id);
-        this.props.navigation.navigate('AddCounter');
+        this.props.navigation.navigate('AddCounter', {title: ADD_COUNTER.TITLE.EDIT});
     };
 
     renderItem = ({item}) => (

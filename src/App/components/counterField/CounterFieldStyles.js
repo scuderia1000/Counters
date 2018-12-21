@@ -17,6 +17,7 @@ export default StyleSheet.create({
         // height: 35,
         // minHeight: 35,
         paddingVertical: 0,
+        color: colors.wetAsphalt,
     },
     errorContainer: {
         position: 'absolute',

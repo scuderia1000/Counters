@@ -6,9 +6,7 @@ const initState = {
         '1': {
             id: 1,
             createTime: new Date().getTime(),
-            counterName: 'Test 1',
-            tariffName: 'Tariff 1',
-            tariff: 15,
+            counterName: 'Счетчик воды',
             personalAccount: '1234567890',
             fio: 'Иванов Иван иванович',
             address: 'Harvard 12-89',

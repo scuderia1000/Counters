@@ -16,6 +16,7 @@ const CounterField = React.forwardRef(({ field = {}, type, index, onChange, isEr
             {!!label && <FormLabel>{label}</FormLabel>}
             <View style={styles.inputContainer}>
                 <FormInput inputStyle={[styles.input, hasDelButton && {width: '110%'}]}
+                           placeholderTextColor={colors.gray}
                            containerStyle={{flex: 1}}
                            placeholder={placeholder}
                            keyboardType={keyboardType}

@@ -16,10 +16,15 @@ import styles from './AddCounterStyles';
 
 const defaultFieldsLength = Object.keys(InterfaceBuilder.counter.fields).length;
 
+const TITLE = {
+    CREATE: 'Создать счетчик',
+    EDIT: 'Редактировать счетчик',
+};
+
 class AddCounter extends Component {
     static navigationOptions = ({ navigation }) => {
         return {
-            title: 'Создать счетчик',
+            title: navigation.getParam('title', ''),
             headerRight: (
                 <CommonButton style={{marginRight: 10, height: 38, borderRadius: 4}}
                               caption='Готово'
@@ -52,10 +57,9 @@ class AddCounter extends Component {
     }
 
     componentDidMount() {
-        const { navigation, counters, tariffs } = this.props;
-        navigation.setParams({ createCounter: this.handleCreateCounter});
+        const { navigation, counters = {}, tariffs } = this.props;
         const { counterId } = counters;
-        // const counterId = navigation.getParam('counterId', 'NO ID');
+        navigation.setParams({ createCounter: this.handleCreateCounter});
 
         if (counterId && counters.list && counters.list[counterId]) {
             const fieldsValues = cloneObject(counters.list[counterId]);
