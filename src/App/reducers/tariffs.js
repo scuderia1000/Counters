@@ -10,7 +10,6 @@ const initialState = {
                 createTime: new Date().getTime(),
                 name: 'Холодная вода',
                 amount: '30.23', // ставка тарифа
-                value: '15', // значение с которого начинать расчет
             },
             'tariffId_2': {
                 id: 'tariffId_2',
@@ -18,7 +17,6 @@ const initialState = {
                 createTime: new Date().getTime(),
                 name: 'Горячая вода',
                 amount: '130.03', // ставка тарифа
-                value: '0', // значение с которого начинать расчет
             }
         }
     }
@@ -30,6 +28,7 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 list: {
+                    ...state.list,
                     ...action.payload
                 }
             }

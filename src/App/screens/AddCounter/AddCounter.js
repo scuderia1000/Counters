@@ -49,7 +49,7 @@ class AddCounter extends Component {
             isRequiredFieldsFilled: false,
             requiredFields: {},
             fieldsValues: {},
-            tariffsValues: {}, // {index: {name: '', amount: ''}}
+            tariffsValues: {}, // {index: {name: '', amount: '', value: number}}
             refs: [],
             errorsDefault: [],
             errorsTariff: [], // реальные индексы на форме
@@ -57,26 +57,39 @@ class AddCounter extends Component {
     }
 
     componentDidMount() {
-        const { navigation, counters = {}, tariffs } = this.props;
+        const { navigation, counters = {}, tariffs = {}, tariffsValues = {} } = this.props;
         const { counterId } = counters;
         navigation.setParams({ createCounter: this.handleCreateCounter});
 
         if (counterId && counters.list && counters.list[counterId]) {
             const fieldsValues = cloneObject(counters.list[counterId]);
-
             const tariffsCopy = cloneObject(tariffs.list[counterId]);
-            const tariffsValues = {};
+            const tariffsDataCopy = cloneObject(tariffsValues.list);
+
+            const tariffsFiledValues = {};
             const defaultFields = InterfaceBuilder.counter.fields;
             let index = Object.keys(defaultFields).length;
+
             Object.keys(tariffsCopy).forEach(tariffId => {
-                tariffsValues[index] = tariffsCopy[tariffId];
+                // значения полей тарифа
+                tariffsFiledValues[index] = tariffsCopy[tariffId];
+                // начальное значение
+                if (tariffsDataCopy) {
+                    const tariffDataValues = tariffsDataCopy[tariffId] || {};
+                    const tariffsDataKeys = Object.keys(tariffDataValues);
+                    if (tariffsDataKeys.length) {
+                        tariffsDataKeys.sort((key1, key2) => tariffDataValues[key1].createTime - tariffDataValues[key2].createTime);
+
+                        tariffsFiledValues[index] = {...tariffsFiledValues[index], ...tariffDataValues[tariffsDataKeys[0]]};
+                    }
+                }
                 this.handleAddTariffFields();
                 index++;
             });
 
             this.setState({
                 fieldsValues: fieldsValues,
-                tariffsValues: tariffsValues,
+                tariffsValues: tariffsFiledValues,
             })
         } else {
             // по умолчанию д.б. 1 тарифф
@@ -318,6 +331,7 @@ class AddCounter extends Component {
 const mapStateToProps = state => ({
     counters: state.counters,
     tariffs: state.tariffs,
+    tariffsValues: state.tariffsData,
 });
 const dispatchers = dispatch => ({
     createCounter: (counterData, id) => {

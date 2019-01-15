@@ -6,9 +6,9 @@ import {View, TouchableOpacity, Text, FlatList} from 'react-native';
 // own component
 import CounterField from '../../components/counterField/CounterField';
 // styles
-import styles from './CounterDataInputStyles';
+import styles from './TariffDataInputStyles';
 
-class CounterDataInput extends Component {
+class TariffDataInput extends Component {
     static navigationOptions = {
         title: 'Заполнение данных'
     };
@@ -26,4 +26,4 @@ const mapStateToProps = state => ({
 });
 const dispatchers = dispatch => ({
 });
-export default connect(mapStateToProps, dispatchers)(CounterDataInput);
+export default connect(mapStateToProps, dispatchers)(TariffDataInput);
