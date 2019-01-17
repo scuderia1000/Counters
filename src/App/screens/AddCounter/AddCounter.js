@@ -190,6 +190,10 @@ class AddCounter extends Component {
         if (defaultRequiredFields.length) {
             errorFields = defaultRequiredFields.filter(fieldName => !valuesKeys.includes(fieldName) || !fieldsValues[fieldName]);
         }
+        // e-mail не обязательное поле, но у него нужно проверить правильность заполнения
+        if (valuesKeys.includes('emailAddress') && fieldsValues['emailAddress'] && !this.validateEmail(fieldsValues['emailAddress'])) {
+            errorFields.push('emailAddress');
+        }
 
         // проверка тарифов
         // реальные индексы на отрисованной форме
@@ -220,6 +224,12 @@ class AddCounter extends Component {
 
         return true;
     };
+
+    // копипаста https://stackoverflow.com/questions/46155/how-to-validate-an-email-address-in-javascript
+    validateEmail(email) {
+        const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(String(email).toLowerCase());
+    }
 
     handleCreateCounter = () => {
         const { fieldsValues, tariffsValues } = this.state;

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {View, FlatList} from 'react-native';
 import {connect} from "react-redux";
-
+import ActionSheet from 'react-native-actionsheet';
 // own components
 import CountersModal from '../CountersModal/CountersModal';
 import CommonButton from '../../components/buttons/CommonButton';
@@ -25,6 +25,7 @@ class Home extends Component {
         this.state = {
             modalVisible: false,
         };
+        this.actionSheet = React.createRef();
     }
 
     setModalVisible(visible) {
@@ -67,15 +68,32 @@ class Home extends Component {
         />
     );
 
+    showActionSheet = () => {
+        this.actionSheet.current.show()
+    };
+
+    actionSheetOptions = (counters) => {
+        let options = [];
+        if (counters.length) {
+            options = counters.slice();
+            options.push({counterName: 'Отмена'});
+        }
+
+        return options;
+    };
+
     render() {
         const { list = {} } = this.props.counters;
-        const countersKeys = Object.keys(list);
+        const countersIds = Object.keys(list);
         let countersArray = [];
-        if (countersKeys.length) {
-            countersArray = countersKeys.map(key => list[key]);
+        if (countersIds.length) {
+            countersArray = countersIds.map(id => list[id]);
         }
 
         const countersList = Object.keys(list).map(key => list[key]);
+
+        const options = countersArray.length && this.actionSheetOptions(countersArray) || [];
+        const isCounterSelectionComponentModal = countersArray.length > 10;
 
         return(
             <View style={styles.container}>
@@ -92,15 +110,35 @@ class Home extends Component {
                                   caption={'Создать счетчик'}
                                   icon={{name: 'counter', type: 'material-community', color: 'white'}}/>
                     <CommonButton style={{borderRadius: 5, flex: 0.48}}
-                                  onPress={() => this.setModalVisible(!this.state.modalVisible)}
+                                  onPress={() => {
+                                      if (isCounterSelectionComponentModal) {
+                                          this.setModalVisible(!this.state.modalVisible)
+                                      } else {
+                                          this.showActionSheet();
+                                      }
+                                  }}
                                   caption={'Внести данные'}
                                   icon={{name: 'plus', type: 'material-community', color: 'white'}}/>
                 </View>
-                <CountersModal visible={this.state.modalVisible}
-                               setModalVisible={this.setModalVisible}
-                               countersList={countersList}
-                               addCounterData={this.handleAddCounterData}
-                />
+                {isCounterSelectionComponentModal ?
+                    <CountersModal visible={this.state.modalVisible}
+                                   setModalVisible={this.setModalVisible}
+                                   countersList={countersList}
+                                   addCounterData={this.handleAddCounterData}
+                    />
+                    :
+                    <ActionSheet
+                        ref={this.actionSheet}
+                        // title={'Which one do you like ?'}
+                        options={options.map(counter => counter.counterName)}
+                        cancelButtonIndex={options.length - 1}
+                        onPress={(index) => {
+                            if (index !== options.length - 1){
+                                this.handleAddCounterData(options[index].id);
+                            }
+                        }}
+                    />
+                }
             </View>
         )
     }

@@ -55,10 +55,11 @@ export default {
             },
             emailAddress: {
                 placeholder: 'E-mail, куда отправлять данные...',
-                errorText: 'Введите e-mail',
+                errorText: 'Неверный формат e-mail',
                 style: {
                     marginBottom: 15
-                }
+                },
+                keyboardType: 'email-address',
             },
         }
     }

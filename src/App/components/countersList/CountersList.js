@@ -9,7 +9,7 @@ import fakeData from '../../constants/FakeData';
 import styles from './styles/CountersListStyles';
 
 export default function CountersList (props) {
-    const { countersList, addCounterData, closeModal, setModalVisible } = props;
+    const { countersList, addCounterData, closeModal, setModalVisible, hasDelButton = true } = props;
 
 
 
@@ -23,6 +23,7 @@ export default function CountersList (props) {
             id={item.id}
             onPressItem={() => onPressItem(item.id)}
             title={item.counterName}
+            hasDelButton={hasDelButton}
         />
     );
 

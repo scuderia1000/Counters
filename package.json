@@ -9,9 +9,11 @@
   "dependencies": {
     "react": "16.6.3",
     "react-native": "0.57.5",
+    "react-native-actionsheet": "^2.4.2",
     "react-native-elements": "^0.19.1",
     "react-native-gesture-handler": "^1.0.10",
     "react-native-keyboard-aware-scrollview": "^2.0.0",
+    "react-native-torch": "^1.1.5",
     "react-native-vector-icons": "^6.0.2",
     "react-navigation": "^3.0.2",
     "react-redux": "^5.1.1",

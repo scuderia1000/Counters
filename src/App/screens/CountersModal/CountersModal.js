@@ -23,7 +23,9 @@ export default function CountersModal(props) {
             <View style={styles.container}>
                 <CountersList countersList={countersList}
                               addCounterData={addCounterData}
-                              setModalVisible={setModalVisible}/>
+                              setModalVisible={setModalVisible}
+                              hasDelButton={false}
+                />
             </View>
             <View style={styles.closeButtonContainer}>
                 <TouchableOpacity style={styles.closeButton} onPress={closeModal}>

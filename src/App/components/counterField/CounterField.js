@@ -10,7 +10,7 @@ import { colors } from '../../constants/Colors';
 
 const CounterField = React.forwardRef(({ field = {}, type, index, onChange, isError = false, value,
                                            hasDelButton = false, onDelPress = () => {}, autoFocus = false }, ref) => {
-    const { label = '', keyboardType = 'default', placeholder = '', style = {}, required = false, errorText = '' } = field;
+    const { label = '', keyboardType = 'default', placeholder = '', style = {}, required = false, errorText = '', errorStyle } = field;
     return(
         <View key={`${type}_${index}`} style={[styles.container, style]}>
             {!!label && <FormLabel>{label}</FormLabel>}
@@ -33,7 +33,7 @@ const CounterField = React.forwardRef(({ field = {}, type, index, onChange, isEr
                                   onPress={() => onDelPress(index)}/>
                 }
             </View>
-            {isError && <FormValidationMessage labelStyle={styles.errorContainer}>{errorText}</FormValidationMessage>}
+            {isError && <FormValidationMessage labelStyle={[styles.errorContainer, errorStyle]}>{errorText}</FormValidationMessage>}
         </View>
     )
 });
