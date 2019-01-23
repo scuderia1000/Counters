@@ -12,5 +12,18 @@ export default StyleSheet.create({
         flex: 1,
         backgroundColor: colors.backgroundColor,
     },
+    torchComponent: {
+        alignItems: 'flex-end',
+        justifyContent: 'center',
+        marginTop: 10,
+        marginRight: 10,
+    },
+    torch: {
+        width: 80,
+        borderRadius: 5
+    },
+    torchCaption: {
+        fontSize: 14,
+    }
 
 })

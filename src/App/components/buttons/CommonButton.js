@@ -17,7 +17,10 @@ const CommonButton = ({ caption = '', style = {}, captionStyle = {}, onPress = (
                 {!!Object.keys(icon).length &&
                     <Icon name={icon.name}
                           type={icon.type}
-                          color={icon.color} iconStyle={{marginRight: 5}} />
+                          color={icon.color}
+                          size={icon.size || 26}
+                          iconStyle={{marginRight: 5}}
+                    />
                 }
                 <Text style={[common.buttonCaption, captionStyle]}>{caption}</Text>
             </View>

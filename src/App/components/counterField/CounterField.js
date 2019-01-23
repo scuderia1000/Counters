@@ -9,8 +9,9 @@ import styles from './CounterFieldStyles';
 import { colors } from '../../constants/Colors';
 
 const CounterField = React.forwardRef(({ field = {}, type, index, onChange, isError = false, value,
-                                           hasDelButton = false, onDelPress = () => {}, autoFocus = false }, ref) => {
-    const { label = '', keyboardType = 'default', placeholder = '', style = {}, required = false, errorText = '', errorStyle } = field;
+                                           hasDelButton = false, onDelPress = () => {}, autoFocus = false,
+                                           onFocus = () => {} }, ref) => {
+    const { label = '', keyboardType = 'default', placeholder = '', style = {}, errorText = '', errorStyle } = field;
     return(
         <View key={`${type}_${index}`} style={[styles.container, style]}>
             {!!label && <FormLabel>{label}</FormLabel>}
@@ -27,7 +28,11 @@ const CounterField = React.forwardRef(({ field = {}, type, index, onChange, isEr
                            returnKeyType={'next'}
                            onChangeText={value => {
                                onChange(type, value, index);
-                           }}/>
+                           }}
+                           /*onFocus={() => {
+                               onFocus(index, autoFocus);
+                           }}*/
+                />
                 {hasDelButton &&
                     <RemoveButton containerStyle={{justifyContent: 'flex-start'}}
                                   onPress={() => onDelPress(index)}/>

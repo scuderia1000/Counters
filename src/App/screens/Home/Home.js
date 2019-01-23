@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {View, FlatList} from 'react-native';
+import {View, FlatList, InteractionManager} from 'react-native';
 import {connect} from "react-redux";
 import ActionSheet from 'react-native-actionsheet';
 // own components
@@ -12,6 +12,21 @@ import { ADD_COUNTER } from '../../constants/ProjectConst';
 //style
 import styles from './HomeStyles';
 import {createCounter} from "../AddCounter/actions/AddCounterActions";
+
+const iconStyle = {
+    type: 'material-community',
+    color: 'white',
+    size: 20
+};
+
+const buttonStyle = {
+    borderRadius: 5,
+    flex: 0.48,
+};
+
+const captionStyle = {
+    fontSize: 15
+};
 
 class Home extends Component {
     static navigationOptions = {
@@ -33,12 +48,25 @@ class Home extends Component {
     }
 
     handleAddCounterData = (id) => {
-        this.props.navigation.navigate(
-            'CounterDataInput',
-            {
-                counterId: id,
-            }
-        );
+        /*InteractionManager.runAfterInteractions(() => {
+            // ...long-running synchronous task...
+            console.log('timer')
+            this.props.navigation.navigate(
+                'CounterDataInput',
+                {
+                    counterId: id,
+                }
+            );
+        });*/
+        // если вызывать напрямую, клавиатура не появляется при фокусе на первое поле
+        setTimeout(() => {
+            this.props.navigation.navigate(
+                'CounterDataInput',
+                {
+                    counterId: id,
+                }
+            );
+        }, 0);
     };
 
     handleAddCounter = () => {
@@ -105,11 +133,12 @@ class Home extends Component {
                     />
                 </View>
                 <View style={styles.buttonsContainer}>
-                    <CommonButton style={{borderRadius: 5, flex: 0.48}}
+                    <CommonButton style={buttonStyle}
                                   onPress={this.handleAddCounter}
                                   caption={'Создать счетчик'}
-                                  icon={{name: 'counter', type: 'material-community', color: 'white'}}/>
-                    <CommonButton style={{borderRadius: 5, flex: 0.48}}
+                                  captionStyle={captionStyle}
+                                  icon={{...iconStyle, name: 'counter'}}/>
+                    <CommonButton style={buttonStyle}
                                   onPress={() => {
                                       if (isCounterSelectionComponentModal) {
                                           this.setModalVisible(!this.state.modalVisible)
@@ -118,7 +147,8 @@ class Home extends Component {
                                       }
                                   }}
                                   caption={'Внести данные'}
-                                  icon={{name: 'plus', type: 'material-community', color: 'white'}}/>
+                                  captionStyle={captionStyle}
+                                  icon={{...iconStyle, name: 'plus'}}/>
                 </View>
                 {isCounterSelectionComponentModal ?
                     <CountersModal visible={this.state.modalVisible}
