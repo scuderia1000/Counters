@@ -17,6 +17,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
 // own component
 import CounterField from '../../components/counterField/CounterField';
 import CommonButton from "../../components/buttons/CommonButton";
+import { createTariffData } from "./actions/TariffDataInputActions";
 // styles
 import styles from './TariffDataInputStyles';
 
@@ -28,7 +29,7 @@ class TariffDataInput extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            values: {}, // {id_1: value1, id_2: value2}
+            values: {}, // {tariffId_1: {value: , dataId: }, tariffId_2: {value: , dataId: }}
             errorsTariff: [], // ids
             isTorchOn: false,
         };
@@ -56,7 +57,10 @@ class TariffDataInput extends Component {
             return {
                 values: {
                     ...state.values,
-                    [id]: value
+                    [id]: {
+                        ...state.values[id],
+                        value: value
+                    }
                 },
                 errorsTariff: [],
             }
@@ -71,7 +75,7 @@ class TariffDataInput extends Component {
         if (counterId) {
             const tariff = tariffsList[counterId];
             const tariffIds = Object.keys(tariff);
-            const errorIds = tariffIds.filter(id => !values[id]);
+            const errorIds = tariffIds.filter(id => !values[id] || !values[id].value);
 
             if (errorIds.length) {
                 this.setState({errorsTariff: errorIds});
@@ -105,7 +109,7 @@ class TariffDataInput extends Component {
                                   type={id}
                                   field={field}
                                   index={index}
-                                  value={values && values[id]}
+                                  value={values && values[id] && values[id].value}
                                   ref={this.inputs[index]}
                                   isError={!!errorsTariff.length && errorsTariff.includes(id)}
                                   onChange={this.handleFieldChange}
@@ -120,7 +124,8 @@ class TariffDataInput extends Component {
 
     handleAddData = () => {
         if (this.checkFields()) {
-
+            this.props.saveData(this.state.values);
+            this.props.navigation.goBack();
         }
     };
 
@@ -150,6 +155,7 @@ class TariffDataInput extends Component {
     };
 
     render() {
+        console.log('tarissData', this.state)
         return (
             <View style={styles.container}>
                 <ScrollView keyboardShouldPersistTaps={'always'}>
@@ -196,5 +202,9 @@ const mapStateToProps = state => ({
     counters: state.counters,
     tariffsList: state.tariffs.list,
 });
-const dispatchers = dispatch => ({});
+const dispatchers = dispatch => ({
+    saveData: (data) => {
+        dispatch(createTariffData(data));
+    }
+});
 export default connect(mapStateToProps, dispatchers)(TariffDataInput);

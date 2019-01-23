@@ -47,9 +47,9 @@ export default (state = initialState, action) => {
 
             tariffIds.forEach(tariffId => {
                 const tariffData = dataList[tariffId];
-                let dataId = uuid.v4();
-                if (tariffData) {
-                    const dataId = newData[tariffId].dataId;
+                const tariffDataIds = tariffData && Object.keys(tariffData) || [];
+                let dataId = newData[tariffId].dataId;
+                if (dataId && tariffDataIds.length && tariffDataIds.includes(dataId)) {
                     dataList[tariffId] = {
                         ...dataList[tariffId],
                         [dataId]: {
@@ -58,7 +58,9 @@ export default (state = initialState, action) => {
                         }
                     }
                 } else {
+                    dataId = uuid.v4();
                     dataList[tariffId] = {
+                        ...dataList[tariffId],
                         [dataId]: {
                             ...newData[tariffId],
                             dataId: dataId,
