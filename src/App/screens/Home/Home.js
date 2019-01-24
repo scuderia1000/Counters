@@ -61,7 +61,7 @@ class Home extends Component {
         // если вызывать напрямую, клавиатура не появляется при фокусе на первое поле
         setTimeout(() => {
             this.props.navigation.navigate(
-                'CounterDataInput',
+                'TariffDataInput',
                 {
                     counterId: id,
                 }

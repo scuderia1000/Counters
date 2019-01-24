@@ -37,13 +37,16 @@ class TariffDataInput extends Component {
         this.handleFieldChange = this.handleFieldChange.bind(this);
     }
 
-    // в таком варианте приложение зависает, если этот экран вызывается через setTimeout
-    /*componentDidMount() {
-        if (this.inputs.length && this.inputs[0] && this.inputs[0].current) {
+    componentDidMount() {
+
+
+        // при таком варианте установки фокуса, чтобы открылась клавиатура, приложение зависает,
+        // если этот экран вызывается через setTimeout в Home.handleAddCounterData
+        /*if (this.inputs.length && this.inputs[0] && this.inputs[0].current) {
             console.log('this.inputsRefs[index]', this.inputs[0])
-            // this.inputs[0].current.focus();
-        }
-    }*/
+            this.inputs[0].current.focus();
+        }*/
+    }
 
     componentWillUnmount() {
         const { isTorchOn } = this.state;
