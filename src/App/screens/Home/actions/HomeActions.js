@@ -1,4 +1,4 @@
-import {COUNTER, TARIFF} from '../../../constants/ActionConst'
+import {COUNTER, TARIFF} from '../../../constants/ActionConst';
 
 export const editCounter = (counterId) => {
     return (dispatch, getState) => {

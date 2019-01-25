@@ -9,6 +9,7 @@ import CountersListItem from '../../components/countersList/CountersListItem';
 import { editCounter, removeCounter, removeCounterTariffs } from './actions/HomeActions';
 // const
 import { ADD_COUNTER } from '../../constants/ProjectConst';
+import { calculateCounterValues, cloneObject } from '../../constants/FunctionConst';
 //style
 import styles from './HomeStyles';
 import {createCounter} from "../AddCounter/actions/AddCounterActions";
@@ -75,7 +76,25 @@ class Home extends Component {
     };
 
     openCounterData = (id) => {
+        const { counters = {}, tariffs = {}, tariffsValues = {} } = this.props;
+        const counterData = counters.list[id];
 
+        const counterTariffs = cloneObject(tariffs.list[id]);
+        const tariffsIds = Object.keys(counterTariffs);
+
+        const tariffsData = {};
+        tariffsIds.forEach(id => {
+            if (tariffsValues.list[id]) {
+                tariffsData[id] = cloneObject(tariffsValues.list[id]);
+            }
+        });
+
+        if (Object.keys(tariffsData).length !== 0) {
+            const counterValues = calculateCounterValues(counterData, counterTariffs, tariffsData);
+            if (counterValues.length) {
+                this.props.navigation.navigate('TariffData', {title: counterData.counterName});
+            }
+        }
     };
 
     editCounter = (id) => {
@@ -175,6 +194,8 @@ class Home extends Component {
 }
 const mapStateToProps = state => ({
     counters: state.counters,
+    tariffs: state.tariffs,
+    tariffsValues: state.tariffsData,
 });
 const dispatchers = dispatch => ({
     editCounter: (counterId) => {

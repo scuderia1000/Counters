@@ -13,3 +13,7 @@ export const TARIFF_DATA = {
     CREATE: "CREATE_DATA",
     REMOVE: "REMOVE_DATA",
 };
+
+export const COUNTERS_VALUES = {
+    UPDATE: "UPDATE_COUNTERS_VALUES",
+};
