@@ -12,4 +12,15 @@ export default StyleSheet.create({
         // justifyContent: 'space-between',
         backgroundColor: colors.gray,
     },
+    itemContainer: {
+        flex: 1,
+        ...common.center,
+    },
+    tariffsContainer: {
+        flex: 1,
+        ...common.center,
+    },
+    tariffRowContainer: {
+        flexDirection: 'row'
+    },
 });

@@ -36,11 +36,36 @@ class TariffData extends Component {
 
     }
 
-    renderItem = ({item}) => {
+    headerRow = () => {
 
     };
 
+    tariffRow = () => {
+        return (
+            <View style={styles.tariffRowContainer}>
+
+
+            </View>
+        )
+    };
+
+    renderItem = ({item}) => {
+        const dates = Object.keys(item);
+        return dates.map(date => {
+            return (
+                <View style={styles.itemContainer}>
+                    <Text>{new Date(date)}</Text>
+                    <View style={styles.tariffsContainer}>
+
+                    </View>
+                </View>
+            )
+        });
+    };
+
     render() {
+        const { countersValues, currentCounterId } = this.props;
+        const countersArray = countersValues[currentCounterId];
         return (
             <View style={styles.container}>
                 <FlatList renderItem={this.renderItem}
@@ -54,9 +79,8 @@ class TariffData extends Component {
 }
 
 const mapStateToProps = state => ({
-    counters: state.counters,
-    tariffs: state.tariffs && state.tariffs.list,
-    tariffsValues: state.tariffsData && state.tariffsData.list,
+    countersValues: state.countersValues && state.countersValues.list,
+    currentCounterId: state.countersValues && state.countersValues.currentCounterId
 });
 const dispatchers = dispatch => ({
 

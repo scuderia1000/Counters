@@ -33,5 +33,10 @@ export const calculateCounterValues = (counterData, counterTariffs, tariffsData)
         });
     });
     console.log('sortedTariffsData', sortedTariffsData);
-    return Object.keys(sortedTariffsData).map(date => sortedTariffsData[date]);
+    // return sortedTariffsData;
+    return Object.keys(sortedTariffsData).map(date => {
+        return {
+            [date]: sortedTariffsData[date]
+        }
+    });
 };
