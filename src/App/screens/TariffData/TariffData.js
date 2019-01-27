@@ -13,7 +13,7 @@ import {
     KeyboardAvoidingView
 } from 'react-native';
 // own component
-
+import NumberText from '../../components/text/NumberText';
 // styles
 import styles from './TariffDataStyles';
 import CommonButton from "../../components/buttons/CommonButton";
@@ -40,23 +40,35 @@ class TariffData extends Component {
 
     };
 
-    tariffRow = () => {
+    tariffRow = (tariffName, tariff) => {
         return (
             <View style={styles.tariffRowContainer}>
-
-
+                <Text style={[styles.text, {flex: 5}]} numberOfLines={1}>{tariffName}</Text>
+                <NumberText>{tariff.previousValue}</NumberText>
+                <NumberText>{tariff.currentValue}</NumberText>
+                <NumberText>{tariff.difference}</NumberText>
+                <NumberText containerStyle={{flex: 2}}>{tariff.tariffAmount}</NumberText>
+                <NumberText containerStyle={{flex: 2}}>{tariff.total}</NumberText>
             </View>
         )
+    };
+
+    getTariffsRows = (tariffs) => {
+        return Object.keys(tariffs).map(tariffName => this.tariffRow(tariffName, tariffs[tariffName]));
     };
 
     renderItem = ({item}) => {
         const dates = Object.keys(item);
         return dates.map(date => {
+            const localDate = new Date(Number(date));
             return (
                 <View style={styles.itemContainer}>
-                    <Text>{new Date(date)}</Text>
+                    <Text>{localDate.toLocaleString()}</Text>
                     <View style={styles.tariffsContainer}>
-
+                        {this.getTariffsRows(item[date].tariffs)}
+                    </View>
+                    <View style={styles.total}>
+                        <Text>{item[date].total}</Text>
                     </View>
                 </View>
             )
@@ -70,7 +82,8 @@ class TariffData extends Component {
             <View style={styles.container}>
                 <FlatList renderItem={this.renderItem}
                           data={countersArray}
-                          keyExtractor={item => item.id.toString()}
+                          keyExtractor={item => Object.keys(item)[0].toString()}
+                          // keyExtractor={(item, index) => Object.keys(item)[index].toString()}
                           style={{width: '100%'}}
                 />
             </View>

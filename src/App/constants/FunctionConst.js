@@ -32,11 +32,17 @@ export const calculateCounterValues = (counterData, counterTariffs, tariffsData)
             }
         });
     });
-    console.log('sortedTariffsData', sortedTariffsData);
+    // console.log('sortedTariffsData', sortedTariffsData);
     // return sortedTariffsData;
     return Object.keys(sortedTariffsData).map(date => {
+        const amountByDate = Object.keys(sortedTariffsData[date])
+            .map(tariffName => sortedTariffsData[date][tariffName].total)
+            .reduce((accumulator, currentValue) => accumulator + currentValue);
         return {
-            [date]: sortedTariffsData[date]
+            [date]: {
+                tariffs: sortedTariffsData[date],
+                total: amountByDate,
+            }
         }
     });
 };

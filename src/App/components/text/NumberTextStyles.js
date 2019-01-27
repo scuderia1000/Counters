@@ -5,7 +5,6 @@ import { StyleSheet } from 'react-native';
 // styles
 import { colors } from '../../constants/Colors';
 import common from '../../constants/Styles';
-
 export default StyleSheet.create({
     container: {
         flex: 1,
@@ -31,4 +30,12 @@ export default StyleSheet.create({
         alignItems: 'flex-end',
         justifyContent: 'center',
     },
+    numberContainer: {
+        flex: 1,
+        alignItems: 'flex-end',
+        paddingRight: 5,
+    },
+    text: {
+        // paddingRight: 5
+    }
 });

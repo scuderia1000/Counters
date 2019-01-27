@@ -96,7 +96,7 @@ class Home extends Component {
             const counterValues = calculateCounterValues(counterData, counterTariffs, tariffsData);
             if (counterValues.length) {
                 updateCounterData(id, counterValues);
-                // this.props.navigation.navigate('TariffData', {title: counterData.counterName});
+                this.props.navigation.navigate('TariffData', {title: counterData.counterName});
             }
         }
     };
