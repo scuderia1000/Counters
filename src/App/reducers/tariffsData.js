@@ -44,6 +44,7 @@ export default (state = initialState, action) => {
             const dataList = state.list ? cloneObject(state.list) : {};
 
             if (!tariffIds.length) return state;
+            const dateNow = Date.now();
 
             tariffIds.forEach(tariffId => {
                 const tariffData = dataList[tariffId];
@@ -65,7 +66,7 @@ export default (state = initialState, action) => {
                             ...newData[tariffId],
                             dataId: dataId,
                             tariffId: tariffId,
-                            createTime: Date.now(),
+                            createTime: dateNow,
                         }
                     }
                 }

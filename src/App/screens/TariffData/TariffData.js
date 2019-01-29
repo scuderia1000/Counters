@@ -12,11 +12,23 @@ import {
     ScrollView,
     KeyboardAvoidingView
 } from 'react-native';
+import {Divider} from "react-native-elements";
 // own component
 import NumberText from '../../components/text/NumberText';
 // styles
 import styles from './TariffDataStyles';
 import CommonButton from "../../components/buttons/CommonButton";
+
+const header = (
+    <View key={'headerRow'} style={styles.headerContainer}>
+        <Text style={[styles.text, styles.tariffName]}>{'Название'}</Text>
+        <NumberText containerStyle={styles.previousValue}>{'Пред.'}</NumberText>
+        <NumberText containerStyle={styles.currentValue}>{'Текущее'}</NumberText>
+        <NumberText containerStyle={styles.difference}>{'Расход'}</NumberText>
+        <NumberText containerStyle={styles.tariffAmount}>{'Тариф'}</NumberText>
+        <NumberText containerStyle={styles.totalNumber}>{'Сумма'}</NumberText>
+    </View>
+);
 
 class TariffData extends Component {
     static navigationOptions = ({ navigation }) => {
@@ -36,19 +48,15 @@ class TariffData extends Component {
 
     }
 
-    headerRow = () => {
-
-    };
-
     tariffRow = (tariffName, tariff) => {
         return (
-            <View style={styles.tariffRowContainer}>
-                <Text style={[styles.text, {flex: 5}]} numberOfLines={1}>{tariffName}</Text>
-                <NumberText>{tariff.previousValue}</NumberText>
-                <NumberText>{tariff.currentValue}</NumberText>
-                <NumberText>{tariff.difference}</NumberText>
-                <NumberText containerStyle={{flex: 2}}>{tariff.tariffAmount}</NumberText>
-                <NumberText containerStyle={{flex: 2}}>{tariff.total}</NumberText>
+            <View key={tariff.dataId} style={styles.tariffRowContainer}>
+                <Text style={[styles.text, styles.tariffName]}>{tariffName}</Text>
+                <NumberText containerStyle={styles.previousValue}>{tariff.previousValue}</NumberText>
+                <NumberText containerStyle={styles.currentValue}>{tariff.currentValue}</NumberText>
+                <NumberText containerStyle={styles.difference}>{tariff.difference}</NumberText>
+                <NumberText containerStyle={styles.tariffAmount}>{tariff.tariffAmount}</NumberText>
+                <NumberText containerStyle={styles.totalNumber}>{tariff.total}</NumberText>
             </View>
         )
     };
@@ -61,9 +69,10 @@ class TariffData extends Component {
         const dates = Object.keys(item);
         return dates.map(date => {
             const localDate = new Date(Number(date));
+            const options = {day: 'numeric', month: 'long', year: 'numeric'};
             return (
-                <View style={styles.itemContainer}>
-                    <Text>{localDate.toLocaleString()}</Text>
+                <View key={date} style={styles.itemContainer}>
+                    <Text style={styles.date}>{localDate.toLocaleString('ru-RU', options)}</Text>
                     <View style={styles.tariffsContainer}>
                         {this.getTariffsRows(item[date].tariffs)}
                     </View>
@@ -75,16 +84,19 @@ class TariffData extends Component {
         });
     };
 
+    renderDivider = () => <Divider />;
+
     render() {
         const { countersValues, currentCounterId } = this.props;
         const countersArray = countersValues[currentCounterId];
         return (
             <View style={styles.container}>
-                <FlatList renderItem={this.renderItem}
+                <FlatList style={styles.listContainer}
+                          renderItem={this.renderItem}
                           data={countersArray}
                           keyExtractor={item => Object.keys(item)[0].toString()}
-                          // keyExtractor={(item, index) => Object.keys(item)[index].toString()}
-                          style={{width: '100%'}}
+                          ListHeaderComponent={header}
+                          ItemSeparatorComponent={this.renderDivider}
                 />
             </View>
         )

@@ -21,11 +21,12 @@ export const calculateCounterValues = (counterData, counterTariffs, tariffsData)
                 sortedTariffsData[data.createTime] = {
                     ...sortedTariffsData[data.createTime],
                     [tariffName]: {
+                        dataId: dataId,
                         previousValue: previousValue,
                         currentValue: currentValue,
-                        difference: difference,
-                        tariffAmount: tariffAmount,
-                        total: total
+                        difference: (difference ^ 0) === difference ? difference : difference.toFixed(1),
+                        tariffAmount: Number(tariffAmount).toFixed(2),
+                        total: total.toFixed(2)
                     },
 
                 }
@@ -37,11 +38,12 @@ export const calculateCounterValues = (counterData, counterTariffs, tariffsData)
     return Object.keys(sortedTariffsData).map(date => {
         const amountByDate = Object.keys(sortedTariffsData[date])
             .map(tariffName => sortedTariffsData[date][tariffName].total)
-            .reduce((accumulator, currentValue) => accumulator + currentValue);
+            .reduce((accumulator, currentValue) => Number(accumulator) + Number(currentValue));
+        console.log('amountByDate', amountByDate)
         return {
             [date]: {
                 tariffs: sortedTariffsData[date],
-                total: amountByDate,
+                total: amountByDate.toFixed(2),
             }
         }
     });
