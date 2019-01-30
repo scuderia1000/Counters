@@ -17,7 +17,13 @@ const initialState = {
                 tariffId: 'tariffId_1',
                 createTime: Date.now() + 100,
                 value: '20',
-            }
+            },
+            '5': {
+                dataId: '5',
+                tariffId: 'tariffId_1',
+                createTime: Date.now() + 200,
+                value: '30',
+            },
         },
         'tariffId_2': {
             '3': {
@@ -31,7 +37,13 @@ const initialState = {
                 tariffId: 'tariffId_2',
                 createTime: Date.now() + 100,
                 value: '10',
-            }
+            },
+            '6': {
+                dataId: '6',
+                tariffId: 'tariffId_2',
+                createTime: Date.now() + 200,
+                value: '40',
+            },
         },
     }
 };
@@ -75,6 +87,21 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 list: dataList,
+            }
+        }
+        case TARIFF_DATA.EDIT: {
+            const editData = action.payload;
+            if (!editData) return state;
+
+            return {
+                ...state,
+                editData: editData
+            }
+        }
+        case TARIFF_DATA.RESET_EDIT: {
+            return {
+                ...state,
+                editData: {}
             }
         }
         default: return state;

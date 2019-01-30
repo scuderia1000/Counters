@@ -1,9 +1,11 @@
 export const cloneObject = obj => JSON.parse(JSON.stringify(obj));
 
-export const calculateCounterValues = (counterData, counterTariffs, tariffsData) => {
+export const calculateCounterValues = (counterId, tariffs, tariffsData) => {
     const tariffsIds = Object.keys(tariffsData);
-    const result = [];
+    const counterTariffs = cloneObject(tariffs.list[counterId]);
+
     const sortedTariffsData = {}; // key = date
+
     tariffsIds.forEach(tariffId => {
         const dataIds = Object.keys(tariffsData[tariffId]);
         dataIds.sort((dataId1, dataId2) => tariffsData[tariffId][dataId2].createTime - tariffsData[tariffId][dataId1].createTime);
@@ -22,6 +24,7 @@ export const calculateCounterValues = (counterData, counterTariffs, tariffsData)
                     ...sortedTariffsData[data.createTime],
                     [tariffName]: {
                         dataId: dataId,
+                        tariffId: tariffId,
                         previousValue: previousValue,
                         currentValue: currentValue,
                         difference: (difference ^ 0) === difference ? difference : difference.toFixed(1),
@@ -47,4 +50,17 @@ export const calculateCounterValues = (counterData, counterTariffs, tariffsData)
             }
         }
     });
+};
+
+export const getCounterTariffsData = (counterId, tariffs = {}, tariffsValues = {}, ) => {
+    const counterTariffs = cloneObject(tariffs.list[counterId]);
+    const tariffsIds = Object.keys(counterTariffs);
+    const tariffsData = {};
+
+    tariffsIds.forEach(id => {
+        if (tariffsValues.list[id]) {
+            tariffsData[id] = cloneObject(tariffsValues.list[id]);
+        }
+    });
+    return tariffsData;
 };

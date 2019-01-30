@@ -6,10 +6,10 @@ import ActionSheet from 'react-native-actionsheet';
 import CountersModal from '../CountersModal/CountersModal';
 import CommonButton from '../../components/buttons/CommonButton';
 import CountersListItem from '../../components/countersList/CountersListItem';
-import { editCounter, removeCounter, removeCounterTariffs, calculateCounterData } from './actions/HomeActions';
+import { editCounter, removeCounter, removeCounterTariffs } from './actions/HomeActions';
 // const
 import { ADD_COUNTER } from '../../constants/ProjectConst';
-import { calculateCounterValues, cloneObject } from '../../constants/FunctionConst';
+import { calculateCounterValues, cloneObject, getCounterTariffsData } from '../../constants/FunctionConst';
 //style
 import styles from './HomeStyles';
 import {createCounter} from "../AddCounter/actions/AddCounterActions";
@@ -77,23 +77,14 @@ class Home extends Component {
     };
 
     openCounterData = (id) => {
-        console.log('openCounterData')
         const { counters = {}, tariffs = {}, tariffsValues = {}, updateCounterData } = this.props;
-        const counterData = counters.list[id];
 
-
-        const counterTariffs = cloneObject(tariffs.list[id]);
-        const tariffsIds = Object.keys(counterTariffs);
-
-        const tariffsData = {};
-        tariffsIds.forEach(id => {
-            if (tariffsValues.list[id]) {
-                tariffsData[id] = cloneObject(tariffsValues.list[id]);
-            }
-        });
+        const tariffsData = getCounterTariffsData(id, tariffs, tariffsValues);
 
         if (Object.keys(tariffsData).length !== 0) {
-            const counterValues = calculateCounterValues(counterData, counterTariffs, tariffsData);
+            const counterData = counters.list[id];
+
+            const counterValues = calculateCounterValues(id, tariffs, tariffsData);
             if (counterValues.length) {
                 updateCounterData(id, counterValues);
                 this.props.navigation.navigate('TariffData', {title: counterData.counterName});

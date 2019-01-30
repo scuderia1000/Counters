@@ -20,6 +20,8 @@ import CommonButton from "../../components/buttons/CommonButton";
 import { createTariffData } from "./actions/TariffDataInputActions";
 // styles
 import styles from './TariffDataInputStyles';
+import {COUNTERS_VALUES, TARIFF_DATA} from "../../constants/ActionConst";
+import {calculateCounterValues, getCounterTariffsData} from "../../constants/FunctionConst";
 
 class TariffDataInput extends Component {
     static navigationOptions = {
@@ -38,8 +40,25 @@ class TariffDataInput extends Component {
     }
 
     componentDidMount() {
-
-
+        const { tariffsValues = {} } = this.props;
+        const { list, editData  } = tariffsValues;
+        if (list && editData) {
+            const values = {};
+            editData.dataIds.forEach(dataId => {
+                Object.keys(list).forEach(tariffId => {
+                    const dataIds = Object.keys(list[tariffId]);
+                    if (dataIds.includes(dataId)) {
+                        values[tariffId] = {
+                            value: list[tariffId][dataId].value,
+                            dataId: dataId
+                        }
+                    }
+                })
+            });
+            this.setState({
+                values: values
+            })
+        }
         // при таком варианте установки фокуса, чтобы открылась клавиатура, приложение зависает,
         // если этот экран вызывается через setTimeout в Home.handleAddCounterData
         /*if (this.inputs.length && this.inputs[0] && this.inputs[0].current) {
@@ -52,6 +71,20 @@ class TariffDataInput extends Component {
         const { isTorchOn } = this.state;
         if (isTorchOn) {
             Torch.switchState(false);
+        }
+        const { tariffsValues = {}, tariffs = {} } = this.props;
+        const { list, editData = {} } = tariffsValues;
+
+        const counterId = editData.counterId;
+        if (list && editData && counterId) {
+            const tariffsData = getCounterTariffsData(counterId, tariffs, tariffsValues);
+            if (Object.keys(tariffsData).length !== 0) {
+                const counterValues = calculateCounterValues(counterId, tariffs, tariffsData);
+                if (counterValues.length) {
+                    this.props.updateCounterData(counterId, counterValues);
+                }
+            }
+            this.props.resetEditData();
         }
     }
 
@@ -158,7 +191,6 @@ class TariffDataInput extends Component {
     };
 
     render() {
-        console.log('tarissData', this.state)
         return (
             <View style={styles.container}>
                 <ScrollView keyboardShouldPersistTaps={'always'}>
@@ -178,24 +210,6 @@ class TariffDataInput extends Component {
                               caption={'Сохранить'}
                     // icon={{name: 'plus', type: 'material-community', color: 'white'}}
                 />
-                {/*<KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}
-                                         // ref={this.scrollView}
-                                         getTextInputRefs={() => { return this.inputs }}
-                >
-                    <View style={styles.torchComponent}>
-                        <CommonButton style={styles.torch}
-                                      onPress={this.handleTorchClick}
-                                      caption={'Фонарик'}
-                                      captionStyle={styles.torchCaption}
-                            // icon={{name: 'plus', type: 'material-community', color: 'white'}}
-                        />
-                    </View>
-                    {this.getTariffsComponents()}
-                </KeyboardAwareScrollView>
-                <CommonButton onPress={this.handleAddData}
-                              caption={'Сохранить'}
-                              // icon={{name: 'plus', type: 'material-community', color: 'white'}}
-                />*/}
             </View>
         )
     }
@@ -204,10 +218,24 @@ class TariffDataInput extends Component {
 const mapStateToProps = state => ({
     counters: state.counters,
     tariffsList: state.tariffs.list,
+    tariffs: state.tariffs,
+    tariffsValues: state.tariffsData,
 });
 const dispatchers = dispatch => ({
     saveData: (data) => {
         dispatch(createTariffData(data));
-    }
+    },
+    resetEditData: () => {
+        dispatch({type: TARIFF_DATA.RESET_EDIT})
+    },
+    updateCounterData: (counterId, counterData) => {
+        dispatch({
+            type: COUNTERS_VALUES.UPDATE,
+            payload: {
+                counterId: counterId,
+                counterData: counterData
+            }
+        });
+    },
 });
 export default connect(mapStateToProps, dispatchers)(TariffDataInput);

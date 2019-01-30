@@ -30,6 +30,7 @@ export default StyleSheet.create({
         width: '100%',
         alignItems: 'flex-end',
         justifyContent: 'center',
+        paddingRight: 5,
     },
     tariffName: {
         flex: 1.9,
