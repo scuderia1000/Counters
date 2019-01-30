@@ -17,6 +17,7 @@ import ActionSheet from "react-native-actionsheet";
 // own component
 import NumberText from '../../components/text/NumberText';
 import { TARIFF_DATA } from '../../constants/ActionConst';
+import { removeTariffData } from './actions/TariffDataActions';
 // styles
 import styles from './TariffDataStyles';
 import CommonButton from "../../components/buttons/CommonButton";
@@ -112,9 +113,7 @@ class TariffData extends Component {
             },
             {
                 title: 'Удалить',
-                action: () => {
-
-                }
+                action: this.removeData
             },
             {
                 title: 'Отмена',
@@ -133,7 +132,16 @@ class TariffData extends Component {
         return options;
     };
 
-    handleEditCounterData = () => {
+    removeData = () => {
+        const editData = this.getEditData();
+        const counterId = editData.counterId;
+        const dataIds = editData.dataIds;
+        if (counterId && dataIds.length) {
+            this.props.removeData(counterId, dataIds);
+        }
+    };
+
+    getEditData = () => {
         const { currentCounterId } = this.props;
         const { activeData } = this.state;
         const editData = {
@@ -142,6 +150,11 @@ class TariffData extends Component {
         };
 
         editData.dataIds = Object.keys(activeData).map(tariffName => activeData[tariffName].dataId);
+        return editData;
+    };
+
+    handleEditCounterData = () => {
+        const editData = this.getEditData();
 
         this.props.editData(editData);
     };
@@ -192,6 +205,16 @@ const dispatchers = dispatch => ({
     resetEditData: () => {
         dispatch({type: TARIFF_DATA.RESET_EDIT})
     },
+    removeData: (counterId, dataIds) => {
+        dispatch(removeTariffData(counterId, dataIds));
+        /*dispatch({
+            type: TARIFF_DATA.REMOVE,
+            payload: {
+                counterId: counterId,
+                dataIds: dataIds,
+            }
+        })*/
+    }
 });
 
 export default connect(mapStateToProps, dispatchers)(TariffData)

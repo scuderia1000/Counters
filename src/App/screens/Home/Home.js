@@ -80,13 +80,12 @@ class Home extends Component {
         const { counters = {}, tariffs = {}, tariffsValues = {}, updateCounterData } = this.props;
 
         const tariffsData = getCounterTariffsData(id, tariffs, tariffsValues);
-
         if (Object.keys(tariffsData).length !== 0) {
-            const counterData = counters.list[id];
-
             const counterValues = calculateCounterValues(id, tariffs, tariffsData);
             if (counterValues.length) {
                 updateCounterData(id, counterValues);
+
+                const counterData = counters.list[id];
                 this.props.navigation.navigate('TariffData', {title: counterData.counterName});
             }
         }

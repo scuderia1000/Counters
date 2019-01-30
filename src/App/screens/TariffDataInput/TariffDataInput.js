@@ -4,16 +4,12 @@ import {connect} from "react-redux";
 // libraries
 import {
     View,
-    TouchableOpacity,
-    Text,
-    FlatList,
     ToastAndroid,
     Platform,
     ScrollView,
     KeyboardAvoidingView
 } from 'react-native';
 import Torch from 'react-native-torch';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
 // own component
 import CounterField from '../../components/counterField/CounterField';
 import CommonButton from "../../components/buttons/CommonButton";
@@ -76,7 +72,7 @@ class TariffDataInput extends Component {
         const { list, editData = {} } = tariffsValues;
 
         const counterId = editData.counterId;
-        if (list && editData && counterId) {
+        if (list && counterId) {
             const tariffsData = getCounterTariffsData(counterId, tariffs, tariffsValues);
             if (Object.keys(tariffsData).length !== 0) {
                 const counterValues = calculateCounterValues(counterId, tariffs, tariffsData);
@@ -105,9 +101,8 @@ class TariffDataInput extends Component {
 
     checkFields = () => {
         const {tariffsList, navigation} = this.props;
-        const {values, errorsTariff} = this.state;
+        const {values} = this.state;
         const counterId = navigation.getParam('counterId', '');
-        const valuesIds = Object.keys(values);
         if (counterId) {
             const tariff = tariffsList[counterId];
             const tariffIds = Object.keys(tariff);

@@ -104,6 +104,29 @@ export default (state = initialState, action) => {
                 editData: {}
             }
         }
+        case TARIFF_DATA.REMOVE: {
+            const dataIds = action.payload.dataIds;
+            if (!dataIds.length) return state;
+
+            const dataList = state.list ? cloneObject(state.list) : {};
+            const tariffsIds = Object.keys(dataList);
+            if (tariffsIds.length) {
+                dataIds.forEach(dataId => {
+                    tariffsIds.forEach(tariffId => {
+                        const tariffDataIds = Object.keys(dataList[tariffId]);
+                        if (dataIds.includes(dataId)) {
+                            delete dataList[tariffId][dataId];
+                        }
+                    })
+                });
+
+            }
+
+            return {
+                ...state,
+                list: dataList
+            }
+        }
         default: return state;
     }
 }
