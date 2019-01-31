@@ -14,11 +14,11 @@ export const calculateCounterValues = (counterId, tariffs, tariffsData) => {
             if (index !== dataIds.length - 1) {
                 const tariffName = counterTariffs[tariffId].name;
                 const previousDataId = dataIds[index + 1];
-                const previousValue = tariffsData[tariffId][previousDataId].value;
-                const currentValue = tariffsData[tariffId][dataId].value;
+                const previousValue = Number(tariffsData[tariffId][previousDataId].value);
+                const currentValue = Number(tariffsData[tariffId][dataId].value);
                 const difference = currentValue - previousValue;
-                const tariffAmount = counterTariffs[tariffId].amount;
-                const total = difference * tariffAmount;
+                const tariffAmount = Number(counterTariffs[tariffId].amount);
+                const total = Number(difference) * Number(tariffAmount);
 
                 sortedTariffsData[data.createTime] = {
                     ...sortedTariffsData[data.createTime],
@@ -28,21 +28,18 @@ export const calculateCounterValues = (counterId, tariffs, tariffsData) => {
                         previousValue: previousValue,
                         currentValue: currentValue,
                         difference: (difference ^ 0) === difference ? difference : difference.toFixed(1),
-                        tariffAmount: Number(tariffAmount).toFixed(2),
-                        total: total.toFixed(2)
+                        tariffAmount: tariffAmount && tariffAmount.toFixed(2) || 0,
+                        total: total && total.toFixed(2) || 0,
                     },
 
                 }
             }
         });
     });
-    // console.log('sortedTariffsData', sortedTariffsData);
-    // return sortedTariffsData;
     return Object.keys(sortedTariffsData).map(date => {
         const amountByDate = Object.keys(sortedTariffsData[date])
             .map(tariffName => sortedTariffsData[date][tariffName].total)
             .reduce((accumulator, currentValue) => Number(accumulator) + Number(currentValue));
-        console.log('amountByDate', amountByDate)
         return {
             [date]: {
                 tariffs: sortedTariffsData[date],
