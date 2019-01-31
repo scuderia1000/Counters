@@ -7,10 +7,7 @@ import {
     TouchableOpacity,
     Text,
     FlatList,
-    ToastAndroid,
-    Platform,
-    ScrollView,
-    KeyboardAvoidingView
+    Linking
 } from 'react-native';
 import {Divider} from "react-native-elements";
 import ActionSheet from "react-native-actionsheet";
@@ -18,13 +15,15 @@ import ActionSheet from "react-native-actionsheet";
 import NumberText from '../../components/text/NumberText';
 import { TARIFF_DATA } from '../../constants/ActionConst';
 import { removeTariffData } from './actions/TariffDataActions';
+import { getEmailBody } from '../../constants/FunctionConst';
+import { EMAIL_SUBJECT } from '../../constants/ProjectConst';
+import { colors } from "../../constants/Colors";
 // styles
 import styles from './TariffDataStyles';
-import CommonButton from "../../components/buttons/CommonButton";
 
 const header = (
     <View key={'headerRow'} style={styles.headerContainer}>
-        <Text style={[styles.text, styles.tariffName]}>{'Название'}</Text>
+        <NumberText containerStyle={[styles.text, styles.tariffName]}>{'Название'}</NumberText>
         <NumberText containerStyle={styles.previousValue}>{'Пред.'}</NumberText>
         <NumberText containerStyle={styles.currentValue}>{'Текущее'}</NumberText>
         <NumberText containerStyle={styles.difference}>{'Расход'}</NumberText>
@@ -56,7 +55,7 @@ class TariffData extends Component {
     tariffRow = (tariffName, tariff) => {
         return (
             <View key={tariff.dataId} style={styles.tariffRowContainer}>
-                <Text style={[styles.text, styles.tariffName]}>{tariffName}</Text>
+                <NumberText containerStyle={[styles.text, styles.tariffName]}>{tariffName}</NumberText>
                 <NumberText containerStyle={styles.previousValue}>{tariff.previousValue}</NumberText>
                 <NumberText containerStyle={styles.currentValue}>{tariff.currentValue}</NumberText>
                 <NumberText containerStyle={styles.difference}>{tariff.difference}</NumberText>
@@ -75,11 +74,13 @@ class TariffData extends Component {
         return dates.map(date => {
             const localDate = new Date(Number(date));
             const options = {day: 'numeric', month: 'long', year: 'numeric'};
+            const formattedDate = localDate.toLocaleString('ru-RU', options);
+            console.log('formattedDate', formattedDate)
             return (
                 <TouchableOpacity key={date}
                                   style={styles.itemContainer}
                                   onPress={() => this.showActionSheet(item[date].tariffs)}>
-                    <Text style={styles.date}>{localDate.toLocaleString('ru-RU', options)}</Text>
+                    <NumberText containerStyle={styles.date}>{formattedDate}</NumberText>
                     <View style={styles.tariffsContainer}>
                         {this.getTariffsRows(item[date].tariffs)}
                     </View>
@@ -121,12 +122,11 @@ class TariffData extends Component {
         ];
 
         if (list && list[currentCounterId] && list[currentCounterId].emailAddress) {
-            options.unshift({
-                title: 'Передать показания',
-                action: () => {
-
-                }
-            })
+            options.splice(options.length - 1, 0, {
+                title: <Text style={{fontSize: 18, color: colors.green}}>Передать показания</Text>,
+                // title: 'Передать показания',
+                action: this.sendEmail
+            });
         }
 
         return options;
@@ -157,6 +157,38 @@ class TariffData extends Component {
         const editData = this.getEditData();
 
         this.props.editData(editData);
+    };
+
+    sendEmail = () => {
+        const url = this.getUrl();
+        Linking.canOpenURL(url)
+            .then((supported) => {
+                if (!supported) {
+                    console.log("Can't handle url: " + url);
+                } else {
+                    return Linking.openURL(url);
+                }
+            })
+            .catch((err) => console.error('An error occurred', err));
+    };
+
+    getUrl = () => {
+        const { counters = {}, currentCounterId } = this.props;
+        const { list = {} } = counters;
+        const { activeData } = this.state;
+        const currentCounter = list[currentCounterId];
+
+        let url = `mailto:${currentCounter.emailAddress}?subject=${EMAIL_SUBJECT}&body=`;
+        let body = getEmailBody(currentCounter.personalAccount, currentCounter.fio, currentCounter.address);
+
+        Object.keys(activeData).forEach(tariffName => {
+             body += `${tariffName}: Предыдущие: ${activeData[tariffName].previousValue}, Текущие: ${activeData[tariffName].currentValue}\n`
+            // 'Холодная вода: Пред. показания: 710, Текущие: 719\n' +
+            // 'Горячая вода: Пред. показания: 672, Текущие: 681'
+        });
+        url += body;
+
+        return url;
     };
 
     render() {
@@ -207,13 +239,6 @@ const dispatchers = dispatch => ({
     },
     removeData: (counterId, dataIds) => {
         dispatch(removeTariffData(counterId, dataIds));
-        /*dispatch({
-            type: TARIFF_DATA.REMOVE,
-            payload: {
-                counterId: counterId,
-                dataIds: dataIds,
-            }
-        })*/
     }
 });
 

@@ -64,3 +64,9 @@ export const getCounterTariffsData = (counterId, tariffs = {}, tariffsValues = {
     });
     return tariffsData;
 };
+
+export const getEmailBody = (personalAccount, fio, address,) => {
+    return `Лицевой счет №: ${personalAccount}\n` +
+        `ФИО: ${fio}\n` +
+        `Адрес: ${address}\n`;
+};

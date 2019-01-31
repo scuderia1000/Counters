@@ -37,8 +37,8 @@ class TariffDataInput extends Component {
 
     componentDidMount() {
         const { tariffsValues = {} } = this.props;
-        const { list, editData  } = tariffsValues;
-        if (list && editData) {
+        const { list, editData = {} } = tariffsValues;
+        if (list && editData.counterId) {
             const values = {};
             editData.dataIds.forEach(dataId => {
                 Object.keys(list).forEach(tariffId => {
@@ -118,13 +118,20 @@ class TariffDataInput extends Component {
         return false;
     };
 
+    focusNextInput = (index) => {
+        if (this.inputs[index] && this.inputs[index].current) {
+            this.inputs[index].current.focus();
+        }
+    };
+
     getTariffsComponents = () => {
         const {tariffsList, navigation} = this.props;
         const {values, errorsTariff} = this.state;
         const counterId = navigation.getParam('counterId', '');
         if (counterId) {
             const tariff = tariffsList[counterId];
-            return Object.keys(tariff).map((id, index) => {
+            const tariffIds = Object.keys(tariff);
+            return tariffIds.map((id, index) => {
                 const field = {
                     label: tariff[id].name,
                     style: {height: 90},
@@ -132,8 +139,10 @@ class TariffDataInput extends Component {
                     errorText: 'Введите значение',
                     errorStyle: {
                         bottom: -2,
-                    }
+                    },
+                    returnKeyType: index === tariffIds.length - 1 ? 'done' : 'next',
                 };
+                const onSubmitEditing = index !== tariffIds.length - 1 ? this.focusNextInput : () => {};
                 this.inputs[index] = React.createRef();
                 return (
                     <CounterField key={`${id}_${index}`}
@@ -145,6 +154,7 @@ class TariffDataInput extends Component {
                                   isError={!!errorsTariff.length && errorsTariff.includes(id)}
                                   onChange={this.handleFieldChange}
                                   autoFocus={index === 0}
+                                  onSubmitEditing={onSubmitEditing}
                     />
                 );
             })

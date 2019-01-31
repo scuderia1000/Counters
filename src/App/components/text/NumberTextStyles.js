@@ -12,6 +12,6 @@ export default StyleSheet.create({
         paddingRight: 5,
     },
     text: {
-        // paddingRight: 5
+        fontSize: 12,
     }
 });

@@ -4,3 +4,5 @@ export const ADD_COUNTER = {
         EDIT: 'Редактировать счетчик',
     },
 };
+
+export const EMAIL_SUBJECT = 'Показания';

@@ -10,8 +10,9 @@ import { colors } from '../../constants/Colors';
 
 const CounterField = React.forwardRef(({ field = {}, type, index, onChange, isError = false, value,
                                            hasDelButton = false, onDelPress = () => {}, autoFocus = false,
-                                           onFocus = () => {} }, ref) => {
-    const { label = '', keyboardType = 'default', placeholder = '', style = {}, errorText = '', errorStyle } = field;
+                                           onFocus = () => {}, onSubmitEditing = () => {} }, ref) => {
+    const { label = '', keyboardType = 'default', placeholder = '', style = {}, errorText = '', errorStyle,
+        returnKeyType = 'next' } = field;
     return(
         <View key={`${type}_${index}`} style={[styles.container, style]}>
             {!!label && <FormLabel>{label}</FormLabel>}
@@ -25,7 +26,11 @@ const CounterField = React.forwardRef(({ field = {}, type, index, onChange, isEr
                            textInputRef={ref}
                            underlineColorAndroid={colors.gray}
                            value={value}
-                           returnKeyType={'next'}
+                           returnKeyType={returnKeyType}
+                           blurOnSubmit={false}
+                           onSubmitEditing={() => {
+                               onSubmitEditing(index + 1);
+                           }}
                            onChangeText={value => {
                                onChange(type, value, index);
                            }}

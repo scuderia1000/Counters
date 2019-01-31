@@ -299,9 +299,11 @@ class AddCounter extends Component {
     getFieldsComponents = (fields = {}) => {
         const { errorsDefault, fieldsValues } = this.state;
         const { counterId } = this.props.counters;
+        const fieldsKeys = Object.keys(fields);
 
-        return Object.keys(fields).map((key, i) => {
+        return fieldsKeys.map((key, i) => {
             this.inputsRefs[i] = React.createRef();
+            const onSubmitEditing = i !== fieldsKeys.length - 1 ? this.focusNextInput : () => {};
             return (
                 <CounterField key={`${key}_${i}`}
                               type={key}
@@ -310,10 +312,17 @@ class AddCounter extends Component {
                               index={i}
                               value={fieldsValues[key]}
                               ref={this.inputsRefs[i]}
+                              onSubmitEditing={onSubmitEditing}
                               isError={!!errorsDefault.length && errorsDefault.includes(key)}
                               onChange={this.handleFieldChange} />
             )
         });
+    };
+
+    focusNextInput = (index) => {
+        if (this.inputsRefs[index] && this.inputsRefs[index].current) {
+            this.inputsRefs[index].current.focus();
+        }
     };
 
     render() {
