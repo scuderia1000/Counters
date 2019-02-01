@@ -51,7 +51,7 @@ const initialState = {
 export default (state = initialState, action) => {
     switch (action.type) {
         case TARIFF_DATA.CREATE: {
-            const newData = action.payload;
+            const newData = action.payload.tariffData;
             const tariffIds = Object.keys(newData);
             const dataList = state.list ? cloneObject(state.list) : {};
 
@@ -113,7 +113,6 @@ export default (state = initialState, action) => {
             if (tariffsIds.length) {
                 dataIds.forEach(dataId => {
                     tariffsIds.forEach(tariffId => {
-                        const tariffDataIds = Object.keys(dataList[tariffId]);
                         if (dataIds.includes(dataId)) {
                             delete dataList[tariffId][dataId];
                         }
@@ -125,6 +124,20 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 list: dataList
+            }
+        }
+        case TARIFF_DATA.REMOVE_ALL_TARIFFS_DATA: {
+            const tariffsIds = action.payload.tariffsIds;
+            if (!tariffsIds.length) return state;
+
+            const dataList = state.list ? cloneObject(state.list) : {};
+            tariffsIds.forEach(tariffId => {
+                delete dataList[tariffId];
+            });
+
+            return {
+                ...state,
+                list: dataList,
             }
         }
         default: return state;

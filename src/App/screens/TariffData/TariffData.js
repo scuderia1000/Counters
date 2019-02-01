@@ -84,9 +84,7 @@ class TariffData extends Component {
                     <View style={styles.tariffsContainer}>
                         {this.getTariffsRows(item[date].tariffs)}
                     </View>
-                    <View style={styles.total}>
-                        <Text>{item[date].total}</Text>
-                    </View>
+                    <NumberText containerStyle={styles.total}>{item[date].total}</NumberText>
                 </TouchableOpacity>
             )
         });

@@ -1,4 +1,4 @@
-export const cloneObject = obj => JSON.parse(JSON.stringify(obj));
+export const cloneObject = (obj = {}) => JSON.parse(JSON.stringify(obj));
 
 export const calculateCounterValues = (counterId, tariffs, tariffsData) => {
     const tariffsIds = Object.keys(tariffsData);
@@ -40,17 +40,19 @@ export const calculateCounterValues = (counterId, tariffs, tariffsData) => {
         const amountByDate = Object.keys(sortedTariffsData[date])
             .map(tariffName => sortedTariffsData[date][tariffName].total)
             .reduce((accumulator, currentValue) => Number(accumulator) + Number(currentValue));
+        console.log('amountByDate', amountByDate)
         return {
             [date]: {
                 tariffs: sortedTariffsData[date],
-                total: amountByDate.toFixed(2),
+                total: amountByDate && amountByDate.toFixed(2) || 0,
             }
         }
     });
 };
 
 export const getCounterTariffsData = (counterId, tariffs = {}, tariffsValues = {}, ) => {
-    const counterTariffs = cloneObject(tariffs.list[counterId]);
+    const { list = {} } = tariffs;
+    const counterTariffs = cloneObject(list[counterId]);
     const tariffsIds = Object.keys(counterTariffs);
     const tariffsData = {};
 

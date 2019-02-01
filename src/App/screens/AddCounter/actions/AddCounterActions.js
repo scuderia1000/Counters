@@ -65,7 +65,7 @@ export const createCounterTariff = (counterId, data) => {
     }
 
     return (dispatch, getState) => {
-        dispatch(createTariffData(tariffData));
+        dispatch(createTariffData(counterId, tariffData));
         dispatch({
             type: TARIFF.CREATE,
             payload: {

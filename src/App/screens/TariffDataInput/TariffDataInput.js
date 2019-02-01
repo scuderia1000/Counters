@@ -68,18 +68,11 @@ class TariffDataInput extends Component {
         if (isTorchOn) {
             Torch.switchState(false);
         }
-        const { tariffsValues = {}, tariffs = {} } = this.props;
-        const { list, editData = {} } = tariffsValues;
+        const { tariffsValues = {} } = this.props;
+        const { editData = {} } = tariffsValues;
 
         const counterId = editData.counterId;
-        if (list && counterId) {
-            const tariffsData = getCounterTariffsData(counterId, tariffs, tariffsValues);
-            if (Object.keys(tariffsData).length !== 0) {
-                const counterValues = calculateCounterValues(counterId, tariffs, tariffsData);
-                if (counterValues.length) {
-                    this.props.updateCounterData(counterId, counterValues);
-                }
-            }
+        if (counterId) {
             this.props.resetEditData();
         }
     }
@@ -124,6 +117,15 @@ class TariffDataInput extends Component {
         }
     };
 
+    handleAddData = () => {
+        const { navigation } = this.props;
+        if (this.checkFields()) {
+            const counterId = navigation.getParam('counterId', '');
+            this.props.saveData(counterId, this.state.values);
+            this.props.navigation.goBack();
+        }
+    };
+
     getTariffsComponents = () => {
         const {tariffsList, navigation} = this.props;
         const {values, errorsTariff} = this.state;
@@ -161,13 +163,6 @@ class TariffDataInput extends Component {
         }
 
         return [];
-    };
-
-    handleAddData = () => {
-        if (this.checkFields()) {
-            this.props.saveData(this.state.values);
-            this.props.navigation.goBack();
-        }
     };
 
     handleTorchClick = async () => {
@@ -227,8 +222,8 @@ const mapStateToProps = state => ({
     tariffsValues: state.tariffsData,
 });
 const dispatchers = dispatch => ({
-    saveData: (data) => {
-        dispatch(createTariffData(data));
+    saveData: (counterId, data) => {
+        dispatch(createTariffData(counterId, data));
     },
     resetEditData: () => {
         dispatch({type: TARIFF_DATA.RESET_EDIT})

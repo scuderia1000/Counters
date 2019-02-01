@@ -7,13 +7,14 @@ import CountersModal from '../CountersModal/CountersModal';
 import CommonButton from '../../components/buttons/CommonButton';
 import CountersListItem from '../../components/countersList/CountersListItem';
 import { editCounter, removeCounter, removeCounterTariffs } from './actions/HomeActions';
+import { removeAllTariffsData } from '../TariffData/actions/TariffDataActions';
 // const
 import { ADD_COUNTER } from '../../constants/ProjectConst';
 import { calculateCounterValues, cloneObject, getCounterTariffsData } from '../../constants/FunctionConst';
 //style
 import styles from './HomeStyles';
 import {createCounter} from "../AddCounter/actions/AddCounterActions";
-import {COUNTERS_VALUES} from "../../constants/ActionConst";
+import {COUNTERS_VALUES, TARIFF_DATA} from "../../constants/ActionConst";
 
 const iconStyle = {
     type: 'material-community',
@@ -77,17 +78,13 @@ class Home extends Component {
     };
 
     openCounterData = (id) => {
-        const { counters = {}, tariffs = {}, tariffsValues = {}, updateCounterData } = this.props;
-
-        const tariffsData = getCounterTariffsData(id, tariffs, tariffsValues);
-        if (Object.keys(tariffsData).length !== 0) {
-            const counterValues = calculateCounterValues(id, tariffs, tariffsData);
-            if (counterValues.length) {
-                updateCounterData(id, counterValues);
-
-                const counterData = counters.list[id];
-                this.props.navigation.navigate('TariffData', {title: counterData.counterName});
-            }
+        const { counters = {}, countersValues = {} } = this.props;
+        const { list = {}} = countersValues;
+        const countersIds = Object.keys(list);
+        const counterId = String(id);
+        if (countersIds.length && countersIds.includes(counterId)) {
+            const counterData = counters.list[counterId];
+            this.props.navigation.navigate('TariffData', {title: counterData.counterName});
         }
     };
 
@@ -100,10 +97,12 @@ class Home extends Component {
         <CountersListItem
             id={item.id}
             onPressItem={this.openCounterData}
+            // onLongPress={this.openCounterData}
             onLongPress={this.editCounter}
             title={item.counterName}
             onDelPress={() => {
                 this.props.removeCounter(item.id);
+                this.props.removeAllTariffsData(item.id);
                 this.props.removeCounterTariffs(item.id);
             }}
         />
@@ -190,6 +189,7 @@ const mapStateToProps = state => ({
     counters: state.counters,
     tariffs: state.tariffs,
     tariffsValues: state.tariffsData,
+    countersValues: state.countersValues,
 });
 const dispatchers = dispatch => ({
     editCounter: (counterId) => {
@@ -201,14 +201,8 @@ const dispatchers = dispatch => ({
     removeCounterTariffs: (counterId) => {
         dispatch(removeCounterTariffs(counterId))
     },
-    updateCounterData: (counterId, counterData) => {
-        dispatch({
-            type: COUNTERS_VALUES.UPDATE,
-            payload: {
-                counterId: counterId,
-                counterData: counterData
-            }
-        });
-    },
+    removeAllTariffsData: (counterId)=> {
+        dispatch(removeAllTariffsData(counterId));
+    }
 });
 export default connect(mapStateToProps, dispatchers)(Home);
