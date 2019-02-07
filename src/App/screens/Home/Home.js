@@ -84,6 +84,7 @@ class Home extends Component {
         const counterId = String(id);
         if (countersIds.length && countersIds.includes(counterId)) {
             const counterData = counters.list[counterId];
+            this.props.setCounterId(counterId);
             this.props.navigation.navigate('TariffData', {title: counterData.counterName});
         }
     };
@@ -203,6 +204,14 @@ const dispatchers = dispatch => ({
     },
     removeAllTariffsData: (counterId)=> {
         dispatch(removeAllTariffsData(counterId));
+    },
+    setCounterId: (counterId) => {
+        dispatch({
+            type: COUNTERS_VALUES.OPEN,
+            payload: {
+                counterId: counterId
+            }
+        })
     }
 });
 export default connect(mapStateToProps, dispatchers)(Home);

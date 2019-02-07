@@ -19,4 +19,5 @@ export const TARIFF_DATA = {
 
 export const COUNTERS_VALUES = {
     UPDATE: "UPDATE_COUNTERS_VALUES",
+    OPEN: "OPEN_COUNTERS_VALUES",
 };

@@ -118,11 +118,22 @@ class TariffDataInput extends Component {
     };
 
     handleAddData = () => {
-        const { navigation } = this.props;
+        const { navigation, countersValues = {}, counters = {} } = this.props;
+        const { list = {}} = countersValues;
+
         if (this.checkFields()) {
             const counterId = navigation.getParam('counterId', '');
             this.props.saveData(counterId, this.state.values);
-            this.props.navigation.goBack();
+
+            const countersIds = Object.keys(list);
+            // пока сделал так, в голову не приходит как по нормальному перейти к экранну с данными после обновления стора
+            if (countersIds.length && countersIds.includes(counterId)) {
+                const counterData = counters.list[counterId];
+                this.props.setCounterId(counterId);
+                navigation.navigate('TariffData', {title: counterData.counterName});
+            } else {
+                navigation.goBack();
+            }
         }
     };
 
@@ -220,6 +231,7 @@ const mapStateToProps = state => ({
     tariffsList: state.tariffs.list,
     tariffs: state.tariffs,
     tariffsValues: state.tariffsData,
+    countersValues: state.countersValues,
 });
 const dispatchers = dispatch => ({
     saveData: (counterId, data) => {
@@ -237,5 +249,13 @@ const dispatchers = dispatch => ({
             }
         });
     },
+    setCounterId: (counterId) => {
+        dispatch({
+            type: COUNTERS_VALUES.OPEN,
+            payload: {
+                counterId: counterId
+            }
+        })
+    }
 });
 export default connect(mapStateToProps, dispatchers)(TariffDataInput);

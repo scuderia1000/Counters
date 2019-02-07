@@ -28,6 +28,15 @@ const initState = {
 
 export default (state = initState, action) => {
     switch (action.type) {
+        case COUNTERS_VALUES.OPEN: {
+            const { counterId = '' } = action.payload;
+            if (!counterId) return state;
+
+            return {
+                ...state,
+                currentCounterId: counterId
+            }
+        }
         case COUNTERS_VALUES.UPDATE: {
             const { counterId = '', counterData = ''} = action.payload;
             if (!counterId) return state;
@@ -40,9 +49,8 @@ export default (state = initState, action) => {
                         ...counterData
                     ]
                 },
-                currentCounterId: counterId
+                // currentCounterId: counterId
             }
-
         }
 
         default: return state;
