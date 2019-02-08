@@ -137,6 +137,13 @@ android {
 }
 
 dependencies {
+    implementation(project(":react-native-google-signin"))
+//    implementation "com.google.android.gms:play-services-auth:${rootProject.ext.googlePlayServicesAuthVersion}"
+    implementation 'com.facebook.android:facebook-android-sdk:4.34.0'
+    implementation project(':react-native-fbsdk')
+    implementation(project(':react-native-firebase')) {
+        transitive = false
+    }
     implementation project(':rn-fetch-blob')
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-torch')
@@ -145,6 +152,11 @@ dependencies {
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     implementation "com.facebook.react:react-native:+"  // From node_modules
     apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
+
+    // Firebase dependencies
+    implementation "com.google.android.gms:play-services-base:16.1.0"
+    implementation "com.google.firebase:firebase-core:16.0.7"
+    implementation "com.google.firebase:firebase-auth:16.1.0"
 }
 
 // Run this once to be able to run the application with BUCK
@@ -153,3 +165,4 @@ task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.compile
     into 'libs'
 }
+apply plugin: 'com.google.gms.google-services'
