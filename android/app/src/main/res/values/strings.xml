@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Counters</string>
+    <string name="facebook_app_id">378637616264846</string>
+    <string name="fb_login_protocol_scheme">fb378637616264846</string>
 </resources>
