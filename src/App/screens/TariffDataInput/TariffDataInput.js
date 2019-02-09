@@ -118,11 +118,12 @@ class TariffDataInput extends Component {
     };
 
     handleAddData = () => {
-        const { navigation, countersValues = {}, counters = {} } = this.props;
+        const { navigation, countersValues = {}, counters = {}, tariffsValues = {} } = this.props;
         const { list = {}} = countersValues;
+        const { editData = {} } = tariffsValues;
 
         if (this.checkFields()) {
-            const counterId = navigation.getParam('counterId', '');
+            const counterId = editData.counterId;
             this.props.saveData(counterId, this.state.values);
 
             const countersIds = Object.keys(list);

@@ -69,3 +69,56 @@ export const getEmailBody = (personalAccount, fio, address,) => {
         `ФИО: ${fio}\n` +
         `Адрес: ${address}\n`;
 };
+
+export const query = (textQuery, state) => {
+    let fields = [];
+    let storeName = '';
+    let predicate = [];
+    const splittedTextQuery = textQuery.split(' ');
+    splittedTextQuery.forEach((text, index) => {
+        switch (text) {
+            case 'select': {
+                for (let i = index + 1; i < splittedTextQuery.length; i++) {
+                    if (splittedTextQuery[i] === 'from') break;
+                    fields.push(splittedTextQuery[i]);
+                }
+                break;
+            }
+            case 'from': {
+                storeName = splittedTextQuery[index + 1];
+                break;
+            }
+            case 'where': {
+                for (let i = index + 1; i < splittedTextQuery.length; i++) {
+                    // if (splittedTextQuery[i] === 'and') return;
+                    // пока только одно условие можно передать
+                    predicate.push(splittedTextQuery[i]);
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    });
+
+    let store = state[storeName] && cloneObject(state[storeName].list);
+    let result;
+    if (store) {
+        const predicateLength = predicate.length;
+        if (predicateLength) {
+            store = Object.values(store);
+            for (let i = 0; i < predicateLength; i++) {
+                if (predicate[i] === '=') {
+                    const propertyName = predicate[i - 1];
+                    const propertyValue = predicate[i + 1];
+                    for (let j = 0; j < store.length; j++) {
+                        if (store[j].hasOwnProperty(propertyName) && store[j][propertyName] === propertyValue) {
+                            result = store[j];
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return result;
+};

@@ -1,12 +1,31 @@
 import uuid from 'uuid';
 import {COUNTER, TARIFF, TARIFF_DATA} from "../../../constants/ActionConst";
 import {createTariffData} from "../../../screens/TariffDataInput/actions/TariffDataInputActions";
+import { query } from "../../../constants/FunctionConst";
 
 export const createCounter = (counterData, id) => {
+
+
+
+
     counterData.id = id;
     counterData.createTime = Date.now();
 
     return (dispatch, getState) => {
+        // пока только одно условие можно передать
+        const counter = query(`select * from counters where id = ${id}`, getState()) || {};
+
+        if (counter) {
+            counter.updateTime = Date.now();
+        } else {
+            counter.id = id;
+            counter.createTime = Date.now();
+        }
+        Object.keys(counterData).forEach(field => {
+            counter[field] = counterData[field];
+        });
+
+        // commit();
         dispatch({
             type: COUNTER.CREATE,
             payload: {

@@ -51,6 +51,11 @@ const initialState = {
 export default (state = initialState, action) => {
     switch (action.type) {
         case TARIFF_DATA.CREATE: {
+
+
+
+
+
             const newData = action.payload.tariffData;
             const tariffIds = Object.keys(newData);
             const dataList = state.list ? cloneObject(state.list) : {};
@@ -60,23 +65,24 @@ export default (state = initialState, action) => {
 
             tariffIds.forEach(tariffId => {
                 const tariffData = dataList[tariffId];
-                const tariffDataIds = tariffData && Object.keys(tariffData) || [];
-                let dataId = newData[tariffId].dataId;
-                if (dataId && tariffDataIds.length && tariffDataIds.includes(dataId)) {
+                const dataIds = tariffData && Object.keys(tariffData) || [];
+
+                let updatedDataId = newData[tariffId].dataId;
+                if (updatedDataId && dataIds.length && dataIds.includes(updatedDataId)) {
                     dataList[tariffId] = {
                         ...dataList[tariffId],
-                        [dataId]: {
-                            ...dataList[tariffId][dataId],
+                        [updatedDataId]: {
+                            ...dataList[tariffId][updatedDataId],
                             ...newData[tariffId],
                         }
                     }
                 } else {
-                    dataId = uuid.v4();
+                    updatedDataId = uuid.v4();
                     dataList[tariffId] = {
                         ...dataList[tariffId],
-                        [dataId]: {
+                        [updatedDataId]: {
                             ...newData[tariffId],
-                            dataId: dataId,
+                            dataId: updatedDataId,
                             tariffId: tariffId,
                             createTime: dateNow,
                         }

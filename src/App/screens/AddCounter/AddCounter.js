@@ -237,6 +237,9 @@ class AddCounter extends Component {
         if (this.checkRequiredFilled()) {
             const id = counterId ? counterId : uuid.v4();
             this.props.createCounter(fieldsValues, id);
+
+
+
             this.props.createCounterTariff(id, tariffsValues);
             this.props.navigation.goBack();
         }
