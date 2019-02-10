@@ -4,8 +4,8 @@ import { cloneObject } from "../constants/FunctionConst";
 
 
 const initialState = {
-    list: {
-        'tariffId_1': {
+    /*list: {
+        // 'tariffId_1': {
             '1': {
                 dataId: '1',
                 tariffId: 'tariffId_1',
@@ -24,8 +24,8 @@ const initialState = {
                 createTime: Date.now() + 200,
                 value: '30',
             },
-        },
-        'tariffId_2': {
+        // },
+        // 'tariffId_2': {
             '3': {
                 dataId: '3',
                 tariffId: 'tariffId_2',
@@ -44,19 +44,52 @@ const initialState = {
                 createTime: Date.now() + 200,
                 value: '40',
             },
-        },
-    }
+        // },
+    }*/
 };
 
 export default (state = initialState, action) => {
     switch (action.type) {
         case TARIFF_DATA.CREATE: {
+            // const counterId = action.payload.counterId;
+            /*
+                dataId: {
+                    id: ,
+                    tariffId: ,
+                    currentValue: ,
+                    amount: ,
+                    createTime: ,
+                }
+             */
+            const tariffsData = action.payload.tariffsData;
+            const list = cloneObject(state.list);
+            const oldDataIds = Object.keys(list);
+
+            const newList = {};
+
+            Object.keys(tariffsData).forEach(dataId => {
+                const newData = {...tariffsData[dataId]};
+                if (oldDataIds.length) {
+                    oldDataIds
+                        .filter(id => list[id].tariffId === newData.tariffId)
+                        .sort((idA, idB) => list[idB].createTime - list[idA].createTime);
+                    if (!oldDataIds.includes(dataId)) {
+                        newData['prevValue'] = list[oldDataIds[0]].currentValue;
+                    }
+                    let difference = newData.currentValue - newData.prevValue;
+                    difference = (difference ^ 0) === difference ? difference : difference.toFixed(1);
+                    newData['difference'] = difference;
+                    newData['total'] = difference * newData.amount;
+                } else {
+                    newData['prevValue'] = null;
+                    newData['difference'] = null;
+                    newData['total'] = null;
+                }
+                newList[dataId] = newData;
+            });
 
 
-
-
-
-            const newData = action.payload.tariffData;
+            /*const newData = action.payload.tariffData;
             const tariffIds = Object.keys(newData);
             const dataList = state.list ? cloneObject(state.list) : {};
 
@@ -88,11 +121,14 @@ export default (state = initialState, action) => {
                         }
                     }
                 }
-            });
+            });*/
 
             return {
                 ...state,
-                list: dataList,
+                list: {
+                    ...state.list,
+                    ...newList
+                },
             }
         }
         case TARIFF_DATA.EDIT: {

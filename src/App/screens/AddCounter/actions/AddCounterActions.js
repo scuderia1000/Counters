@@ -4,25 +4,19 @@ import {createTariffData} from "../../../screens/TariffDataInput/actions/TariffD
 import { query } from "../../../constants/FunctionConst";
 
 export const createCounter = (counterData, id) => {
-
-
-
-
-    counterData.id = id;
-    counterData.createTime = Date.now();
-
     return (dispatch, getState) => {
         // пока только одно условие можно передать
-        const counter = query(`select * from counters where id = ${id}`, getState()) || {};
+        const counter = query(`select * from counters where id = ${id}`, getState());
+        const updatedCounter = counter.length && counter[0] || {};
 
-        if (counter) {
-            counter.updateTime = Date.now();
+        if (counter.length) {
+            updatedCounter.updateTime = Date.now();
         } else {
-            counter.id = id;
-            counter.createTime = Date.now();
+            updatedCounter.id = id;
+            updatedCounter.createTime = Date.now();
         }
         Object.keys(counterData).forEach(field => {
-            counter[field] = counterData[field];
+            updatedCounter[field] = counterData[field];
         });
 
         // commit();
@@ -30,7 +24,7 @@ export const createCounter = (counterData, id) => {
             type: COUNTER.CREATE,
             payload: {
                 [id]: {
-                    ...counterData
+                    ...updatedCounter
                 }
             }
         })
@@ -38,14 +32,71 @@ export const createCounter = (counterData, id) => {
 };
 
 export const createCounterTariff = (counterId, data) => {
-    const tariff = {};
+    /*
+            data: {
+                5: {
+                    amount: "5",
+                    name: "We gd",
+                    value: "56"
+                },
+                6: {
+                    amount: "5",
+                    counterId: "e353091c-64e6-492d-a0e2-0dc15e9cfa29",
+                    createTime: 1549680171320,
+                    id: "62226a1e-1d06-4044-ba7c-10b56008bd5f",
+                    name: "Tgff",
+                    value: "20"
+                }
+            }
+         */
+    const counterTariffs = {/*tariffId: {}*/};
+    const tariffsData = {/*dataId: {}*/};
+
+    const keys = Object.keys(data);
+    if (keys.length) {
+        keys.forEach(key => {
+            const tariff = {...data[key]};
+            let tariffId;
+            if (tariff.hasOwnProperty('id')) {
+                tariffId = data[key].id;
+            } else {
+                tariffId = uuid.v4();
+                tariff['id'] = tariffId;
+                tariff['createTime'] = Date.now() + Number(key);
+                tariff['counterId'] = counterId;
+            }
+
+            const tariffData = {
+                currentValue: 0,
+                amount: tariff.amount ? Number(tariff.amount) : 0,
+                tariffId: tariffId,
+                createTime: tariff.createTime
+            };
+            let dataId;
+            if (tariff.hasOwnProperty('dataId')) {
+                dataId = tariff.dataId;
+                delete tariff.dataId;
+            } else {
+                dataId = uuid.v4();
+            }
+            tariffData['id'] = dataId;
+            if (tariff.hasOwnProperty('value')) {
+                tariffData['currentValue'] = Number(tariff.value);
+                delete tariff.value;
+            }
+
+            counterTariffs[tariffId] = {...tariff};
+            tariffsData[dataId] = {...tariffData};
+        });
+    }
+    /*const tariff = {};
     const tariffData = {
-        /*
+        /!*
         tariffId: {
             dataId: '',
             value: value,
         }
-         */
+         *!/
     };
     const valuesIndex = Object.keys(data);
     if (valuesIndex.length) {
@@ -81,15 +132,20 @@ export const createCounterTariff = (counterId, data) => {
                 }
             });
         });
-    }
+    }*/
 
     return (dispatch, getState) => {
-        dispatch(createTariffData(counterId, tariffData));
+        dispatch({
+            type: TARIFF_DATA.CREATE,
+            payload: {
+                // counterId: counterId,
+                tariffsData: tariffsData
+            }
+        });
+        // dispatch(createTariffData(counterId, tariffsData));
         dispatch({
             type: TARIFF.CREATE,
-            payload: {
-                [counterId]: tariff
-            }
+            payload: counterTariffs
         })
     }
 };

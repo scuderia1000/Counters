@@ -2,8 +2,8 @@ import {TARIFF} from "../constants/ActionConst";
 import {cloneObject} from "../constants/FunctionConst";
 
 const initialState = {
-    list: {
-        '1': {
+    /*list: {
+        // '1': {
             'tariffId_1': {
                 id: 'tariffId_1',
                 counterId: '1',
@@ -18,8 +18,8 @@ const initialState = {
                 name: 'Горячая вода',
                 amount: '130.03', // ставка тарифа
             }
-        }
-    }
+        // }
+    }*/
 };
 
 export default (state = initialState, action) => {

@@ -2,7 +2,7 @@ import { COUNTER } from "../constants/ActionConst";
 import { cloneObject } from "../constants/FunctionConst";
 
 const initState = {
-    list: {
+    /*list: {
         '1': {
             id: 1,
             createTime: new Date().getTime(),
@@ -12,7 +12,7 @@ const initState = {
             address: 'Harvard 12-89',
             emailAddress: 'test@test.test',
         }
-    }
+    }*/
 };
 
 export default (state = initState, action) => {

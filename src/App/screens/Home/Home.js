@@ -15,6 +15,7 @@ import { calculateCounterValues, cloneObject, getCounterTariffsData } from '../.
 import styles from './HomeStyles';
 import {createCounter} from "../AddCounter/actions/AddCounterActions";
 import {COUNTERS_VALUES, TARIFF_DATA} from "../../constants/ActionConst";
+import log from "rn-fetch-blob/utils/log";
 
 const iconStyle = {
     type: 'material-community',
@@ -131,16 +132,20 @@ class Home extends Component {
             countersArray = countersIds.map(id => list[id]);
         }
 
-        const countersList = Object.keys(list).map(key => list[key]);
+        const countersList = Object.values(list);
+        console.log('countersList', countersList)
+        // const countersList = Object.keys(list).map(key => list[key]);
 
-        const options = countersArray.length && this.actionSheetOptions(countersArray) || [];
-        const isCounterSelectionComponentModal = countersArray.length > 10;
+        const options = countersList.length && this.actionSheetOptions(countersList) || [];
+        // const options = countersArray.length && this.actionSheetOptions(countersArray) || [];
+        const isCounterSelectionComponentModal = countersList.length > 10;
+        // const isCounterSelectionComponentModal = countersArray.length > 10;
 
         return(
             <View style={styles.container}>
                 <View style={styles.countersListContainer}>
                     <FlatList renderItem={this.renderItem}
-                              data={countersArray}
+                              data={countersList}
                               keyExtractor={item => item.id.toString()}
                               style={{width: '100%'}}
                     />

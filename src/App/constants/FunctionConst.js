@@ -102,7 +102,7 @@ export const query = (textQuery, state) => {
     });
 
     let store = state[storeName] && cloneObject(state[storeName].list);
-    let result;
+    let result = [];
     if (store) {
         const predicateLength = predicate.length;
         if (predicateLength) {
@@ -113,7 +113,7 @@ export const query = (textQuery, state) => {
                     const propertyValue = predicate[i + 1];
                     for (let j = 0; j < store.length; j++) {
                         if (store[j].hasOwnProperty(propertyName) && store[j][propertyName] === propertyValue) {
-                            result = store[j];
+                            result.push(store[j]);
                         }
                     }
                 }
