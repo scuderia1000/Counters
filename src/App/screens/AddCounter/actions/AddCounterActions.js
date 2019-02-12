@@ -68,7 +68,7 @@ export const createCounterTariff = (counterId, data) => {
 
             const tariffData = {
                 currentValue: 0,
-                amount: tariff.amount ? Number(tariff.amount) : 0,
+                // amount: tariff.amount ? Number(tariff.amount) : 0,
                 tariffId: tariffId,
                 createTime: tariff.createTime
             };
@@ -78,8 +78,10 @@ export const createCounterTariff = (counterId, data) => {
                 delete tariff.dataId;
             } else {
                 dataId = uuid.v4();
+                tariffData['amount'] = tariff.amount ? Number(tariff.amount) : 0;
             }
             tariffData['id'] = dataId;
+
             if (tariff.hasOwnProperty('value')) {
                 tariffData['currentValue'] = Number(tariff.value);
                 delete tariff.value;
@@ -89,52 +91,13 @@ export const createCounterTariff = (counterId, data) => {
             tariffsData[dataId] = {...tariffData};
         });
     }
-    /*const tariff = {};
-    const tariffData = {
-        /!*
-        tariffId: {
-            dataId: '',
-            value: value,
-        }
-         *!/
-    };
-    const valuesIndex = Object.keys(data);
-    if (valuesIndex.length) {
-        valuesIndex.forEach(index => {
-            const tariffId = data[index].id || uuid.v4();
-            if (data[index].id) {
-                tariff[tariffId] = data[index];
-            } else {
-                tariff[tariffId] = {
-                    id: tariffId,
-                    counterId: counterId,
-                    createTime: Date.now() + Number(index),
-                };
-            }
-            Object.keys(data[index]).forEach(fieldName => {
-                const tariffKeys = Object.keys(tariff[tariffId]);
-                // начальные значения тарифа убираем в данные тарифа
-                if (fieldName === 'value' || fieldName === 'dataId') {
-                    tariffData[tariffId] = {
-                        ...tariffData[tariffId],
-                        [fieldName]: data[index][fieldName],
-                    };
-                    if (tariffKeys.includes(fieldName)) delete tariff[tariffId][fieldName];
-                } else {
-                    if (fieldName === 'tariffId' && tariffKeys.includes(fieldName)) {
-                        delete tariff[tariffId][fieldName];
-                    } else {
-                        tariff[tariffId] = {
-                            ...tariff[tariffId],
-                            [fieldName]: data[index][fieldName]
-                        }
-                    }
-                }
-            });
-        });
-    }*/
 
     return (dispatch, getState) => {
+        dispatch({
+            type: TARIFF.CREATE,
+            payload: counterTariffs
+        });
+
         dispatch({
             type: TARIFF_DATA.CREATE,
             payload: {
@@ -142,10 +105,6 @@ export const createCounterTariff = (counterId, data) => {
                 tariffsData: tariffsData
             }
         });
-        // dispatch(createTariffData(counterId, tariffsData));
-        dispatch({
-            type: TARIFF.CREATE,
-            payload: counterTariffs
-        })
+
     }
 };

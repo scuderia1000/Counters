@@ -79,7 +79,9 @@ class Home extends Component {
     };
 
     openCounterData = (id) => {
-        const { counters = {}, countersValues = {} } = this.props;
+        const { counters = {}, tariffs = {}, tariffsValues = {} } = this.props;
+        const { list = {}} = tariffsValues;
+        /*const { counters = {}, countersValues = {} } = this.props;
         const { list = {}} = countersValues;
         const countersIds = Object.keys(list);
         const counterId = String(id);
@@ -87,7 +89,7 @@ class Home extends Component {
             const counterData = counters.list[counterId];
             this.props.setCounterId(counterId);
             this.props.navigation.navigate('TariffData', {title: counterData.counterName});
-        }
+        }*/
     };
 
     editCounter = (id) => {

@@ -97,8 +97,7 @@ class TariffDataInput extends Component {
         const {values} = this.state;
         const counterId = navigation.getParam('counterId', '');
         if (counterId) {
-            const tariff = tariffsList[counterId];
-            const tariffIds = Object.keys(tariff);
+            const tariffIds = Object.keys(tariffsList);
             const errorIds = tariffIds.filter(id => !values[id] || !values[id].value);
 
             if (errorIds.length) {
@@ -119,11 +118,12 @@ class TariffDataInput extends Component {
 
     handleAddData = () => {
         const { navigation, countersValues = {}, counters = {}, tariffsValues = {} } = this.props;
-        const { list = {}} = countersValues;
+        // const { list = {}} = countersValues;
         const { editData = {} } = tariffsValues;
 
         if (this.checkFields()) {
-            const counterId = editData.counterId;
+            const counterId = navigation.getParam('counterId', '');
+            // const counterId = editData.counterId;
             this.props.saveData(counterId, this.state.values);
 
             const countersIds = Object.keys(list);
@@ -143,11 +143,12 @@ class TariffDataInput extends Component {
         const {values, errorsTariff} = this.state;
         const counterId = navigation.getParam('counterId', '');
         if (counterId) {
-            const tariff = tariffsList[counterId];
-            const tariffIds = Object.keys(tariff);
+            const tariffIds = Object.values(tariffsList)
+                .filter(tariff => tariff.counterId === counterId)
+                .map(tariff => tariff.id);
             return tariffIds.map((id, index) => {
                 const field = {
-                    label: tariff[id].name,
+                    label: tariffsList[id].name,
                     style: {height: 90},
                     keyboardType: 'numeric',
                     errorText: 'Введите значение',
@@ -232,7 +233,7 @@ const mapStateToProps = state => ({
     tariffsList: state.tariffs.list,
     tariffs: state.tariffs,
     tariffsValues: state.tariffsData,
-    countersValues: state.countersValues,
+    // countersValues: state.countersValues,
 });
 const dispatchers = dispatch => ({
     saveData: (counterId, data) => {

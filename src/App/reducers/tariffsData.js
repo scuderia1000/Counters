@@ -69,6 +69,7 @@ export default (state = initialState, action) => {
 
             Object.keys(tariffsData).forEach(dataId => {
                 const newData = {...tariffsData[dataId]};
+                // const amount =
                 if (oldDataIds.length) {
                     oldDataIds
                         .filter(id => list[id].tariffId === newData.tariffId)
@@ -79,7 +80,15 @@ export default (state = initialState, action) => {
                     let difference = newData.currentValue - newData.prevValue;
                     difference = (difference ^ 0) === difference ? difference : difference.toFixed(1);
                     newData['difference'] = difference;
-                    newData['total'] = difference * newData.amount;
+
+                    let amount;
+                    if (newData.hasOwnProperty('amount')) {
+                        amount = newData.amount;
+                    } else {
+                        amount = list[dataId].amount;
+                    }
+
+                    newData['total'] = difference * amount;
                 } else {
                     newData['prevValue'] = null;
                     newData['difference'] = null;
@@ -87,41 +96,6 @@ export default (state = initialState, action) => {
                 }
                 newList[dataId] = newData;
             });
-
-
-            /*const newData = action.payload.tariffData;
-            const tariffIds = Object.keys(newData);
-            const dataList = state.list ? cloneObject(state.list) : {};
-
-            if (!tariffIds.length) return state;
-            const dateNow = Date.now();
-
-            tariffIds.forEach(tariffId => {
-                const tariffData = dataList[tariffId];
-                const dataIds = tariffData && Object.keys(tariffData) || [];
-
-                let updatedDataId = newData[tariffId].dataId;
-                if (updatedDataId && dataIds.length && dataIds.includes(updatedDataId)) {
-                    dataList[tariffId] = {
-                        ...dataList[tariffId],
-                        [updatedDataId]: {
-                            ...dataList[tariffId][updatedDataId],
-                            ...newData[tariffId],
-                        }
-                    }
-                } else {
-                    updatedDataId = uuid.v4();
-                    dataList[tariffId] = {
-                        ...dataList[tariffId],
-                        [updatedDataId]: {
-                            ...newData[tariffId],
-                            dataId: updatedDataId,
-                            tariffId: tariffId,
-                            createTime: dateNow,
-                        }
-                    }
-                }
-            });*/
 
             return {
                 ...state,
@@ -169,13 +143,20 @@ export default (state = initialState, action) => {
             }
         }
         case TARIFF_DATA.REMOVE_ALL_TARIFFS_DATA: {
-            const tariffsIds = action.payload.tariffsIds;
-            if (!tariffsIds.length) return state;
+            const tariffs = action.payload.tariffs;
+            const counterId = action.payload.counterId;
+            if (!counterId) return state;
+
+            const removedTariffIds = Object.values(tariffs)
+                .filter(tariff => tariff.counterId === counterId)
+                .map(tariff => tariff.id);
 
             const dataList = state.list ? cloneObject(state.list) : {};
-            tariffsIds.forEach(tariffId => {
-                delete dataList[tariffId];
-            });
+            const removedDataIds = Object.values(dataList)
+                .filter(data => removedTariffIds.includes(data.tariffId))
+                .map(data => data.id);
+
+            removedDataIds.forEach(id => delete dataList[id]);
 
             return {
                 ...state,
