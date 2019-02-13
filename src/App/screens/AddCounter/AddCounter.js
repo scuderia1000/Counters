@@ -8,7 +8,7 @@ import uuid from "uuid";
 // own component
 import CounterField from '../../components/counterField/CounterField';
 import CommonButton from '../../components/buttons/CommonButton';
-import { createCounter, createCounterTariff } from './actions/AddCounterActions';
+import { createCounter, createCounterTariff, updateCounterTariff } from './actions/AddCounterActions';
 import { cloneObject } from "../../constants/FunctionConst";
 import InterfaceBuilder, { TARIFF_COMPONENT } from './constatnts/InterfaceBuilder';
 // styles
@@ -49,7 +49,7 @@ class AddCounter extends Component {
             isRequiredFieldsFilled: false,
             requiredFields: {},
             fieldsValues: {},
-            tariffsValues: {}, // {index: {name: '', amount: '', value: number}}
+            tariffsValues: {}, // {index: {name: '', amount: '', currentValue: number}}
             refs: [],
             errorsDefault: [],
             errorsTariff: [], // реальные индексы на форме
@@ -63,25 +63,34 @@ class AddCounter extends Component {
 
         if (counterId && counters.list && counters.list[counterId]) {
             const fieldsValues = cloneObject(counters.list[counterId]);
-            const tariffsCopy = cloneObject(tariffs.list[counterId]);
+
+            const tariffs = cloneObject(tariffs.list);
+            const tariffsIds = tariffs.values(tariffs)
+                .filter(tariff => tariff.counterId === counterId)
+                .map(tariff => tariff.id);
+
             const tariffsDataCopy = cloneObject(tariffsValues.list);
+            const tariffsData = {};
+            Object.values(tariffsDataCopy)
+                .filter(tariffData => tariffsIds.includes(tariffData.tariffId))
+                .map(data => {
+                    tariffsData[data.tariffId] = data;
+                });
 
             const tariffsFiledValues = {};
             const defaultFields = InterfaceBuilder.counter.fields;
             let index = Object.keys(defaultFields).length;
 
-            Object.keys(tariffsCopy).forEach(tariffId => {
+            Object.keys(tariffsIds).forEach(tariffId => {
                 // значения полей тарифа
-                tariffsFiledValues[index] = tariffsCopy[tariffId];
+                tariffsFiledValues[index] = tariffs[tariffId];
                 // начальное значение
-                if (tariffsDataCopy) {
-                    const tariffDataValues = tariffsDataCopy[tariffId] || {};
-                    const tariffsDataKeys = Object.keys(tariffDataValues);
-                    if (tariffsDataKeys.length) {
-                        tariffsDataKeys.sort((key1, key2) => tariffDataValues[key1].createTime - tariffDataValues[key2].createTime);
+                const tariffDataValues = tariffsData[tariffId] || {};
+                const tariffsDataKeys = Object.keys(tariffDataValues);
+                if (tariffsDataKeys.length) {
+                    tariffsDataKeys.sort((key1, key2) => tariffDataValues[key1].createTime - tariffDataValues[key2].createTime);
 
-                        tariffsFiledValues[index] = {...tariffsFiledValues[index], ...tariffDataValues[tariffsDataKeys[0]]};
-                    }
+                    tariffsFiledValues[index] = {...tariffsFiledValues[index], ...tariffDataValues[tariffsDataKeys[0]]};
                 }
                 this.handleAddTariffFields();
                 index++;
@@ -109,7 +118,7 @@ class AddCounter extends Component {
         const newTariff = {
             name: {...TARIFF_COMPONENT.name, autoFocus: !!e},
             amount: {...TARIFF_COMPONENT.amount},
-            value: {...TARIFF_COMPONENT.value},
+            currentValue: {...TARIFF_COMPONENT.currentValue},
         };
         this.setState((state) => {
             return {
@@ -235,12 +244,21 @@ class AddCounter extends Component {
         const { fieldsValues, tariffsValues } = this.state;
         const { counterId } = this.props.counters;
         if (this.checkRequiredFilled()) {
-            const id = counterId ? counterId : uuid.v4();
-            this.props.createCounter(fieldsValues, id);
+            let id;
+            if (counterId) {
+                id = counterId;
+                this.props.createCounter(fieldsValues, id);
+                this.props.updateCounterTariff(id, tariffsValues);
+
+
+            } else {
+                id = uuid.v4();
+                this.props.createCounter(fieldsValues, id);
+                this.props.createCounterTariff(id, tariffsValues);
+            }
 
 
 
-            this.props.createCounterTariff(id, tariffsValues);
             this.props.navigation.goBack();
         }
     };
@@ -361,6 +379,9 @@ const dispatchers = dispatch => ({
     },
     createCounterTariff: (counterId, tariffsData) => {
         dispatch(createCounterTariff(counterId, tariffsData));
+    },
+    updateCounterTariff: (counterId, tariffsData) => {
+        dispatch(updateCounterTariff(counterId, tariffsData));
     },
 });
 

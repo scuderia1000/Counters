@@ -11,6 +11,7 @@ export const TARIFF = {
 
 export const TARIFF_DATA = {
     CREATE: "CREATE_DATA",
+    UPDATE: "UPDATE_DATA",
     EDIT: "EDIT_DATA",
     RESET_EDIT: "RESET_EDIT_DATA",
     REMOVE: "REMOVE_DATA",

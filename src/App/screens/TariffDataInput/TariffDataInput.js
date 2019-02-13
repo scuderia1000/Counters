@@ -13,7 +13,7 @@ import Torch from 'react-native-torch';
 // own component
 import CounterField from '../../components/counterField/CounterField';
 import CommonButton from "../../components/buttons/CommonButton";
-import { createTariffData } from "./actions/TariffDataInputActions";
+import { createTariffData, updateTariffData } from "./actions/TariffDataInputActions";
 // styles
 import styles from './TariffDataInputStyles';
 import {COUNTERS_VALUES, TARIFF_DATA} from "../../constants/ActionConst";
@@ -36,20 +36,16 @@ class TariffDataInput extends Component {
     }
 
     componentDidMount() {
-        const { tariffsValues = {} } = this.props;
-        const { list, editData = {} } = tariffsValues;
+        const { tariffsData = {} } = this.props;
+        const { list, editData = {} } = tariffsData;
         if (list && editData.counterId) {
             const values = {};
             editData.dataIds.forEach(dataId => {
-                Object.keys(list).forEach(tariffId => {
-                    const dataIds = Object.keys(list[tariffId]);
-                    if (dataIds.includes(dataId)) {
-                        values[tariffId] = {
-                            value: list[tariffId][dataId].value,
-                            dataId: dataId
-                        }
-                    }
-                })
+                const tariffId = list[dataId].tariffId;
+                values[tariffId] = {
+                    currentValue: list[dataId].currentValue,
+                    id: dataId
+                };
             });
             this.setState({
                 values: values
@@ -68,8 +64,8 @@ class TariffDataInput extends Component {
         if (isTorchOn) {
             Torch.switchState(false);
         }
-        const { tariffsValues = {} } = this.props;
-        const { editData = {} } = tariffsValues;
+        const { tariffsData = {} } = this.props;
+        const { editData = {} } = tariffsData;
 
         const counterId = editData.counterId;
         if (counterId) {
@@ -77,14 +73,14 @@ class TariffDataInput extends Component {
         }
     }
 
-    handleFieldChange = (id, value) => {
+    handleFieldChange = (tariffId, value) => {
         this.setState((state, props) => {
             return {
                 values: {
-                    ...state.values,
-                    [id]: {
-                        ...state.values[id],
-                        value: value
+                    ...state.currentValue,
+                    [tariffId]: {
+                        ...state.currentValue[tariffId],
+                        currentValue: value
                     }
                 },
                 errorsTariff: [],
@@ -98,7 +94,7 @@ class TariffDataInput extends Component {
         const counterId = navigation.getParam('counterId', '');
         if (counterId) {
             const tariffIds = Object.keys(tariffsList);
-            const errorIds = tariffIds.filter(id => !values[id] || !values[id].value);
+            const errorIds = tariffIds.filter(id => !values[id] || !values[id].currentValue);
 
             if (errorIds.length) {
                 this.setState({errorsTariff: errorIds});
@@ -117,16 +113,20 @@ class TariffDataInput extends Component {
     };
 
     handleAddData = () => {
-        const { navigation, countersValues = {}, counters = {}, tariffsValues = {} } = this.props;
+        const { navigation, countersValues = {}, counters = {}, tariffsData = {} } = this.props;
         // const { list = {}} = countersValues;
-        const { editData = {} } = tariffsValues;
+        const { editData = {} } = tariffsData;
 
         if (this.checkFields()) {
             const counterId = navigation.getParam('counterId', '');
             // const counterId = editData.counterId;
-            this.props.saveData(counterId, this.state.values);
+            if (editData.counterId) {
+                this.props.updateData(this.state.values);
+            } else {
+                this.props.saveData(this.state.values);
+            }
 
-            const countersIds = Object.keys(list);
+            /*const countersIds = Object.keys(list);
             // пока сделал так, в голову не приходит как по нормальному перейти к экранну с данными после обновления стора
             if (countersIds.length && countersIds.includes(counterId)) {
                 const counterData = counters.list[counterId];
@@ -134,7 +134,7 @@ class TariffDataInput extends Component {
                 navigation.navigate('TariffData', {title: counterData.counterName});
             } else {
                 navigation.goBack();
-            }
+            }*/
         }
     };
 
@@ -164,7 +164,7 @@ class TariffDataInput extends Component {
                                   type={id}
                                   field={field}
                                   index={index}
-                                  value={values && values[id] && values[id].value}
+                                  value={values && values[id] && values[id].currentValue}
                                   ref={this.inputs[index]}
                                   isError={!!errorsTariff.length && errorsTariff.includes(id)}
                                   onChange={this.handleFieldChange}
@@ -232,12 +232,15 @@ const mapStateToProps = state => ({
     counters: state.counters,
     tariffsList: state.tariffs.list,
     tariffs: state.tariffs,
-    tariffsValues: state.tariffsData,
+    tariffsData: state.tariffsData,
     // countersValues: state.countersValues,
 });
 const dispatchers = dispatch => ({
-    saveData: (counterId, data) => {
-        dispatch(createTariffData(counterId, data));
+    saveData: (data) => {
+        dispatch(createTariffData(data));
+    },
+    updateData: (data) => {
+        dispatch(updateTariffData(data));
     },
     resetEditData: () => {
         dispatch({type: TARIFF_DATA.RESET_EDIT})
