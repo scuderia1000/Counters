@@ -6,6 +6,7 @@ export const COUNTER = {
 
 export const TARIFF = {
     CREATE: "CREATE_TARIFF",
+    UPDATE: "UPDATE_TARIFF",
     REMOVE: "REMOVE_TARIFF",
 };
 

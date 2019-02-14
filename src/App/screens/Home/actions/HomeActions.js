@@ -3,9 +3,35 @@ import {calculateCounterValues, cloneObject} from "../../../constants/FunctionCo
 
 export const editCounter = (counterId) => {
     return (dispatch, getState) => {
+        const { tariffs, tariffsData } = getState();
+
+        const counterTariffs = {};
+        Object.values(tariffs.list)
+            .filter(tariff => tariff.counterId === counterId)
+            .map(tariff => {
+                counterTariffs[tariff.id] = tariff;
+            });
+        const counterTariffsIds = Object.keys(counterTariffs);
+        const counterTariffsData = {};
+        Object.values(tariffsData.list)
+            .filter(data => counterTariffsIds.includes(data.tariffId))
+            // .sort((dataA, dataB) => tariffsData.list[])
+            .map(data => {
+                if (counterTariffsData[data.tariffId]) {
+                    counterTariffsData[data.tariffId] = [...counterTariffsData[data.tariffId], data];
+                } else {
+                    counterTariffsData[data.tariffId] = [data];
+                }
+            });
+        Object.values(counterTariffsData).sort((dataA, dataB) => dataA.createTime - dataB.createTime);
+
         dispatch({
             type: COUNTER.EDIT,
-            payload: counterId
+            payload: {
+                counterId: counterId,
+                tariffs: counterTariffs,
+                tariffsData: counterTariffsData
+            }
         })
     }
 };

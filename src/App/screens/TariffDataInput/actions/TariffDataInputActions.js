@@ -14,17 +14,17 @@ export const createTariffData = (values) => {
         const { list = {} } = tariffs;
         const now = Date.now();
         Object.keys(values).forEach(tariffId => {
-            const data = {};
             const tariff = list[tariffId];
 
             let dataId = uuid.v4();
-            data['id'] = dataId;
-            data['tariffId'] = tariffId;
-            data['currentValue'] = Number(values[tariffId].currentValue);
-            data['amount'] = tariff.amount > 0 && Number(tariff.amount) || 0;
-            data['createTime'] = now;
 
-            tariffsData[dataId] = data;
+            tariffsData[dataId] = {
+                id: dataId,
+                tariffId: tariffId,
+                currentValue: Number(values[tariffId].currentValue),
+                amount: tariff.amount > 0 && Number(tariff.amount) || 0,
+                createTime: now,
+            };
         });
 
         dispatch({

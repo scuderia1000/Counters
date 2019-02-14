@@ -4,50 +4,62 @@ import { cloneObject } from "../constants/FunctionConst";
 
 
 const initialState = {
-    /*list: {
+    list: {
             '1': {
                 id: '1',
                 tariffId: 'tariffId_1',
                 prevValue: null,
-                currentValue: '15', // значение с которого начинать расчет
+                currentValue: 5,
+                amount: 30.23,
                 difference: null,
-                amount: tariffAmount,
                 total: null,
                 createTime: Date.now(),
             },
             '2': {
-                dataId: '2',
+                id: '2',
                 tariffId: 'tariffId_1',
+                prevValue: 5,
+                currentValue: 15,
+                amount: 30.23,
+                difference: 10,
+                total: 302.3,
                 createTime: Date.now() + 100,
-                value: '20',
             },
-            '5': {
-                dataId: '5',
-                tariffId: 'tariffId_1',
-                createTime: Date.now() + 200,
-                value: '30',
-            },
+            // '5': {
+            //     dataId: '5',
+            //     tariffId: 'tariffId_1',
+            //     createTime: Date.now() + 200,
+            //     value: '30',
+            // },
         // },
         // 'tariffId_2': {
             '3': {
-                dataId: '3',
+                id: '3',
                 tariffId: 'tariffId_2',
+                prevValue: null,
+                currentValue: 10,
+                amount: 130.03,
+                difference: null,
+                total: null,
                 createTime: Date.now(),
-                value: '5',
             },
             '4': {
-                dataId: '4',
+                id: '4',
                 tariffId: 'tariffId_2',
+                prevValue: 10,
+                currentValue: 30,
+                amount: 130.03,
+                difference: 20,
+                total: 2600.6,
                 createTime: Date.now() + 100,
-                value: '10',
             },
-            '6': {
-                dataId: '6',
-                tariffId: 'tariffId_2',
-                createTime: Date.now() + 200,
-                value: '40',
-            },
-    }*/
+            // '6': {
+            //     dataId: '6',
+            //     tariffId: 'tariffId_2',
+            //     createTime: Date.now() + 200,
+            //     value: '40',
+            // },
+    }
 };
 
 export default (state = initialState, action) => {

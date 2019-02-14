@@ -15,7 +15,7 @@ class CountersListItem extends React.PureComponent {
             <TouchableOpacity style={styles.container}
                               key={`item_${id}`}
                               onPress={() => onPressItem(id)}
-                              onLongPress={() => onLongPress(id)}>
+                              onLongPress={() => onLongPress(String(id))}>
                 <Text style={styles.titleText}>{this.props.title}</Text>
                 {hasDelButton &&
                     <RemoveButton containerStyle={{justifyContent: 'center'}}

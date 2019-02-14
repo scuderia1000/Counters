@@ -4,22 +4,34 @@ import {createTariffData} from "../../../screens/TariffDataInput/actions/TariffD
 import { query } from "../../../constants/FunctionConst";
 
 export const createCounter = (counterData, id) => {
+    const counter = {
+        ...counterData,
+        id: id,
+        createTime: Date.now(),
+    };
+    return (dispatch, getState) => {
+        dispatch({
+            type: COUNTER.CREATE,
+            payload: {
+                [id]: {
+                    ...counter
+                }
+            }
+        })
+    }
+};
+
+export const updateCounter = (counterData, id) => {
     return (dispatch, getState) => {
         // пока только одно условие можно передать
-        const counter = query(`select * from counters where id = ${id}`, getState());
-        const updatedCounter = counter.length && counter[0] || {};
+        const { counters } = getState();
+        const { list } = counters;
 
-        if (counter.length) {
-            updatedCounter.updateTime = Date.now();
-        } else {
-            updatedCounter.id = id;
-            updatedCounter.createTime = Date.now();
-        }
-        Object.keys(counterData).forEach(field => {
-            updatedCounter[field] = counterData[field];
-        });
+        const updatedCounter = {
+            ...list[id],
+            ...counterData
+        };
 
-        // commit();
         dispatch({
             type: COUNTER.CREATE,
             payload: {
@@ -56,10 +68,10 @@ export const createCounterTariff = (counterId, data) => {
     Object.values(data).forEach(tariffItem => {
         const tariff = {
             id: uuid.v4(),
-            createTime: now,
             counterId: counterId,
             name: tariffItem.name,
             amount: tariffItem.amount > 0 && Number(tariffItem.amount) || null,
+            createTime: now,
         };
         const data = {
             id: uuid.v4(),
@@ -90,76 +102,37 @@ export const createCounterTariff = (counterId, data) => {
 };
 
 export const updateCounterTariff = (counterId, data) => {
-    /*
-            data: {
-                5: {
-                    amount: "5",
-                    name: "We gd",
-                    value: "56"
-                },
-                6: {
-                    amount: "5",
-                    counterId: "e353091c-64e6-492d-a0e2-0dc15e9cfa29",
-                    createTime: 1549680171320,
-                    id: "62226a1e-1d06-4044-ba7c-10b56008bd5f",
-                    name: "Tgff",
-                    value: "20"
-                }
-            }
-         */
-    const counterTariffs = {/*tariffId: {}*/};
-    const tariffsData = {/*dataId: {}*/};
-
-    const keys = Object.keys(data);
-    if (keys.length) {
-        keys.forEach(key => {
-            const tariff = {...data[key]};
-            let tariffId;
-            if (tariff.hasOwnProperty('id')) {
-                tariffId = data[key].id;
-            } else {
-                tariffId = uuid.v4();
-                tariff['id'] = tariffId;
-                tariff['createTime'] = Date.now() + Number(key);
-                tariff['counterId'] = counterId;
-            }
-
-            const tariffData = {
-                currentValue: 0,
-                // amount: tariff.amount ? Number(tariff.amount) : 0,
-                tariffId: tariffId,
-                createTime: tariff.createTime
-            };
-            let dataId;
-            if (tariff.hasOwnProperty('dataId')) {
-                dataId = tariff.dataId;
-                delete tariff.dataId;
-            } else {
-                dataId = uuid.v4();
-                tariffData['amount'] = tariff.amount ? Number(tariff.amount) : 0;
-            }
-            tariffData['id'] = dataId;
-
-            if (tariff.hasOwnProperty('value')) {
-                tariffData['currentValue'] = Number(tariff.value);
-                delete tariff.value;
-            }
-
-            counterTariffs[tariffId] = {...tariff};
-            tariffsData[dataId] = {...tariffData};
-        });
-    }
-
     return (dispatch, getState) => {
+
+        const counterTariffs = {/*tariffId: {}*/};
+        const tariffsData = {/*dataId: {}*/};
+
+        Object.values(data).forEach(item => {
+            const { tariffs, tariffsData } = getState();
+            const tariff = {
+                ...tariffs.list[item.id],
+                name: item.name,
+                amount: item.amount > 0 && Number(item.amount) || null,
+            };
+            const data = {
+                ...tariffsData.list[item.dataId],
+                currentValue: item.currentValue > 0 && Number(item.currentValue) || null,
+                // если изменилась ставка тарифа, то начальные данные не персчитываем
+                // изменения ставки тарифа касаются только новых данных
+                // amount: tariff.amount,
+            };
+            counterTariffs[tariff.id] = {...tariff};
+            tariffsData[data.id] = {...data};
+        });
+
         dispatch({
-            type: TARIFF.CREATE,
+            type: TARIFF.UPDATE,
             payload: counterTariffs
         });
 
         dispatch({
-            type: TARIFF_DATA.CREATE,
+            type: TARIFF_DATA.UPDATE,
             payload: {
-                // counterId: counterId,
                 tariffsData: tariffsData
             }
         });

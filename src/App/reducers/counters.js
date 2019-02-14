@@ -2,9 +2,9 @@ import { COUNTER } from "../constants/ActionConst";
 import { cloneObject } from "../constants/FunctionConst";
 
 const initState = {
-    /*list: {
+    list: {
         '1': {
-            id: 1,
+            id: '1',
             createTime: new Date().getTime(),
             counterName: 'Счетчик воды',
             personalAccount: '1234567890',
@@ -12,7 +12,7 @@ const initState = {
             address: 'Harvard 12-89',
             emailAddress: 'test@test.test',
         }
-    }*/
+    }
 };
 
 export default (state = initState, action) => {
@@ -35,7 +35,10 @@ export default (state = initState, action) => {
         case COUNTER.EDIT: {
             return {
                 ...state,
-                counterId: action.payload
+                editData: {
+                    ...action.payload
+
+                }
             }
         }
         case COUNTER.REMOVE: {

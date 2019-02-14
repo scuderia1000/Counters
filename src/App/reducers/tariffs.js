@@ -2,27 +2,36 @@ import {TARIFF} from "../constants/ActionConst";
 import {cloneObject} from "../constants/FunctionConst";
 
 const initialState = {
-    /*list: {
+    list: {
             'tariffId_1': {
                 id: 'tariffId_1',
                 counterId: '1',
                 createTime: new Date().getTime(),
                 name: 'Холодная вода',
-                amount: '30.23', // ставка тарифа
+                amount: 30.23, // ставка тарифа
             },
             'tariffId_2': {
                 id: 'tariffId_2',
                 counterId: '1',
                 createTime: new Date().getTime(),
                 name: 'Горячая вода',
-                amount: '130.03', // ставка тарифа
+                amount: 130.03, // ставка тарифа
             }
-    }*/
+    }
 };
 
 export default (state = initialState, action) => {
     switch (action.type) {
         case TARIFF.CREATE: {
+            return {
+                ...state,
+                list: {
+                    ...state.list,
+                    ...action.payload
+                }
+            }
+        }
+        case TARIFF.UPDATE: {
             return {
                 ...state,
                 list: {
