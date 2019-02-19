@@ -23,7 +23,6 @@ export const createCounter = (counterData, id) => {
 
 export const updateCounter = (counterData, id) => {
     return (dispatch, getState) => {
-        // пока только одно условие можно передать
         const { counters } = getState();
         const { list } = counters;
 
@@ -101,29 +100,38 @@ export const createCounterTariff = (counterId, data) => {
     }
 };
 
-export const updateCounterTariff = (counterId, data) => {
+export const updateCounterTariff = (counterId, tariffsValues) => {
     return (dispatch, getState) => {
 
         const counterTariffs = {/*tariffId: {}*/};
-        const tariffsData = {/*dataId: {}*/};
+        const counterTariffsData = {/*dataId: {}*/};
+        const newTariff = {/*tariffId: {}*/};
 
-        Object.values(data).forEach(item => {
-            const { tariffs, tariffsData } = getState();
-            const tariff = {
-                ...tariffs.list[item.id],
-                name: item.name,
-                amount: item.amount > 0 && Number(item.amount) || null,
-            };
-            const data = {
-                ...tariffsData.list[item.dataId],
-                currentValue: item.currentValue > 0 && Number(item.currentValue) || null,
-                // если изменилась ставка тарифа, то начальные данные не персчитываем
-                // изменения ставки тарифа касаются только новых данных
-                // amount: tariff.amount,
-            };
-            counterTariffs[tariff.id] = {...tariff};
-            tariffsData[data.id] = {...data};
+        Object.values(tariffsValues).forEach((item, index) => {
+            if (item.dataId) {
+                const {tariffs, tariffsData} = getState();
+                const tariff = {
+                    ...tariffs.list[item.id],
+                    name: item.name,
+                    amount: item.amount > 0 && Number(item.amount) || null,
+                };
+                const data = {
+                    ...tariffsData.list[item.dataId],
+                    currentValue: item.currentValue > 0 && Number(item.currentValue) || null,
+                    // если изменилась ставка тарифа, то начальные данные не персчитываем
+                    // изменения ставки тарифа касаются только новых данных
+                    // amount: tariff.amount,
+                };
+                counterTariffs[tariff.id] = {...tariff};
+                counterTariffsData[data.id] = {...data};
+            } else {
+                newTariff[index] = {...item}
+            }
         });
+
+        if (Object.keys(newTariff).length) {
+            dispatch(createCounterTariff(counterId, newTariff));
+        }
 
         dispatch({
             type: TARIFF.UPDATE,
@@ -133,7 +141,7 @@ export const updateCounterTariff = (counterId, data) => {
         dispatch({
             type: TARIFF_DATA.UPDATE,
             payload: {
-                tariffsData: tariffsData
+                tariffsData: counterTariffsData
             }
         });
 

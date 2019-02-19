@@ -76,18 +76,21 @@ export default (state = initialState, action) => {
                 }
              */
             const tariffsData = action.payload.tariffsData;
-            const list = cloneObject(state.list);
+            const { list } = state;
             const oldDataIds = Object.keys(list);
 
             const newList = {};
 
             Object.keys(tariffsData).forEach(dataId => {
                 const newData = {...tariffsData[dataId]};
-                // const amount =
-                if (oldDataIds.length) {
-                    oldDataIds
-                        .filter(id => list[id].tariffId === newData.tariffId)
-                        .sort((idA, idB) => list[idB].createTime - list[idA].createTime);
+
+                const tariffDataIds = oldDataIds
+                    .filter(id => list[id].tariffId === newData.tariffId)
+                    .sort((idA, idB) => list[idB].createTime - list[idA].createTime);
+                if (tariffDataIds.length) {
+                    // oldDataIds
+                    //     .filter(id => list[id].tariffId === newData.tariffId)
+                    //     .sort((idA, idB) => list[idB].createTime - list[idA].createTime);
 
                     newData['prevValue'] = Number(list[oldDataIds[0]].currentValue);
 
@@ -118,7 +121,7 @@ export default (state = initialState, action) => {
                     currentValue:
                 }
              */
-            const tariffsData = action.payload.tariffsData;
+            const { tariffsData } = action.payload;
             const list = cloneObject(state.list);
 
             const newList = {};
