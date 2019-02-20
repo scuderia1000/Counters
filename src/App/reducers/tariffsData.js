@@ -4,62 +4,48 @@ import { cloneObject } from "../constants/FunctionConst";
 
 
 const initialState = {
-    list: {
-            '1': {
-                id: '1',
-                tariffId: 'tariffId_1',
-                prevValue: null,
-                currentValue: 5,
-                amount: 30.23,
-                difference: null,
-                total: null,
-                createTime: Date.now(),
-            },
-            '2': {
-                id: '2',
-                tariffId: 'tariffId_1',
-                prevValue: 5,
-                currentValue: 15,
-                amount: 30.23,
-                difference: 10,
-                total: 302.3,
-                createTime: Date.now() + 100,
-            },
-            // '5': {
-            //     dataId: '5',
-            //     tariffId: 'tariffId_1',
-            //     createTime: Date.now() + 200,
-            //     value: '30',
-            // },
-        // },
-        // 'tariffId_2': {
-            '3': {
-                id: '3',
-                tariffId: 'tariffId_2',
-                prevValue: null,
-                currentValue: 10,
-                amount: 130.03,
-                difference: null,
-                total: null,
-                createTime: Date.now(),
-            },
-            '4': {
-                id: '4',
-                tariffId: 'tariffId_2',
-                prevValue: 10,
-                currentValue: 30,
-                amount: 130.03,
-                difference: 20,
-                total: 2600.6,
-                createTime: Date.now() + 100,
-            },
-            // '6': {
-            //     dataId: '6',
-            //     tariffId: 'tariffId_2',
-            //     createTime: Date.now() + 200,
-            //     value: '40',
-            // },
-    }
+    // list: {
+    //         '1': {
+    //             id: '1',
+    //             tariffId: 'tariffId_1',
+    //             prevValue: null,
+    //             currentValue: 5,
+    //             amount: 30.23,
+    //             difference: null,
+    //             total: null,
+    //             createTime: Date.now(),
+    //         },
+    //         '2': {
+    //             id: '2',
+    //             tariffId: 'tariffId_1',
+    //             prevValue: 5,
+    //             currentValue: 15,
+    //             amount: 30.23,
+    //             difference: 10,
+    //             total: 302.3,
+    //             createTime: Date.now() + 100,
+    //         },
+    //         '3': {
+    //             id: '3',
+    //             tariffId: 'tariffId_2',
+    //             prevValue: null,
+    //             currentValue: 10,
+    //             amount: 130.03,
+    //             difference: null,
+    //             total: null,
+    //             createTime: Date.now(),
+    //         },
+    //         '4': {
+    //             id: '4',
+    //             tariffId: 'tariffId_2',
+    //             prevValue: 10,
+    //             currentValue: 30,
+    //             amount: 130.03,
+    //             difference: 20,
+    //             total: 2600.6,
+    //             createTime: Date.now() + 100,
+    //         },
+    // }
 };
 
 export default (state = initialState, action) => {
@@ -76,7 +62,7 @@ export default (state = initialState, action) => {
                 }
              */
             const tariffsData = action.payload.tariffsData;
-            const { list } = state;
+            const { list = {} } = state;
             const oldDataIds = Object.keys(list);
 
             const newList = {};
@@ -98,6 +84,7 @@ export default (state = initialState, action) => {
                     difference = (difference ^ 0) === difference ? difference : difference.toFixed(1);
                     newData['difference'] = difference;
 
+                    // amount должен приходить из action
                     newData['total'] = difference * newData.amount;
                 } else {
                     newData['prevValue'] = null;
@@ -185,17 +172,17 @@ export default (state = initialState, action) => {
             }
         }
         case TARIFF_DATA.REMOVE_ALL_TARIFFS_DATA: {
-            const tariffs = action.payload.tariffs;
-            const counterId = action.payload.counterId;
-            if (!counterId) return state;
-
-            const removedTariffIds = Object.values(tariffs)
-                .filter(tariff => tariff.counterId === counterId)
-                .map(tariff => tariff.id);
-
+            const { tariffsIds = [] } = action.payload;
+            // const counterId = action.payload.counterId;
+            // if (!counterId) return state;
+            //
+            // const removedTariffIds = Object.values(tariffs)
+            //     .filter(tariff => tariff.counterId === counterId)
+            //     .map(tariff => tariff.id);
+            //
             const dataList = state.list ? cloneObject(state.list) : {};
             const removedDataIds = Object.values(dataList)
-                .filter(data => removedTariffIds.includes(data.tariffId))
+                .filter(data => tariffsIds.includes(data.tariffId))
                 .map(data => data.id);
 
             removedDataIds.forEach(id => delete dataList[id]);

@@ -77,9 +77,8 @@ class TariffDataInput extends Component {
         this.setState((state, props) => {
             return {
                 values: {
-                    ...state.currentValue,
+                    ...state.values,
                     [tariffId]: {
-                        ...state.currentValue[tariffId],
                         currentValue: value
                     }
                 },
@@ -89,12 +88,14 @@ class TariffDataInput extends Component {
     };
 
     checkFields = () => {
-        const {tariffsList, navigation} = this.props;
-        const {values} = this.state;
+        const { tariffsList, navigation } = this.props;
+        const { values } = this.state;
         const counterId = navigation.getParam('counterId', '');
-        if (counterId) {
-            const tariffIds = Object.keys(tariffsList);
-            const errorIds = tariffIds.filter(id => !values[id] || !values[id].currentValue);
+        // if (counterId) {
+        //     const tariffIds = Object.keys(tariffsList);
+        const errorIds = Object.values(tariffsList)
+            .filter(tariff => tariff.counterId === counterId && !values[tariff.id] || !values[tariff.id].currentValue);
+            // const errorIds = tariffIds.filter(id => !values[id] || !values[id].currentValue);
 
             if (errorIds.length) {
                 this.setState({errorsTariff: errorIds});
@@ -102,8 +103,8 @@ class TariffDataInput extends Component {
             }
 
             return true;
-        }
-        return false;
+        // }
+        // return false;
     };
 
     focusNextInput = (index) => {
@@ -118,14 +119,14 @@ class TariffDataInput extends Component {
         const { editData = {} } = tariffsData;
 
         if (this.checkFields()) {
-            const counterId = navigation.getParam('counterId', '');
+            // const counterId = navigation.getParam('counterId', '');
             // const counterId = editData.counterId;
             if (editData.counterId) {
                 this.props.updateData(this.state.values);
             } else {
                 this.props.saveData(this.state.values);
             }
-
+            navigation.goBack();
             /*const countersIds = Object.keys(list);
             // пока сделал так, в голову не приходит как по нормальному перейти к экранну с данными после обновления стора
             if (countersIds.length && countersIds.includes(counterId)) {
@@ -231,7 +232,7 @@ class TariffDataInput extends Component {
 const mapStateToProps = state => ({
     counters: state.counters,
     tariffsList: state.tariffs.list,
-    tariffs: state.tariffs,
+    // tariffs: state.tariffs,
     tariffsData: state.tariffsData,
     // countersValues: state.countersValues,
 });

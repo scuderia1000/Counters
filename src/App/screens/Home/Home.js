@@ -14,7 +14,7 @@ import { calculateCounterValues, cloneObject, getCounterTariffsData } from '../.
 //style
 import styles from './HomeStyles';
 import {createCounter} from "../AddCounter/actions/AddCounterActions";
-import {COUNTERS_VALUES, TARIFF_DATA} from "../../constants/ActionConst";
+import {COUNTER, COUNTERS_VALUES, TARIFF_DATA} from "../../constants/ActionConst";
 import log from "rn-fetch-blob/utils/log";
 
 const iconStyle = {
@@ -74,13 +74,23 @@ class Home extends Component {
     };
 
     handleAddCounter = () => {
-        this.props.editCounter('');
+        this.props.resetEditData();
         this.props.navigation.navigate('AddCounter', {title: ADD_COUNTER.TITLE.CREATE});
     };
 
-    openCounterData = (id) => {
+    openCounterData = (counterId) => {
         const { counters = {}, tariffs = {}, tariffsValues = {} } = this.props;
-        const { list = {}} = tariffsValues;
+        // const { list = {}} = tariffsValues;
+
+        const tariffsIds = Object.values(tariffs.list)
+            .filter(tariff => tariff.counterId === counterId)
+            .map(tariff => tariff.id);
+
+        const tariffsDataIds = Object.values(tariffsValues)
+            .filter(data => tariffsIds.includes(data.tariffId))
+            .map(data => data.id);
+
+
         /*const { counters = {}, countersValues = {} } = this.props;
         const { list = {}} = countersValues;
         const countersIds = Object.keys(list);
@@ -197,7 +207,7 @@ const mapStateToProps = state => ({
     counters: state.counters,
     tariffs: state.tariffs,
     tariffsValues: state.tariffsData,
-    countersValues: state.countersValues,
+    // countersValues: state.countersValues,
 });
 const dispatchers = dispatch => ({
     editCounter: (counterId) => {
@@ -218,6 +228,11 @@ const dispatchers = dispatch => ({
             payload: {
                 counterId: counterId
             }
+        })
+    },
+    resetEditData: () => {
+        dispatch({
+            type: COUNTER.RESET_COUNTER_EDIT_DATA
         })
     }
 });

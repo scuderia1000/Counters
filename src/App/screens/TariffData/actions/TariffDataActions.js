@@ -16,11 +16,14 @@ export const removeAllTariffsData = (counterId) => {
     return (dispatch, getState) => {
         const { tariffs = {} } = getState();
         const { list = {} } = tariffs;
+        const tariffsIds = Object.values(list)
+            .filter(tariff => tariff.counterId === counterId)
+            .map(tariff => tariff.id);
         dispatch({
             type: TARIFF_DATA.REMOVE_ALL_TARIFFS_DATA,
             payload: {
-                counterId: counterId,
-                tariffs: list
+                // counterId: counterId,
+                tariffsIds: tariffsIds
             }
         });
     }

@@ -2,17 +2,17 @@ import { COUNTER } from "../constants/ActionConst";
 import { cloneObject } from "../constants/FunctionConst";
 
 const initState = {
-    list: {
-        '1': {
-            id: '1',
-            createTime: new Date().getTime(),
-            counterName: 'Счетчик воды',
-            personalAccount: '1234567890',
-            fio: 'Иванов Иван иванович',
-            address: 'Harvard 12-89',
-            emailAddress: 'test@test.test',
-        }
-    }
+    // list: {
+    //     '1': {
+    //         id: '1',
+    //         createTime: new Date().getTime(),
+    //         counterName: 'Счетчик воды',
+    //         personalAccount: '1234567890',
+    //         fio: 'Иванов Иван иванович',
+    //         address: 'Harvard 12-89',
+    //         emailAddress: 'test@test.test',
+    //     }
+    // }
 };
 
 export default (state = initState, action) => {
@@ -39,6 +39,12 @@ export default (state = initState, action) => {
                     ...action.payload
 
                 }
+            }
+        }
+        case COUNTER.RESET_COUNTER_EDIT_DATA: {
+            return {
+                ...state,
+                editData: {}
             }
         }
         case COUNTER.REMOVE: {

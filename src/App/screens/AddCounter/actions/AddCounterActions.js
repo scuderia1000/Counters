@@ -108,7 +108,7 @@ export const updateCounterTariff = (counterId, tariffsValues) => {
         const newTariff = {/*tariffId: {}*/};
 
         Object.values(tariffsValues).forEach((item, index) => {
-            if (item.dataId) {
+            if (item.id) {
                 const {tariffs, tariffsData} = getState();
                 const tariff = {
                     ...tariffs.list[item.id],

@@ -1,30 +1,23 @@
-// react
-// import React from 'react';
-// libraries
-
-// own component
-
-// styles
-
-
 export const TARIFF_COMPONENT = {
-    name: {
+    tariffName: {
         placeholder: 'Название тарифа...',
         errorText: 'Введите название',
         required: true,
     },
-    amount: {
+    tariffAmount: {
         keyboardType: 'numeric',
         placeholder: 'Ставка тарифа...',
         errorText: 'Введите ставку тарифа',
+        required: true,
     },
-    currentValue: {
+    tariffCurrentValue: {
         keyboardType: 'numeric',
         placeholder: 'Текущее значение...',
         errorText: 'Введите текущее значение тарифа',
         style: {
             marginBottom: 15
-        }
+        },
+        required: true,
     }
 };
 
@@ -61,6 +54,7 @@ export default {
                 },
                 keyboardType: 'email-address',
             },
+            ...TARIFF_COMPONENT
         }
     }
 }
