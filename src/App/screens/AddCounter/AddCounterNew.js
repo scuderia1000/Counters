@@ -4,14 +4,17 @@ import {connect} from "react-redux";
 // libraries
 import ReactNative, { View, KeyboardAvoidingView, ScrollView } from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
+import uuid from "uuid";
+
 // own component
 import InterfaceBuilder, { TARIFF_COMPONENT } from './constatnts/InterfaceBuilder';
 import CounterField from "../../components/counterField/CounterField";
 import CommonButton from "../../components/buttons/CommonButton";
+import {createCounter, createCounterTariff, updateCounter, updateCounterTariff} from "./actions/AddCounterActions";
+import {cloneObject, validateEmail} from "../../constants/FunctionConst";
+
 // styles
 import styles from './AddCounterNewStyles';
-import {createCounter, createCounterTariff, updateCounter, updateCounterTariff} from "./actions/AddCounterActions";
-import {cloneObject} from "../../constants/FunctionConst";
 
 class AddCounterNew extends Component {
     static navigationOptions = ({ navigation }) => {
@@ -38,6 +41,80 @@ class AddCounterNew extends Component {
             fieldsValues: {}, // { fieldName: value }
             errors: [], // [fieldName]
         }
+    }
+
+    componentDidMount(): void {
+        const { navigation, counters = {} } = this.props;
+        const { editData = {} } = counters;
+        const { counterId, tariffs, tariffsData } = editData;
+        navigation.setParams({ createCounter: this.handleCreateCounter});
+    }
+
+    handleCreateCounter = () => {
+        const { fieldsValues, tariffsValues } = this.state;
+        const { counters } = this.props;
+        const { editData = {} } = counters;
+        const { counterId } = editData;
+
+        if (this.checkRequiredFilled()) {
+            let id;
+            if (counterId) {
+                id = counterId;
+                this.props.updateCounter(fieldsValues, id);
+                this.props.updateCounterTariff(id, tariffsValues);
+            } else {
+                id = uuid.v4();
+                this.props.createCounter(fieldsValues, id);
+                this.props.createCounterTariff(id, tariffsValues);
+            }
+
+
+
+            this.props.navigation.goBack();
+        }
+    };
+
+    checkRequiredFilled() {
+        const { fields, fieldsValues } = this.state;
+
+        const valuesNames = Object.keys(fieldsValues);
+
+        const errorFieldNames = Object.keys(fields)
+            .filter(fieldName =>
+                fields[fieldName].required &&
+                (!valuesNames.includes(fieldName) || !fieldsValues[fieldName]));
+        // e-mail не обязательное поле, но у него нужно проверить правильность заполнения
+        if (valuesNames.includes('emailAddress') &&
+            fieldsValues['emailAddress'] &&
+            !validateEmail(fieldsValues['emailAddress'])) {
+            errorFieldNames.push('emailAddress');
+        }
+
+        if (errorFieldNames.length) {
+            this.setState({errors: errorFieldNames});
+            setTimeout(() => {
+                this.scrollToError();
+            }, 0);
+            return false;
+        }
+        return true;
+    }
+
+    scrollToError() {
+        const { errors, fields } = this.state;
+
+        if (errors.length) {
+            const fieldsNames = Object.keys(fields);
+            const firstErrorIndex = fieldsNames.indexOf(errors[0]);
+
+            this.inputsRefs[firstErrorIndex].current.focus();
+            this.inputsRefs[firstErrorIndex].current.measureLayout(ReactNative.findNodeHandle(this.scrollView.current), ( xPos, yPos, Width, Height ) =>
+            {
+                this.scrollView.current.scrollTo({x: 0, y: yPos});
+            });
+        }
+
+
     }
 
     handleAddTariffFields = () => {
@@ -81,7 +158,7 @@ class AddCounterNew extends Component {
     };
 
     getFields = () => {
-        const { fields, fieldsValues } = this.state;
+        const { fields, fieldsValues, errors } = this.state;
         const { editData = {} } = this.props.counters;
         const { counterId } = editData;
         return Object.keys(fields).map((fieldName, index) => {
@@ -95,7 +172,7 @@ class AddCounterNew extends Component {
                               value={fieldsValues[fieldName]}
                               ref={this.inputsRefs[index]}
                               onSubmitEditing={this.focusNextInput}
-                              // isError={!!errorsDefault.length && errorsDefault.includes(key)}
+                              isError={!!errors.length && errors.includes(fieldName)}
                               onChange={this.handleFieldChange}
                               hasDelButton={fieldName.includes('tariffName_')}
                               onDelPress={this.handleRemoveTariffField} />
@@ -125,6 +202,7 @@ class AddCounterNew extends Component {
     render() {
         console.log('this.state.fieldsValues', this.state.fieldsValues)
         console.log('this.state.fields', this.state.fields)
+        console.log('this.state.errors', this.state.errors)
         return (
             <View style={styles.container}>
                 <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}
@@ -146,17 +224,17 @@ const mapStateToProps = state => ({
     // tariffsValues: state.tariffsData,
 });
 const dispatchers = dispatch => ({
-    // createCounter: (counterData, id) => {
-    //     dispatch(createCounter(counterData, id));
-    // },
-    // updateCounter: (counterData, id) => {
-    //     dispatch(updateCounter(counterData, id));
-    // },
-    // createCounterTariff: (counterId, tariffsData) => {
-    //     dispatch(createCounterTariff(counterId, tariffsData));
-    // },
-    // updateCounterTariff: (counterId, tariffsData) => {
-    //     dispatch(updateCounterTariff(counterId, tariffsData));
-    // },
+    createCounter: (counterData, id) => {
+        dispatch(createCounter(counterData, id));
+    },
+    updateCounter: (counterData, id) => {
+        dispatch(updateCounter(counterData, id));
+    },
+    createCounterTariff: (counterId, tariffsData) => {
+        dispatch(createCounterTariff(counterId, tariffsData));
+    },
+    updateCounterTariff: (counterId, tariffsData) => {
+        dispatch(updateCounterTariff(counterId, tariffsData));
+    },
 });
 export default connect(mapStateToProps, dispatchers)(AddCounterNew);

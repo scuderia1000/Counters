@@ -25,10 +25,13 @@ export default StyleSheet.create({
         height: 46,
 
     },
-    errorContainer: {
+    errorText: {
         position: 'absolute',
         bottom: 0,
         marginTop: 0,
+        color: 'red',
+        paddingLeft: 8,
+        paddingRight: 8,
     },
     divider: {
         position: 'absolute',

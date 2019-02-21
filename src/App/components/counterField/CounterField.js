@@ -44,7 +44,7 @@ const CounterField = React.forwardRef(({ field = {}, type, index, onChange, isEr
                                   onPress={() => onDelPress(index)}/>
                 }
             </View>
-            {isError && <Text labelStyle={[styles.errorContainer, errorStyle]}>{errorText}</Text>}
+            {isError && <Text style={[styles.errorText, errorStyle]}>{errorText}</Text>}
         </View>
     )
 });
