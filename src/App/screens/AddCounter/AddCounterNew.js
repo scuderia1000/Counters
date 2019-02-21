@@ -52,7 +52,7 @@ class AddCounterNew extends Component {
             return {
                 fields: {
                     ...state.fields,
-                    newFields
+                    ...newFields
                 }
             }
         });
@@ -114,10 +114,17 @@ class AddCounterNew extends Component {
             delete fieldsValues[removedFieldName];
             errors.splice(errors.indexOf(removedFieldName), 1);
         });
+
+        this.setState({
+            fields: fields,
+            fieldsValues: fieldsValues,
+            errors: errors,
+        })
     };
 
     render() {
-        // console.log('this.state.fields', this.state.fields)
+        console.log('this.state.fieldsValues', this.state.fieldsValues)
+        console.log('this.state.fields', this.state.fields)
         return (
             <View style={styles.container}>
                 <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}
