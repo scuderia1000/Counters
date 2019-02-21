@@ -1,6 +1,6 @@
 // react
 import React from 'react';
-import { View } from 'react-native';
+import { View, TextInput, Text } from 'react-native';
 import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elements';
 // own component
 import RemoveButton from '../../components/buttons/RemoveButton';
@@ -15,15 +15,16 @@ const CounterField = React.forwardRef(({ field = {}, type, index, onChange, isEr
         returnKeyType = 'next' } = field;
     return(
         <View key={`${type}_${index}`} style={[styles.container, style]}>
-            {!!label && <FormLabel>{label}</FormLabel>}
+            {!!label && <Text>{label}</Text>}
             <View style={styles.inputContainer}>
-                <FormInput inputStyle={[styles.input, hasDelButton && {width: '110%'}]}
+                <TextInput style={[styles.input, hasDelButton && {width: '110%'}]}
                            placeholderTextColor={colors.gray}
-                           containerStyle={{flex: 1}}
+                           // containerStyle={{flex: 1}}
                            placeholder={placeholder}
                            keyboardType={keyboardType}
                            autoFocus={autoFocus}
-                           textInputRef={ref}
+                           ref={ref}
+                           // textInputRef={ref}
                            underlineColorAndroid={colors.gray}
                            value={value}
                            returnKeyType={returnKeyType}
@@ -43,7 +44,7 @@ const CounterField = React.forwardRef(({ field = {}, type, index, onChange, isEr
                                   onPress={() => onDelPress(index)}/>
                 }
             </View>
-            {isError && <FormValidationMessage labelStyle={[styles.errorContainer, errorStyle]}>{errorText}</FormValidationMessage>}
+            {isError && <Text labelStyle={[styles.errorContainer, errorStyle]}>{errorText}</Text>}
         </View>
     )
 });

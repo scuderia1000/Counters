@@ -12,12 +12,18 @@ export default StyleSheet.create({
         height: 55,
         minHeight: 55,
         position: 'relative',
+        paddingLeft: 5,
+        paddingRight: 5,
     },
     input: {
+        flex: 1,
         // height: 35,
         // minHeight: 35,
         paddingVertical: 0,
         color: colors.wetAsphalt,
+        fontSize: 16,
+        height: 46,
+
     },
     errorContainer: {
         position: 'absolute',
