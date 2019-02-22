@@ -37,34 +37,106 @@ class AddCounterNew extends Component {
         this.state = {
             // при добавлении тарифа нужно к названию добавляемых полей добавить индекс fieldName_index,
             // т.к. название это уникальный ключ поля
-            fields: InterfaceBuilder.counter.fields, // {}
+            fields: {},
             fieldsValues: {}, // { fieldName: value }
             errors: [], // [fieldName]
+            // используется при редактировании счетчика
+            // связка полей тарифа с id тарифа
+            editedTariffsFields: {} // { tariffId: ['tariffName_index', 'tariffAmount_index', 'tariffCurrentValue_index']}
         }
     }
 
     componentDidMount(): void {
         const { navigation, counters = {} } = this.props;
         const { editData = {} } = counters;
-        const { counterId, tariffs, tariffsData } = editData;
+        const { counterId, tariffs } = editData;
         navigation.setParams({ createCounter: this.handleCreateCounter});
+
+        if (counterId) {
+            let newFields = {...InterfaceBuilder.counter.fields};
+            const editedTariffsFields = {};
+            let fieldsValues = cloneObject(counters.list[counterId]);
+
+            let fieldsCount = Object.keys(newFields).length;
+            Object.keys(tariffs).forEach(tariffId => {
+                editedTariffsFields[tariffId] = [];
+
+                Object.keys(TARIFF_COMPONENT).forEach(fieldName => {
+                    const name = `${fieldName}_${fieldsCount}`;
+                    newFields[name] = TARIFF_COMPONENT[fieldName];
+
+                    Object.keys(tariffs[tariffId])
+                        .filter(field => fieldName.toLowerCase().includes(field.toLowerCase()))
+                        .map(field => fieldsValues[name] = tariffs[tariffId][field]);
+
+                    editedTariffsFields[tariffId].push(name);
+                });
+                fieldsCount++;
+            });
+            this.setState({
+                fields: newFields,
+                fieldsValues: fieldsValues,
+                editedTariffsFields: editedTariffsFields,
+            })
+        } else {
+            this.setState({
+                fields: {...InterfaceBuilder.counter.fields, ...InterfaceBuilder.tariff.fields}
+            });
+        }
     }
 
     handleCreateCounter = () => {
-        const { fieldsValues, tariffsValues } = this.state;
+        const values = cloneObject(this.state.fieldsValues);
+        const { editedTariffsFields } = this.state;
+        const editedTariffIds = Object.keys(editedTariffsFields);
         const { counters } = this.props;
         const { editData = {} } = counters;
         const { counterId } = editData;
 
         if (this.checkRequiredFilled()) {
+            // разделяю поля счетчика и поля тарифа
+            const counterValues = {};
+            let tariffsValues = [];
+
+            Object.keys(InterfaceBuilder.counter.fields).forEach(fieldName => {
+                 counterValues[fieldName] = values[fieldName];
+                 // delete values[fieldName];
+            });
+
+            Object.keys(InterfaceBuilder.tariff.fields).forEach(fieldName => {
+                const valuesFieldNames = Object.keys(values).filter(name => name.includes(fieldName));
+                valuesFieldNames.forEach((name, index) => {
+                    if (tariffsValues[index]) {
+                        tariffsValues[index] = {
+                            ...tariffsValues[index],
+                            [name]: values[name]
+                        };
+                    } else {
+                        tariffsValues[index] = {
+                            [name]: values[name]
+                        };
+                        if (editedTariffIds.length && !tariffsValues[index].hasOwnProperty('id')) {
+                            editedTariffIds
+                                .filter(id => editedTariffsFields[id].includes(name))
+                                .map(id => {
+                                    tariffsValues[index]['id'] = id;
+                                });
+
+                        }
+                    }
+                });
+            });
+
+
+
             let id;
             if (counterId) {
                 id = counterId;
-                this.props.updateCounter(fieldsValues, id);
+                this.props.updateCounter(counterValues, id);
                 this.props.updateCounterTariff(id, tariffsValues);
             } else {
                 id = uuid.v4();
-                this.props.createCounter(fieldsValues, id);
+                this.props.createCounter(counterValues, id);
                 this.props.createCounterTariff(id, tariffsValues);
             }
 
@@ -83,10 +155,9 @@ class AddCounterNew extends Component {
             .filter(fieldName =>
                 fields[fieldName].required &&
                 (!valuesNames.includes(fieldName) || !fieldsValues[fieldName]));
-        // e-mail не обязательное поле, но у него нужно проверить правильность заполнения
-        if (valuesNames.includes('emailAddress') &&
-            fieldsValues['emailAddress'] &&
-            !validateEmail(fieldsValues['emailAddress'])) {
+        // e-mail не обязательное поле, но если оно заполнено у него нужно проверить формат
+        if (!fields['emailAddress'].required && valuesNames.includes('emailAddress') &&
+            fieldsValues['emailAddress'] && !validateEmail(fieldsValues['emailAddress'])) {
             errorFieldNames.push('emailAddress');
         }
 
@@ -113,9 +184,13 @@ class AddCounterNew extends Component {
                 this.scrollView.current.scrollTo({x: 0, y: yPos});
             });
         }
-
-
     }
+
+    scrollToBottom = () => {
+        if (this.scrollView && this.scrollView.current) {
+            this.scrollView.current.scrollTo({x: 0, y: 100000});
+        }
+    };
 
     handleAddTariffFields = () => {
         const { fields } = this.state;
@@ -133,6 +208,9 @@ class AddCounterNew extends Component {
                 }
             }
         });
+        setTimeout(() => {
+            this.scrollToBottom();
+        }, 0);
     };
 
     focusNextInput = (index) => {
@@ -181,28 +259,46 @@ class AddCounterNew extends Component {
     };
 
     handleRemoveTariffField = (index) => {
+        const editedTariffsFields = cloneObject(this.state.editedTariffsFields);
+
         const fields = cloneObject(this.state.fields);
         const fieldsValues = cloneObject(this.state.fieldsValues);
         const errors = [...this.state.errors];
+
+        const removedFields = [];
 
         Object.keys(TARIFF_COMPONENT).forEach(fieldName => {
             const removedFieldName = `${fieldName}_${index}`;
             delete fields[removedFieldName];
             delete fieldsValues[removedFieldName];
             errors.splice(errors.indexOf(removedFieldName), 1);
+            removedFields.push(removedFieldName);
         });
 
-        this.setState({
+        const newState = {
             fields: fields,
             fieldsValues: fieldsValues,
             errors: errors,
-        })
+        };
+
+        const editedTariffIds = Object.keys(editedTariffsFields);
+        if (editedTariffIds.length) {
+            editedTariffIds
+                .filter(id => editedTariffsFields[id].includes(removedFields[0]))
+                .map(id => {
+                    delete editedTariffsFields[id];
+                });
+
+        }
+
+        this.setState(newState);
     };
 
     render() {
-        console.log('this.state.fieldsValues', this.state.fieldsValues)
-        console.log('this.state.fields', this.state.fields)
-        console.log('this.state.errors', this.state.errors)
+        // console.log('this.state.fieldsValues', this.state.fieldsValues)
+        // console.log('this.state.fields', this.state.fields)
+        // console.log('this.state.errors', this.state.errors)
+        console.log('this.state.editedTariffsFields', this.state.editedTariffsFields)
         return (
             <View style={styles.container}>
                 <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}

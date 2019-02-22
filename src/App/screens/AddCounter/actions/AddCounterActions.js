@@ -65,17 +65,27 @@ export const createCounterTariff = (counterId, data) => {
 
     const now = Date.now();
     Object.values(data).forEach(tariffItem => {
+        let tariffName = '';
+        let tariffAmount = null;
+        Object.keys(tariffItem).filter(field => field.includes('tariffName'))
+            .map(field => tariffName = tariffItem[field]);
+        Object.keys(tariffItem).filter(field => field.includes('tariffAmount'))
+            .map(field => tariffAmount = tariffItem[field]);
         const tariff = {
             id: uuid.v4(),
             counterId: counterId,
-            name: tariffItem.name,
-            amount: tariffItem.amount > 0 && Number(tariffItem.amount) || null,
+            name: tariffName,
+            amount: tariffAmount > 0 && Number(tariffAmount) || null,
             createTime: now,
         };
+
+        let tariffCurrentValue = null;
+        Object.keys(tariffItem).filter(field => field.includes('tariffCurrentValue'))
+            .map(field => tariffCurrentValue = tariffItem[field]);
         const data = {
             id: uuid.v4(),
             tariffId: tariff.id,
-            currentValue: tariffItem.currentValue > 0 && Number(tariffItem.currentValue) || null,
+            currentValue: tariffCurrentValue > 0 && Number(tariffCurrentValue) || null,
             amount: tariff.amount,
             createTime: now,
         };

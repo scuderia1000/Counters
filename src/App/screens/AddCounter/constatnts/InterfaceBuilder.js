@@ -54,6 +54,10 @@ export default {
                 },
                 keyboardType: 'email-address',
             },
+        }
+    },
+    tariff: {
+        fields: {
             ...TARIFF_COMPONENT
         }
     }

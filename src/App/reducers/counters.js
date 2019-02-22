@@ -18,7 +18,7 @@ const initState = {
 export default (state = initState, action) => {
     switch (action.type) {
         case COUNTER.CREATE: {
-            const oldCounters = state.list && cloneObject(state.list) || {};
+            const oldCounters = cloneObject(state.list);
             const newCounters = {...oldCounters, ...action.payload};
             const sortedCounters = {};
             const keys = Object.keys(newCounters);

@@ -9,28 +9,36 @@ export const editCounter = (counterId) => {
         Object.values(tariffs.list)
             .filter(tariff => tariff.counterId === counterId)
             .map(tariff => {
-                counterTariffs[tariff.id] = tariff;
+                counterTariffs[tariff.id] = {
+                    name: tariff.name,
+                    amount: tariff.amount && String(tariff.amount) || '',
+                };
+                const tariffDataList = Object.values(tariffsData.list)
+                    .filter(data => data.tariffId === tariff.id)
+                    .sort((dataA, dataB) => dataA.createTime - dataB.createTime);
+                counterTariffs[tariff.id]['currentValue'] =
+                    tariffDataList[0].currentValue && String(tariffDataList[0].currentValue) || '';
             });
-        const counterTariffsIds = Object.keys(counterTariffs);
-        const counterTariffsData = {};
-        Object.values(tariffsData.list)
-            .filter(data => counterTariffsIds.includes(data.tariffId))
-            // .sort((dataA, dataB) => tariffsData.list[])
-            .map(data => {
-                if (counterTariffsData[data.tariffId]) {
-                    counterTariffsData[data.tariffId] = [...counterTariffsData[data.tariffId], data];
-                } else {
-                    counterTariffsData[data.tariffId] = [data];
-                }
-            });
-        Object.values(counterTariffsData).sort((dataA, dataB) => dataA.createTime - dataB.createTime);
+        // const counterTariffsIds = Object.keys(counterTariffs);
+        // const counterTariffsData = {};
+        // Object.values(tariffsData.list)
+        //     .filter(data => counterTariffsIds.includes(data.tariffId))
+        //     // .sort((dataA, dataB) => tariffsData.list[])
+        //     .map(data => {
+        //         if (counterTariffsData[data.tariffId]) {
+        //             counterTariffsData[data.tariffId] = [...counterTariffsData[data.tariffId], data];
+        //         } else {
+        //             counterTariffsData[data.tariffId] = [data];
+        //         }
+        //     });
+        // Object.values(counterTariffsData).sort((dataA, dataB) => dataA.createTime - dataB.createTime);
 
         dispatch({
             type: COUNTER.EDIT,
             payload: {
                 counterId: counterId,
                 tariffs: counterTariffs,
-                tariffsData: counterTariffsData
+                // tariffsData: counterTariffsData
             }
         })
     }
