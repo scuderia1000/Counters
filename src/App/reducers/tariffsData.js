@@ -116,13 +116,16 @@ export default (state = initialState, action) => {
             Object.keys(tariffsData).forEach(dataId => {
                 const newData = {...list[dataId], ...tariffsData[dataId]};
 
-                let difference = newData.currentValue - newData.prevValue;
-                difference = (difference ^ 0) === difference ? difference : difference.toFixed(1);
-                newData['difference'] = difference;
+                if (newData.prevValue !== null) {
+                    let difference = newData.currentValue - newData.prevValue;
+                    difference = (difference ^ 0) === difference ? difference : difference.toFixed(1);
+                    newData['difference'] = difference;
 
-                let amount = list[dataId].amount;
+                    let amount = list[dataId].amount;
 
-                newData['total'] = difference * amount;
+                    newData['total'] = difference * amount;
+                }
+
                 newList[dataId] = newData;
             });
 

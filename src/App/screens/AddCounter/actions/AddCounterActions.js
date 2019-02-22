@@ -65,12 +65,8 @@ export const createCounterTariff = (counterId, data) => {
 
     const now = Date.now();
     Object.values(data).forEach(tariffItem => {
-        let tariffName = '';
-        let tariffAmount = null;
-        Object.keys(tariffItem).filter(field => field.includes('tariffName'))
-            .map(field => tariffName = tariffItem[field]);
-        Object.keys(tariffItem).filter(field => field.includes('tariffAmount'))
-            .map(field => tariffAmount = tariffItem[field]);
+        let tariffName = getTariffName(tariffItem);
+        let tariffAmount = getTariffAmount(tariffItem);
         const tariff = {
             id: uuid.v4(),
             counterId: counterId,
@@ -79,9 +75,7 @@ export const createCounterTariff = (counterId, data) => {
             createTime: now,
         };
 
-        let tariffCurrentValue = null;
-        Object.keys(tariffItem).filter(field => field.includes('tariffCurrentValue'))
-            .map(field => tariffCurrentValue = tariffItem[field]);
+        let tariffCurrentValue = getTariffCurrentValue(tariffItem);
         const data = {
             id: uuid.v4(),
             tariffId: tariff.id,
@@ -120,20 +114,28 @@ export const updateCounterTariff = (counterId, tariffsValues) => {
         Object.values(tariffsValues).forEach((item, index) => {
             if (item.id) {
                 const {tariffs, tariffsData} = getState();
+                let tariffName = getTariffName(item);
+                let tariffAmount = getTariffAmount(item);
                 const tariff = {
                     ...tariffs.list[item.id],
-                    name: item.name,
-                    amount: item.amount > 0 && Number(item.amount) || null,
+                    name: tariffName,
+                    amount: tariffAmount > 0 && Number(tariffAmount) || null,
                 };
+
+                let tariffCurrentValue = getTariffCurrentValue(item);
+                const tariffDataList = Object.values(tariffsData.list)
+                    .filter(data => data.tariffId === item.id)
+                    .sort((dataA, dataB) => dataA.createTime - dataB.createTime);
+                const dataId = tariffDataList[0].id;
+
                 const data = {
-                    ...tariffsData.list[item.dataId],
-                    currentValue: item.currentValue > 0 && Number(item.currentValue) || null,
+                    currentValue: tariffCurrentValue > 0 && Number(tariffCurrentValue) || null,
                     // если изменилась ставка тарифа, то начальные данные не персчитываем
                     // изменения ставки тарифа касаются только новых данных
                     // amount: tariff.amount,
                 };
                 counterTariffs[tariff.id] = {...tariff};
-                counterTariffsData[data.id] = {...data};
+                counterTariffsData[dataId] = {...data};
             } else {
                 newTariff[index] = {...item}
             }
@@ -156,4 +158,25 @@ export const updateCounterTariff = (counterId, tariffsValues) => {
         });
 
     }
+};
+
+const getTariffName = (tariffItem) => {
+    let tariffName = '';
+    Object.keys(tariffItem).filter(field => field.includes('tariffName'))
+        .map(field => tariffName = tariffItem[field]);
+    return tariffName;
+};
+
+const getTariffAmount = (tariffItem) => {
+    let tariffAmount = null;
+    Object.keys(tariffItem).filter(field => field.includes('tariffAmount'))
+        .map(field => tariffAmount = tariffItem[field]);
+    return tariffAmount;
+};
+
+const getTariffCurrentValue = (tariffItem) => {
+    let tariffCurrentValue = null;
+    Object.keys(tariffItem).filter(field => field.includes('tariffCurrentValue'))
+        .map(field => tariffCurrentValue = tariffItem[field]);
+    return tariffCurrentValue;
 };
