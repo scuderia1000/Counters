@@ -40,9 +40,29 @@ export default (state = initialState, action) => {
                 }
             }
         }
-        case TARIFF.REMOVE: {
-            const { counterId } = action.payload;
-            const tariffsList = state.list && cloneObject(state.list) || {};
+        case TARIFF.REMOVE_TARIFF: {
+            const { tariffId = '' } = action.payload;
+            const tariffsList = cloneObject(state.list);
+
+            delete tariffsList[tariffId];
+            return {
+                ...state,
+                list: tariffsList
+            }
+        }
+        case TARIFF.REMOVE_TARIFF_BATCH: {
+            const { tariffIds = [] } = action.payload;
+            const tariffsList = cloneObject(state.list);
+
+            tariffIds.forEach(id => delete tariffsList[id]);
+            return {
+                ...state,
+                list: tariffsList
+            }
+        }
+        case TARIFF.REMOVE_ALL_COUNTER_TARIFFS: {
+            const { counterId = '' } = action.payload;
+            const tariffsList = cloneObject(state.list);
             const tariffsIds = Object.values(tariffsList)
                 .filter(tariff => tariff.counterId === counterId)
                 .map(tariff => tariff.id);

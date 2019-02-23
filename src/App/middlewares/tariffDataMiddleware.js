@@ -4,7 +4,7 @@ import {calculateCounterValues, getCounterTariffsData} from "../constants/Functi
 export const tariffDataMiddleware = store => next => action => {
     switch (action.type) {
         // пересчет значений, если данные поменялись
-        /*case TARIFF_DATA.REMOVE:
+        /*case TARIFF_DATA.REMOVE_ALL_COUNTER_TARIFFS:
         case TARIFF_DATA.REMOVE_ALL_TARIFFS_DATA:
         case TARIFF_DATA.CREATE: {
             const { counterId } = action.payload;

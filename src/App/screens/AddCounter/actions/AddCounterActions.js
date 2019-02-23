@@ -107,6 +107,8 @@ export const createCounterTariff = (counterId, data) => {
 export const updateCounterTariff = (counterId, tariffsValues) => {
     return (dispatch, getState) => {
 
+        const { editData = {} } = getState().counters;
+
         const counterTariffs = {/*tariffId: {}*/};
         const counterTariffsData = {/*dataId: {}*/};
         const newTariff = {/*tariffId: {}*/};

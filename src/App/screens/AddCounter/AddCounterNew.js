@@ -1,17 +1,18 @@
 // react
 import React, { Component } from 'react';
-import {connect} from "react-redux";
+import { connect } from 'react-redux';
 // libraries
 import ReactNative, { View, KeyboardAvoidingView, ScrollView } from 'react-native';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
-import uuid from "uuid";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
+import uuid from 'uuid';
 
 // own component
 import InterfaceBuilder, { TARIFF_COMPONENT } from './constatnts/InterfaceBuilder';
-import CounterField from "../../components/counterField/CounterField";
-import CommonButton from "../../components/buttons/CommonButton";
-import {createCounter, createCounterTariff, updateCounter, updateCounterTariff} from "./actions/AddCounterActions";
-import {cloneObject, validateEmail} from "../../constants/FunctionConst";
+import CounterField from '../../components/counterField/CounterField';
+import CommonButton from '../../components/buttons/CommonButton';
+import { createCounter, createCounterTariff, updateCounter, updateCounterTariff } from './actions/AddCounterActions';
+import { cloneObject, validateEmail } from '../../constants/FunctionConst';
+import { TARIFF } from '../../constants/ActionConst';
 
 // styles
 import styles from './AddCounterNewStyles';
@@ -21,13 +22,13 @@ class AddCounterNew extends Component {
         return {
             title: navigation.getParam('title', ''),
             headerRight: (
-                <CommonButton style={{marginRight: 10, height: 38, borderRadius: 4}}
+                <CommonButton style={{ marginRight: 10, height: 38, borderRadius: 4 }}
                               caption='Готово'
-                              captionStyle={{fontSize: 16, fontWeight: "bold"}}
+                              captionStyle={{ fontSize: 16, fontWeight: 'bold' }}
                               onPress={() => navigation.state.params.createCounter()}/>
 
             )
-        }
+        };
     };
 
     constructor(props) {
@@ -41,19 +42,20 @@ class AddCounterNew extends Component {
             fieldsValues: {}, // { fieldName: value }
             errors: [], // [fieldName]
             // используется при редактировании счетчика
-            // связка полей тарифа с id тарифа
+            // связка id тарифа с полями на форме
+            // костыль, но хз как по другому
             editedTariffsFields: {} // { tariffId: ['tariffName_index', 'tariffAmount_index', 'tariffCurrentValue_index']}
-        }
+        };
     }
 
     componentDidMount(): void {
         const { navigation, counters = {} } = this.props;
         const { editData = {} } = counters;
         const { counterId, tariffs } = editData;
-        navigation.setParams({ createCounter: this.handleCreateCounter});
+        navigation.setParams({ createCounter: this.handleCreateCounter });
 
         if (counterId) {
-            let newFields = {...InterfaceBuilder.counter.fields};
+            let newFields = { ...InterfaceBuilder.counter.fields };
             const editedTariffsFields = {};
             let fieldsValues = cloneObject(counters.list[counterId]);
 
@@ -77,10 +79,10 @@ class AddCounterNew extends Component {
                 fields: newFields,
                 fieldsValues: fieldsValues,
                 editedTariffsFields: editedTariffsFields,
-            })
+            });
         } else {
             this.setState({
-                fields: {...InterfaceBuilder.counter.fields, ...InterfaceBuilder.tariff.fields}
+                fields: { ...InterfaceBuilder.counter.fields, ...InterfaceBuilder.tariff.fields }
             });
         }
     }
@@ -89,7 +91,7 @@ class AddCounterNew extends Component {
         const values = cloneObject(this.state.fieldsValues);
         const { editedTariffsFields } = this.state;
         const editedTariffIds = Object.keys(editedTariffsFields);
-        const { counters } = this.props;
+        const { counters = {}, removeTariffs } = this.props;
         const { editData = {} } = counters;
         const { counterId } = editData;
 
@@ -99,8 +101,7 @@ class AddCounterNew extends Component {
             let tariffsValues = [];
 
             Object.keys(InterfaceBuilder.counter.fields).forEach(fieldName => {
-                 counterValues[fieldName] = values[fieldName];
-                 // delete values[fieldName];
+                counterValues[fieldName] = values[fieldName];
             });
 
             Object.keys(InterfaceBuilder.tariff.fields).forEach(fieldName => {
@@ -121,25 +122,28 @@ class AddCounterNew extends Component {
                                 .map(id => {
                                     tariffsValues[index]['id'] = id;
                                 });
-
                         }
                     }
                 });
             });
-
-
 
             let id;
             if (counterId) {
                 id = counterId;
                 this.props.updateCounter(counterValues, id);
                 this.props.updateCounterTariff(id, tariffsValues);
+
+                // удаление тарифов
+                const { tariffs = {} } = editData;
+                const initialEditedTariffsIds = Object.keys(tariffs);
+                const removedTariffIds = initialEditedTariffsIds.filter(id => !editedTariffIds.includes(id));
+                if (removedTariffIds.length) removeTariffs(removedTariffIds);
+
             } else {
                 id = uuid.v4();
                 this.props.createCounter(counterValues, id);
                 this.props.createCounterTariff(id, tariffsValues);
             }
-
 
 
             this.props.navigation.goBack();
@@ -162,7 +166,7 @@ class AddCounterNew extends Component {
         }
 
         if (errorFieldNames.length) {
-            this.setState({errors: errorFieldNames});
+            this.setState({ errors: errorFieldNames });
             setTimeout(() => {
                 this.scrollToError();
             }, 0);
@@ -179,16 +183,15 @@ class AddCounterNew extends Component {
             const firstErrorIndex = fieldsNames.indexOf(errors[0]);
 
             this.inputsRefs[firstErrorIndex].current.focus();
-            this.inputsRefs[firstErrorIndex].current.measureLayout(ReactNative.findNodeHandle(this.scrollView.current), ( xPos, yPos, Width, Height ) =>
-            {
-                this.scrollView.current.scrollTo({x: 0, y: yPos});
+            this.inputsRefs[firstErrorIndex].current.measureLayout(ReactNative.findNodeHandle(this.scrollView.current), (xPos, yPos, Width, Height) => {
+                this.scrollView.current.scrollTo({ x: 0, y: yPos });
             });
         }
     }
 
     scrollToBottom = () => {
         if (this.scrollView && this.scrollView.current) {
-            this.scrollView.current.scrollTo({x: 0, y: 100000});
+            this.scrollView.current.scrollTo({ x: 0, y: 100000 });
         }
     };
 
@@ -206,7 +209,7 @@ class AddCounterNew extends Component {
                     ...state.fields,
                     ...newFields
                 }
-            }
+            };
         });
         setTimeout(() => {
             this.scrollToBottom();
@@ -231,16 +234,55 @@ class AddCounterNew extends Component {
                     [fieldName]: value,
                 },
                 errors: errors,
+            };
+        });
+    };
+
+    handleRemoveTariffField = (index) => {
+        const editedTariffsFields = cloneObject(this.state.editedTariffsFields);
+
+        const fields = cloneObject(this.state.fields);
+        const fieldsValues = cloneObject(this.state.fieldsValues);
+        const errors = [...this.state.errors];
+
+        Object.keys(TARIFF_COMPONENT).forEach(fieldName => {
+            const removedFieldName = `${fieldName}_${index}`;
+            delete fields[removedFieldName];
+            delete fieldsValues[removedFieldName];
+            errors.splice(errors.indexOf(removedFieldName), 1);
+
+            // при редактировании данных тарифа удаляем связку
+            const editedTariffIds = Object.keys(editedTariffsFields);
+            if (editedTariffIds.length) {
+                editedTariffIds
+                    .filter(id => editedTariffsFields[id].includes(removedFieldName))
+                    .map(id => {
+                        delete editedTariffsFields[id];
+                    });
             }
-        })
+        });
+
+        const newState = {
+            fields: fields,
+            fieldsValues: fieldsValues,
+            errors: errors,
+            editedTariffsFields: editedTariffsFields,
+        };
+
+        this.setState(newState);
     };
 
     getFields = () => {
         const { fields, fieldsValues, errors } = this.state;
         const { editData = {} } = this.props.counters;
         const { counterId } = editData;
-        return Object.keys(fields).map((fieldName, index) => {
+        const fieldNames = Object.keys(fields);
+        let tariffFieldsCount = 0;
+        fieldNames.forEach( name => name.includes('tariffName') && tariffFieldsCount++);
+        console.log('tariffFieldsCount', tariffFieldsCount)
+        return fieldNames.map((fieldName, index) => {
             this.inputsRefs[index] = React.createRef();
+            const hasDelButton = fieldName.includes('tariffName_') && tariffFieldsCount > 1;
             return (
                 <CounterField key={`${fieldName}_${index}`}
                               type={fieldName}
@@ -252,72 +294,37 @@ class AddCounterNew extends Component {
                               onSubmitEditing={this.focusNextInput}
                               isError={!!errors.length && errors.includes(fieldName)}
                               onChange={this.handleFieldChange}
-                              hasDelButton={fieldName.includes('tariffName_')}
-                              onDelPress={this.handleRemoveTariffField} />
-            )
+                              hasDelButton={hasDelButton}
+                              onDelPress={this.handleRemoveTariffField}/>
+            );
         });
-    };
-
-    handleRemoveTariffField = (index) => {
-        const editedTariffsFields = cloneObject(this.state.editedTariffsFields);
-
-        const fields = cloneObject(this.state.fields);
-        const fieldsValues = cloneObject(this.state.fieldsValues);
-        const errors = [...this.state.errors];
-
-        const removedFields = [];
-
-        Object.keys(TARIFF_COMPONENT).forEach(fieldName => {
-            const removedFieldName = `${fieldName}_${index}`;
-            delete fields[removedFieldName];
-            delete fieldsValues[removedFieldName];
-            errors.splice(errors.indexOf(removedFieldName), 1);
-            removedFields.push(removedFieldName);
-        });
-
-        const newState = {
-            fields: fields,
-            fieldsValues: fieldsValues,
-            errors: errors,
-        };
-
-        const editedTariffIds = Object.keys(editedTariffsFields);
-        if (editedTariffIds.length) {
-            editedTariffIds
-                .filter(id => editedTariffsFields[id].includes(removedFields[0]))
-                .map(id => {
-                    delete editedTariffsFields[id];
-                });
-
-        }
-
-        this.setState(newState);
     };
 
     render() {
         // console.log('this.state.fieldsValues', this.state.fieldsValues)
         // console.log('this.state.fields', this.state.fields)
         // console.log('this.state.errors', this.state.errors)
-        console.log('this.state.editedTariffsFields', this.state.editedTariffsFields)
+        console.log('this.state.editedTariffsFields', this.state.editedTariffsFields);
         return (
             <View style={styles.container}>
                 <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}
                                          ref={this.scrollView}
-                                         getTextInputRefs={() => { return this.inputsRefs }}
+                                         getTextInputRefs={() => {
+                                             return this.inputsRefs;
+                                         }}
                 >
                     {this.getFields()}
                 </KeyboardAwareScrollView>
                 <CommonButton onPress={this.handleAddTariffFields}
                               caption={'Добавить тариф'}
-                              icon={{name: 'plus', type: 'material-community', color: 'white'}}/>
+                              icon={{ name: 'plus', type: 'material-community', color: 'white' }}/>
             </View>
-        )
+        );
     }
 }
+
 const mapStateToProps = state => ({
     counters: state.counters,
-    // tariffs: state.tariffs,
-    // tariffsValues: state.tariffsData,
 });
 const dispatchers = dispatch => ({
     createCounter: (counterData, id) => {
@@ -332,5 +339,13 @@ const dispatchers = dispatch => ({
     updateCounterTariff: (counterId, tariffsData) => {
         dispatch(updateCounterTariff(counterId, tariffsData));
     },
+    removeTariffs: (tariffIds) => {
+        dispatch({
+            type: TARIFF.REMOVE_TARIFF_BATCH,
+            payload: {
+                tariffIds: tariffIds
+            }
+        });
+    }
 });
 export default connect(mapStateToProps, dispatchers)(AddCounterNew);
