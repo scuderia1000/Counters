@@ -74,14 +74,10 @@ export default (state = initialState, action) => {
                     .filter(id => list[id].tariffId === newData.tariffId)
                     .sort((idA, idB) => list[idB].createTime - list[idA].createTime);
                 if (tariffDataIds.length) {
-                    // oldDataIds
-                    //     .filter(id => list[id].tariffId === newData.tariffId)
-                    //     .sort((idA, idB) => list[idB].createTime - list[idA].createTime);
-
-                    newData['prevValue'] = Number(list[oldDataIds[0]].currentValue);
+                    newData['prevValue'] = Number(list[tariffDataIds[0]].currentValue);
 
                     let difference = newData.currentValue - newData.prevValue;
-                    difference = (difference ^ 0) === difference ? difference : difference.toFixed(1);
+                    difference = (difference ^ 0) === difference ? difference : Number(difference.toFixed(1));
                     newData['difference'] = difference;
 
                     // amount должен приходить из action

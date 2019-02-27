@@ -12,7 +12,7 @@ import CounterField from '../../components/counterField/CounterField';
 import CommonButton from '../../components/buttons/CommonButton';
 import { createCounter, createCounterTariff, updateCounter, updateCounterTariff } from './actions/AddCounterActions';
 import { cloneObject, validateEmail } from '../../constants/FunctionConst';
-import { TARIFF } from '../../constants/ActionConst';
+import { COUNTER, TARIFF } from '../../constants/ActionConst';
 
 // styles
 import styles from './AddCounterNewStyles';
@@ -88,10 +88,10 @@ class AddCounterNew extends Component {
     }
 
     handleCreateCounter = () => {
-        const values = cloneObject(this.state.fieldsValues);
-        const { editedTariffsFields } = this.state;
+        const { editedTariffsFields, fieldsValues } = this.state;
+        const values = cloneObject(fieldsValues);
         const editedTariffIds = Object.keys(editedTariffsFields);
-        const { counters = {}, removeTariffs } = this.props;
+        const { counters = {}, removeTariffs, resetEditData } = this.props;
         const { editData = {} } = counters;
         const { counterId } = editData;
 
@@ -139,6 +139,8 @@ class AddCounterNew extends Component {
                 const removedTariffIds = initialEditedTariffsIds.filter(id => !editedTariffIds.includes(id));
                 if (removedTariffIds.length) removeTariffs(removedTariffIds);
 
+                resetEditData();
+
             } else {
                 id = uuid.v4();
                 this.props.createCounter(counterValues, id);
@@ -160,7 +162,7 @@ class AddCounterNew extends Component {
                 fields[fieldName].required &&
                 (!valuesNames.includes(fieldName) || !fieldsValues[fieldName]));
         // e-mail не обязательное поле, но если оно заполнено у него нужно проверить формат
-        if (!fields['emailAddress'].required && valuesNames.includes('emailAddress') &&
+        if (valuesNames.includes('emailAddress') &&
             fieldsValues['emailAddress'] && !validateEmail(fieldsValues['emailAddress'])) {
             errorFieldNames.push('emailAddress');
         }
@@ -262,14 +264,12 @@ class AddCounterNew extends Component {
             }
         });
 
-        const newState = {
+        this.setState({
             fields: fields,
             fieldsValues: fieldsValues,
             errors: errors,
             editedTariffsFields: editedTariffsFields,
-        };
-
-        this.setState(newState);
+        });
     };
 
     getFields = () => {
@@ -279,7 +279,6 @@ class AddCounterNew extends Component {
         const fieldNames = Object.keys(fields);
         let tariffFieldsCount = 0;
         fieldNames.forEach( name => name.includes('tariffName') && tariffFieldsCount++);
-        console.log('tariffFieldsCount', tariffFieldsCount)
         return fieldNames.map((fieldName, index) => {
             this.inputsRefs[index] = React.createRef();
             const hasDelButton = fieldName.includes('tariffName_') && tariffFieldsCount > 1;
@@ -301,10 +300,6 @@ class AddCounterNew extends Component {
     };
 
     render() {
-        // console.log('this.state.fieldsValues', this.state.fieldsValues)
-        // console.log('this.state.fields', this.state.fields)
-        // console.log('this.state.errors', this.state.errors)
-        console.log('this.state.editedTariffsFields', this.state.editedTariffsFields);
         return (
             <View style={styles.container}>
                 <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}
@@ -346,6 +341,9 @@ const dispatchers = dispatch => ({
                 tariffIds: tariffIds
             }
         });
+    },
+    resetEditData: () => {
+        dispatch({type: COUNTER.RESET_COUNTER_EDIT_DATA});
     }
 });
 export default connect(mapStateToProps, dispatchers)(AddCounterNew);

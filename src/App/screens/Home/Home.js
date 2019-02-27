@@ -86,10 +86,27 @@ class Home extends Component {
             .filter(tariff => tariff.counterId === counterId)
             .map(tariff => tariff.id);
 
-        const tariffsDataIds = Object.values(tariffsValues)
+        let isDataExists = Object.values(tariffsValues.list)
             .filter(data => tariffsIds.includes(data.tariffId))
-            .map(data => data.id);
+            .sort((dataA, dataB) => dataB.createTime - dataA.createTime)
+            .some(data => data.prevValue !== null);
+        // const tariffsDataIds = Object.values(tariffsValues)
+        //     .filter(data => tariffsIds.includes(data.tariffId))
+        //     .sort((dataA, dataB) => dataB.createTime - dataA.createTime)
+        //     .map(data => {
+        //         if (!isDataExists && data.prevValue !== null) isDataExists = true;
+        //         return data.id;
+        //     });
 
+        if (isDataExists) {
+            this.props.navigation.navigate(
+                'TariffData',
+                {
+                    counterId: counterId,
+                    title: counters.list[counterId].counterName
+                }
+            );
+        }
 
         /*const { counters = {}, countersValues = {} } = this.props;
         const { list = {}} = countersValues;
@@ -224,7 +241,7 @@ const dispatchers = dispatch => ({
     },
     setCounterId: (counterId) => {
         dispatch({
-            type: COUNTERS_VALUES.OPEN,
+            type: TARIFF_DATA.SET_COUNTER_ID,
             payload: {
                 counterId: counterId
             }

@@ -56,10 +56,10 @@ class TariffData extends Component {
         return (
             <View key={tariff.dataId} style={styles.tariffRowContainer}>
                 <NumberText containerStyle={[styles.text, styles.tariffName]}>{tariffName}</NumberText>
-                <NumberText containerStyle={styles.previousValue}>{tariff.previousValue}</NumberText>
+                <NumberText containerStyle={styles.previousValue}>{tariff.prevValue}</NumberText>
                 <NumberText containerStyle={styles.currentValue}>{tariff.currentValue}</NumberText>
                 <NumberText containerStyle={styles.difference}>{tariff.difference}</NumberText>
-                <NumberText containerStyle={styles.tariffAmount}>{tariff.tariffAmount}</NumberText>
+                <NumberText containerStyle={styles.tariffAmount}>{tariff.amount}</NumberText>
                 <NumberText containerStyle={styles.totalNumber}>{tariff.total}</NumberText>
             </View>
         )
@@ -190,8 +190,8 @@ class TariffData extends Component {
     };
 
     render() {
-        const { countersValues, currentCounterId } = this.props;
-        const countersArray = countersValues[currentCounterId];
+        const { countersValues = {} } = this.props;
+        // const countersArray = countersValues[currentCounterId];
 
         const options = this.actionSheetOptions();
 
@@ -199,8 +199,11 @@ class TariffData extends Component {
             <View style={styles.container}>
                 <FlatList style={styles.listContainer}
                           renderItem={this.renderItem}
-                          data={countersArray}
-                          keyExtractor={item => Object.keys(item)[0].toString()}
+                          data={countersValues}
+                          keyExtractor={item => {
+                              console.log('item', item)
+                              Object.keys(item)[0].toString()
+                          }}
                           ListHeaderComponent={header}
                           ItemSeparatorComponent={this.renderDivider}
                 />
@@ -220,10 +223,65 @@ class TariffData extends Component {
     }
 }
 
-const mapStateToProps = state => ({
-    countersValues: state.countersValues && state.countersValues.list,
-    currentCounterId: state.countersValues && state.countersValues.currentCounterId,
+const getCounterTariffData = (state, ownProps) => {
+    const { tariffsData = {}, tariffs = {} } = state;
+    const { list: tariffsList = {} } = tariffs;
+    const { navigation } = ownProps;
+    const counterId = navigation.getParam('counterId', '');
+
+    const tariffsIds = Object.values(tariffs.list)
+        .filter(tariff => tariff.counterId === counterId)
+        .map(tariff => tariff.id);
+    let countersValues = {/*
+        {
+            date1: {
+                tariffs: {
+                    name1: {data1}
+                    name2: {data2}
+                },
+                total:
+            },
+        }
+    */};
+
+    Object.values(tariffsData.list)
+        .filter(data => tariffsIds.includes(data.tariffId))
+        // .sort((dataA, dataB) => dataB.createTime - dataA.createTime)
+        .map(data => {
+            if (countersValues[data.createTime]) {
+                countersValues[data.createTime] = {
+                    tariffs: {
+                        ...countersValues[data.createTime].tariffs,
+                        [tariffsList[data.tariffId].name]: data
+                    }
+                };
+            } else {
+                countersValues[data.createTime] = {
+                    tariffs: {
+                        [tariffsList[data.tariffId].name]: data
+                    }
+                };
+            }
+
+        });
+
+    console.log('countersValues', countersValues)
+    return Object.keys(countersValues).map(date => {
+        return {
+            [date]: countersValues[date]
+        }
+    });
+    // return Object.values(tariffsData.list)
+    //     .filter(data => tariffsIds.includes(data.tariffId))
+    //     .sort((dataA, dataB) => dataB.createTime - dataA.createTime)
+    //     .map(data => data);
+};
+
+const mapStateToProps = (state, ownProps) => ({
+    // countersValues: state.countersValues && state.countersValues.list,
+    // currentCounterId: state.countersValues && state.countersValues.currentCounterId,
     counters: state.counters,
+    countersValues: getCounterTariffData(state, ownProps),
 });
 const dispatchers = dispatch => ({
     editData: (data) => {

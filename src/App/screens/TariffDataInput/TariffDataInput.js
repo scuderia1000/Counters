@@ -1,6 +1,6 @@
 // react
-import React, {Component} from 'react';
-import {connect} from "react-redux";
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 // libraries
 import {
     View,
@@ -12,12 +12,12 @@ import {
 import Torch from 'react-native-torch';
 // own component
 import CounterField from '../../components/counterField/CounterField';
-import CommonButton from "../../components/buttons/CommonButton";
-import { createTariffData, updateTariffData } from "./actions/TariffDataInputActions";
+import CommonButton from '../../components/buttons/CommonButton';
+import { createTariffData, updateTariffData } from './actions/TariffDataInputActions';
 // styles
 import styles from './TariffDataInputStyles';
-import {COUNTERS_VALUES, TARIFF_DATA} from "../../constants/ActionConst";
-import {calculateCounterValues, getCounterTariffsData} from "../../constants/FunctionConst";
+import { COUNTERS_VALUES, TARIFF_DATA } from '../../constants/ActionConst';
+import { calculateCounterValues, getCounterTariffsData } from '../../constants/FunctionConst';
 
 class TariffDataInput extends Component {
     static navigationOptions = {
@@ -49,7 +49,7 @@ class TariffDataInput extends Component {
             });
             this.setState({
                 values: values
-            })
+            });
         }
         // при таком варианте установки фокуса, чтобы открылась клавиатура, приложение зависает,
         // если этот экран вызывается через setTimeout в Home.handleAddCounterData
@@ -83,8 +83,8 @@ class TariffDataInput extends Component {
                     }
                 },
                 errorsTariff: [],
-            }
-        })
+            };
+        });
     };
 
     checkFields = () => {
@@ -95,14 +95,14 @@ class TariffDataInput extends Component {
         //     const tariffIds = Object.keys(tariffsList);
         const errorIds = Object.values(tariffsList)
             .filter(tariff => tariff.counterId === counterId && !values[tariff.id] || !values[tariff.id].currentValue);
-            // const errorIds = tariffIds.filter(id => !values[id] || !values[id].currentValue);
+        // const errorIds = tariffIds.filter(id => !values[id] || !values[id].currentValue);
 
-            if (errorIds.length) {
-                this.setState({errorsTariff: errorIds});
-                return false;
-            }
+        if (errorIds.length) {
+            this.setState({ errorsTariff: errorIds });
+            return false;
+        }
 
-            return true;
+        return true;
         // }
         // return false;
     };
@@ -114,7 +114,7 @@ class TariffDataInput extends Component {
     };
 
     handleAddData = () => {
-        const { navigation, countersValues = {}, counters = {}, tariffsData = {} } = this.props;
+        const { navigation, countersValues = {}, counters = {}, tariffsData = {}, resetEditData } = this.props;
         // const { list = {}} = countersValues;
         const { editData = {} } = tariffsData;
 
@@ -123,6 +123,7 @@ class TariffDataInput extends Component {
             // const counterId = editData.counterId;
             if (editData.counterId) {
                 this.props.updateData(this.state.values);
+                resetEditData();
             } else {
                 this.props.saveData(this.state.values);
             }
@@ -140,8 +141,8 @@ class TariffDataInput extends Component {
     };
 
     getTariffsComponents = () => {
-        const {tariffsList, navigation} = this.props;
-        const {values, errorsTariff} = this.state;
+        const { tariffsList, navigation } = this.props;
+        const { values, errorsTariff } = this.state;
         const counterId = navigation.getParam('counterId', '');
         if (counterId) {
             const tariffIds = Object.values(tariffsList)
@@ -150,7 +151,7 @@ class TariffDataInput extends Component {
             return tariffIds.map((id, index) => {
                 const field = {
                     label: tariffsList[id].name,
-                    style: {height: 90},
+                    style: { height: 90 },
                     keyboardType: 'numeric',
                     errorText: 'Введите значение',
                     errorStyle: {
@@ -158,7 +159,8 @@ class TariffDataInput extends Component {
                     },
                     returnKeyType: index === tariffIds.length - 1 ? 'done' : 'next',
                 };
-                const onSubmitEditing = index !== tariffIds.length - 1 ? this.focusNextInput : () => {};
+                const onSubmitEditing = index !== tariffIds.length - 1 ? this.focusNextInput : () => {
+                };
                 this.inputs[index] = React.createRef();
                 return (
                     <CounterField key={`${id}_${index}`}
@@ -173,14 +175,14 @@ class TariffDataInput extends Component {
                                   onSubmitEditing={onSubmitEditing}
                     />
                 );
-            })
+            });
         }
 
         return [];
     };
 
     handleTorchClick = async () => {
-        const {isTorchOn} = this.state;
+        const { isTorchOn } = this.state;
         const newTorchState = !isTorchOn;
         try {
             if (Platform.OS === 'ios') {
@@ -193,7 +195,7 @@ class TariffDataInput extends Component {
 
                 if (cameraAllowed) {
                     Torch.switchState(newTorchState);
-                    this.setState({isTorchOn: newTorchState});
+                    this.setState({ isTorchOn: newTorchState });
                 }
             }
         } catch (e) {
@@ -225,16 +227,14 @@ class TariffDataInput extends Component {
                     // icon={{name: 'plus', type: 'material-community', color: 'white'}}
                 />
             </View>
-        )
+        );
     }
 }
 
 const mapStateToProps = state => ({
     counters: state.counters,
     tariffsList: state.tariffs.list,
-    // tariffs: state.tariffs,
     tariffsData: state.tariffsData,
-    // countersValues: state.countersValues,
 });
 const dispatchers = dispatch => ({
     saveData: (data) => {
@@ -244,7 +244,7 @@ const dispatchers = dispatch => ({
         dispatch(updateTariffData(data));
     },
     resetEditData: () => {
-        dispatch({type: TARIFF_DATA.RESET_EDIT})
+        dispatch({ type: TARIFF_DATA.RESET_EDIT });
     },
     updateCounterData: (counterId, counterData) => {
         dispatch({
@@ -261,7 +261,7 @@ const dispatchers = dispatch => ({
             payload: {
                 counterId: counterId
             }
-        })
+        });
     }
 });
 export default connect(mapStateToProps, dispatchers)(TariffDataInput);
