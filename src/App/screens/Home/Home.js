@@ -80,7 +80,6 @@ class Home extends Component {
 
     openCounterData = (counterId) => {
         const { counters = {}, tariffs = {}, tariffsValues = {} } = this.props;
-        // const { list = {}} = tariffsValues;
 
         const tariffsIds = Object.values(tariffs.list)
             .filter(tariff => tariff.counterId === counterId)
@@ -90,13 +89,6 @@ class Home extends Component {
             .filter(data => tariffsIds.includes(data.tariffId))
             .sort((dataA, dataB) => dataB.createTime - dataA.createTime)
             .some(data => data.prevValue !== null);
-        // const tariffsDataIds = Object.values(tariffsValues)
-        //     .filter(data => tariffsIds.includes(data.tariffId))
-        //     .sort((dataA, dataB) => dataB.createTime - dataA.createTime)
-        //     .map(data => {
-        //         if (!isDataExists && data.prevValue !== null) isDataExists = true;
-        //         return data.id;
-        //     });
 
         if (isDataExists) {
             this.props.navigation.navigate(
@@ -107,16 +99,6 @@ class Home extends Component {
                 }
             );
         }
-
-        /*const { counters = {}, countersValues = {} } = this.props;
-        const { list = {}} = countersValues;
-        const countersIds = Object.keys(list);
-        const counterId = String(id);
-        if (countersIds.length && countersIds.includes(counterId)) {
-            const counterData = counters.list[counterId];
-            this.props.setCounterId(counterId);
-            this.props.navigation.navigate('TariffData', {title: counterData.counterName});
-        }*/
     };
 
     editCounter = (id) => {

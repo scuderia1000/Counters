@@ -54,7 +54,7 @@ class TariffData extends Component {
 
     tariffRow = (tariffName, tariff) => {
         return (
-            <View key={tariff.dataId} style={styles.tariffRowContainer}>
+            <View key={tariff.id} style={styles.tariffRowContainer}>
                 <NumberText containerStyle={[styles.text, styles.tariffName]}>{tariffName}</NumberText>
                 <NumberText containerStyle={styles.previousValue}>{tariff.prevValue}</NumberText>
                 <NumberText containerStyle={styles.currentValue}>{tariff.currentValue}</NumberText>
@@ -75,7 +75,6 @@ class TariffData extends Component {
             const localDate = new Date(Number(date));
             const options = {day: 'numeric', month: 'long', year: 'numeric'};
             const formattedDate = localDate.toLocaleString('ru-RU', options);
-            console.log('formattedDate', formattedDate)
             return (
                 <TouchableOpacity key={date}
                                   style={styles.itemContainer}
@@ -194,16 +193,12 @@ class TariffData extends Component {
         // const countersArray = countersValues[currentCounterId];
 
         const options = this.actionSheetOptions();
-
         return (
             <View style={styles.container}>
                 <FlatList style={styles.listContainer}
                           renderItem={this.renderItem}
                           data={countersValues}
-                          keyExtractor={item => {
-                              console.log('item', item)
-                              Object.keys(item)[0].toString()
-                          }}
+                          keyExtractor={item => Object.keys(item)[0].toString()}
                           ListHeaderComponent={header}
                           ItemSeparatorComponent={this.renderDivider}
                 />
@@ -248,21 +243,24 @@ const getCounterTariffData = (state, ownProps) => {
         .filter(data => tariffsIds.includes(data.tariffId))
         // .sort((dataA, dataB) => dataB.createTime - dataA.createTime)
         .map(data => {
-            if (countersValues[data.createTime]) {
-                countersValues[data.createTime] = {
-                    tariffs: {
-                        ...countersValues[data.createTime].tariffs,
-                        [tariffsList[data.tariffId].name]: data
-                    }
-                };
-            } else {
-                countersValues[data.createTime] = {
-                    tariffs: {
-                        [tariffsList[data.tariffId].name]: data
-                    }
-                };
+            if (data.prevValue !== null) {
+                if (countersValues[data.createTime]) {
+                    countersValues[data.createTime] = {
+                        tariffs: {
+                            ...countersValues[data.createTime].tariffs,
+                            [tariffsList[data.tariffId].name]: data
+                        },
+                        total: countersValues[data.createTime].total + data.total,
+                    };
+                } else {
+                    countersValues[data.createTime] = {
+                        tariffs: {
+                            [tariffsList[data.tariffId].name]: data
+                        },
+                        total: data.total
+                    };
+                }
             }
-
         });
 
     console.log('countersValues', countersValues)
