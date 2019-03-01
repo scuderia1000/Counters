@@ -1,6 +1,6 @@
-import uuid from "uuid";
-import { TARIFF_DATA } from "../constants/ActionConst";
-import { cloneObject } from "../constants/FunctionConst";
+import uuid from 'uuid';
+import { TARIFF_DATA } from '../constants/ActionConst';
+import { cloneObject } from '../constants/FunctionConst';
 
 
 const initialState = {
@@ -68,7 +68,7 @@ export default (state = initialState, action) => {
             const newList = {};
 
             Object.keys(tariffsData).forEach(dataId => {
-                const newData = {...tariffsData[dataId]};
+                const newData = { ...tariffsData[dataId] };
 
                 const tariffDataIds = oldDataIds
                     .filter(id => list[id].tariffId === newData.tariffId)
@@ -96,7 +96,7 @@ export default (state = initialState, action) => {
                     ...state.list,
                     ...newList
                 },
-            }
+            };
         }
         case TARIFF_DATA.UPDATE: {
             /*
@@ -110,7 +110,7 @@ export default (state = initialState, action) => {
             const newList = {};
 
             Object.keys(tariffsData).forEach(dataId => {
-                const newData = {...list[dataId], ...tariffsData[dataId]};
+                const newData = { ...list[dataId], ...tariffsData[dataId] };
 
                 if (newData.prevValue !== null) {
                     let difference = newData.currentValue - newData.prevValue;
@@ -119,10 +119,14 @@ export default (state = initialState, action) => {
 
                     let amount = list[dataId].amount;
 
-                    newData['total'] = difference * amount;
+                    const total = difference * amount;
+                    newData['total'] = (total ^ 0) === total ? total : Number(total.toFixed(1));
                 }
-
                 newList[dataId] = newData;
+                const editedNextData = recalculateNextData({ ...list }, newData);
+                if (Object.keys(editedNextData).length) {
+                    newList[editedNextData.id] = editedNextData;
+                }
             });
 
             return {
@@ -131,22 +135,33 @@ export default (state = initialState, action) => {
                     ...state.list,
                     ...newList
                 },
-            }
+            };
         }
         case TARIFF_DATA.EDIT: {
-            const editData = action.payload;
-            if (!editData) return state;
+            // {tariffId_1: {value: , dataId: }, tariffId_2: {value: , dataId: }}
+            const editDataIds = action.payload;
+            const list = cloneObject(state.list);
+
+            const editData = {};
+            editDataIds.forEach(id => {
+                const tariffId = list[id].tariffId;
+                editData[tariffId] = {
+                    id: id,
+                    currentValue: list[id].currentValue,
+                };
+            });
+            // if (!editData) return state;
 
             return {
                 ...state,
                 editData: editData
-            }
+            };
         }
         case TARIFF_DATA.RESET_EDIT: {
             return {
                 ...state,
                 editData: {}
-            }
+            };
         }
         case TARIFF_DATA.REMOVE: {
             const dataIds = action.payload.dataIds;
@@ -160,7 +175,7 @@ export default (state = initialState, action) => {
                         if (dataIds.includes(dataId)) {
                             delete dataList[tariffId][dataId];
                         }
-                    })
+                    });
                 });
 
             }
@@ -168,7 +183,7 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 list: dataList
-            }
+            };
         }
         case TARIFF_DATA.REMOVE_ALL_TARIFFS_DATA: {
             const { tariffsIds = [] } = action.payload;
@@ -189,8 +204,29 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 list: dataList,
-            }
+            };
         }
-        default: return state;
+        default:
+            return state;
     }
 }
+
+// пересчет следующего значения тарифа, если отредактировали текущие
+const recalculateNextData = (allData = {}, newData = {}) => {
+    let nextData = {};
+    const tariffDataIds = Object.keys(allData)
+        .filter(dataId => allData[dataId].tariffId === newData.tariffId)
+        .sort((dataIdA, dataIdB) => allData[dataIdA].createTime - allData[dataIdB].createTime);
+    const nextDataId = tariffDataIds[tariffDataIds.indexOf(newData.id) + 1];
+    if (nextDataId) {
+        nextData = allData[nextDataId];
+        nextData.prevValue = newData.currentValue;
+        let difference = nextData.currentValue - nextData.prevValue;
+        difference = (difference ^ 0) === difference ? difference : difference.toFixed(1);
+
+        nextData.difference = difference;
+        nextData.total = difference * nextData.amount;
+    }
+
+    return nextData;
+};

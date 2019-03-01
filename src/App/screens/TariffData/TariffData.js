@@ -95,18 +95,19 @@ class TariffData extends Component {
         this.actionSheet.current.show();
         this.setState({
             activeData: tariffs
-        })
+        });
     };
 
     actionSheetOptions = () => {
-        const { counters = {}, currentCounterId } = this.props;
+        const { counters = {}, navigation } = this.props;
+        const counterId = navigation.getParam('counterId', '');
         const { list } = counters;
         let options = [
             {
                 title: 'Редактировать',
                 action: () => {
                     this.handleEditCounterData();
-                    this.props.navigation.navigate('TariffDataInput', {counterId: currentCounterId});
+                    navigation.navigate('TariffDataInput', {counterId: counterId});
                 }
             },
             {
@@ -118,7 +119,7 @@ class TariffData extends Component {
             }
         ];
 
-        if (list && list[currentCounterId] && list[currentCounterId].emailAddress) {
+        if (list && list[counterId] && list[counterId].emailAddress) {
             options.splice(options.length - 1, 0, {
                 title: <Text style={{fontSize: 18, color: colors.green}}>Передать показания</Text>,
                 // title: 'Передать показания',
@@ -151,9 +152,14 @@ class TariffData extends Component {
     };
 
     handleEditCounterData = () => {
-        const editData = this.getEditData();
+        const { navigation } = this.props;
+        const { activeData } = this.state;
+        const counterId = navigation.getParam('counterId', '');
 
-        this.props.editData(editData);
+        const editDataIds = Object.keys(activeData).map(name => activeData[name].id);
+        // const editData = this.getEditData();
+
+        this.props.editData(editDataIds);
     };
 
     sendEmail = () => {
@@ -190,8 +196,6 @@ class TariffData extends Component {
 
     render() {
         const { countersValues = {} } = this.props;
-        // const countersArray = countersValues[currentCounterId];
-
         const options = this.actionSheetOptions();
         return (
             <View style={styles.container}>
@@ -263,7 +267,6 @@ const getCounterTariffData = (state, ownProps) => {
             }
         });
 
-    console.log('countersValues', countersValues)
     return Object.keys(countersValues).map(date => {
         return {
             [date]: countersValues[date]
@@ -282,10 +285,10 @@ const mapStateToProps = (state, ownProps) => ({
     countersValues: getCounterTariffData(state, ownProps),
 });
 const dispatchers = dispatch => ({
-    editData: (data) => {
+    editData: (dataIds) => {
         dispatch({
             type: TARIFF_DATA.EDIT,
-            payload: data
+            payload: dataIds
         })
     },
     resetEditData: () => {

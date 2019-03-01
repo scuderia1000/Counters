@@ -37,20 +37,25 @@ class TariffDataInput extends Component {
 
     componentDidMount() {
         const { tariffsData = {} } = this.props;
-        const { list, editData = {} } = tariffsData;
-        if (list && editData.counterId) {
-            const values = {};
-            editData.dataIds.forEach(dataId => {
-                const tariffId = list[dataId].tariffId;
-                values[tariffId] = {
-                    currentValue: list[dataId].currentValue,
-                    id: dataId
-                };
-            });
+        const { editData = {} } = tariffsData;
+        if (Object.keys(editData).length) {
             this.setState({
-                values: values
+                values: {...editData}
             });
         }
+        // if (list && editData.counterId) {
+        //     const values = {};
+        //     editData.dataIds.forEach(dataId => {
+        //         const tariffId = list[dataId].tariffId;
+        //         values[tariffId] = {
+        //             currentValue: list[dataId].currentValue,
+        //             id: dataId
+        //         };
+        //     });
+        //     this.setState({
+        //         values: values
+        //     });
+        // }
         // при таком варианте установки фокуса, чтобы открылась клавиатура, приложение зависает,
         // если этот экран вызывается через setTimeout в Home.handleAddCounterData
         /*if (this.inputs.length && this.inputs[0] && this.inputs[0].current) {
@@ -79,6 +84,7 @@ class TariffDataInput extends Component {
                 values: {
                     ...state.values,
                     [tariffId]: {
+                        ...state.values[tariffId],
                         currentValue: value
                     }
                 },
@@ -91,11 +97,11 @@ class TariffDataInput extends Component {
         const { tariffsList, navigation } = this.props;
         const { values } = this.state;
         const counterId = navigation.getParam('counterId', '');
-        // if (counterId) {
-        //     const tariffIds = Object.keys(tariffsList);
+
         const errorIds = Object.values(tariffsList)
-            .filter(tariff => tariff.counterId === counterId && !values[tariff.id] || !values[tariff.id].currentValue);
-        // const errorIds = tariffIds.filter(id => !values[id] || !values[id].currentValue);
+            .filter(tariff =>
+                tariff.counterId === counterId && !values[tariff.id] || !values[tariff.id].currentValue)
+            .map(tariff => tariff.id);
 
         if (errorIds.length) {
             this.setState({ errorsTariff: errorIds });
@@ -103,8 +109,6 @@ class TariffDataInput extends Component {
         }
 
         return true;
-        // }
-        // return false;
     };
 
     focusNextInput = (index) => {
@@ -121,7 +125,7 @@ class TariffDataInput extends Component {
         if (this.checkFields()) {
             // const counterId = navigation.getParam('counterId', '');
             // const counterId = editData.counterId;
-            if (editData.counterId) {
+            if (Object.keys(editData).length) {
                 this.props.updateData(this.state.values);
                 resetEditData();
             } else {
@@ -155,19 +159,18 @@ class TariffDataInput extends Component {
                     keyboardType: 'numeric',
                     errorText: 'Введите значение',
                     errorStyle: {
-                        bottom: -2,
+                        bottom: 8,
                     },
                     returnKeyType: index === tariffIds.length - 1 ? 'done' : 'next',
                 };
-                const onSubmitEditing = index !== tariffIds.length - 1 ? this.focusNextInput : () => {
-                };
+                const onSubmitEditing = index !== tariffIds.length - 1 ? this.focusNextInput : () => {};
                 this.inputs[index] = React.createRef();
                 return (
                     <CounterField key={`${id}_${index}`}
                                   type={id}
                                   field={field}
                                   index={index}
-                                  value={values && values[id] && values[id].currentValue}
+                                  value={values && values[id] && String(values[id].currentValue)}
                                   ref={this.inputs[index]}
                                   isError={!!errorsTariff.length && errorsTariff.includes(id)}
                                   onChange={this.handleFieldChange}

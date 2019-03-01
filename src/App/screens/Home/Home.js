@@ -110,8 +110,8 @@ class Home extends Component {
         <CountersListItem
             id={item.id}
             onPressItem={this.openCounterData}
-            // onLongPress={this.openCounterData}
-            onLongPress={this.editCounter}
+            onLongPress={this.openCounterData}
+            // onLongPress={this.editCounter}
             title={item.counterName}
             onDelPress={() => {
                 this.props.removeCounter(item.id);
@@ -144,7 +144,7 @@ class Home extends Component {
         }
 
         const countersList = Object.values(list);
-        console.log('countersList', countersList)
+        // console.log('countersList', countersList)
         // const countersList = Object.keys(list).map(key => list[key]);
 
         const options = countersList.length && this.actionSheetOptions(countersList) || [];
