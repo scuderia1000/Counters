@@ -81,7 +81,8 @@ export default (state = initialState, action) => {
                     newData['difference'] = difference;
 
                     // amount должен приходить из action
-                    newData['total'] = difference * newData.amount;
+                    const total = difference * newData.amount;
+                    newData['total'] = (total ^ 0) === total ? total : Number(total.toFixed(1));
                 } else {
                     newData['prevValue'] = null;
                     newData['difference'] = null;
@@ -194,7 +195,7 @@ export default (state = initialState, action) => {
             //     .filter(tariff => tariff.counterId === counterId)
             //     .map(tariff => tariff.id);
             //
-            const dataList = state.list ? cloneObject(state.list) : {};
+            const dataList = cloneObject(state.list);
             const removedDataIds = Object.values(dataList)
                 .filter(data => tariffsIds.includes(data.tariffId))
                 .map(data => data.id);

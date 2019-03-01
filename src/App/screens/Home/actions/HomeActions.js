@@ -57,7 +57,9 @@ export const removeCounterTariffs = (counterId) => {
     return (dispatch, getState) => {
         dispatch({
             type: TARIFF.REMOVE_ALL_COUNTER_TARIFFS,
-            payload: counterId
+            payload: {
+                counterId: counterId
+            }
         })
     }
 };

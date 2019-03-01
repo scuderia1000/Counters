@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import {View, FlatList, InteractionManager} from 'react-native';
+import {View, FlatList, Modal, Text, TouchableHighlight} from 'react-native';
+import { Overlay } from 'react-native-elements';
 import {connect} from "react-redux";
 import ActionSheet from 'react-native-actionsheet';
 // own components
@@ -11,11 +12,10 @@ import { removeAllTariffsData } from '../TariffData/actions/TariffDataActions';
 // const
 import { ADD_COUNTER } from '../../constants/ProjectConst';
 import { calculateCounterValues, cloneObject, getCounterTariffsData } from '../../constants/FunctionConst';
+import {COUNTER, COUNTERS_VALUES, TARIFF_DATA} from "../../constants/ActionConst";
+import {createCounter} from "../AddCounter/actions/AddCounterActions";
 //style
 import styles from './HomeStyles';
-import {createCounter} from "../AddCounter/actions/AddCounterActions";
-import {COUNTER, COUNTERS_VALUES, TARIFF_DATA} from "../../constants/ActionConst";
-import log from "rn-fetch-blob/utils/log";
 
 const iconStyle = {
     type: 'material-community',
@@ -23,10 +23,10 @@ const iconStyle = {
     size: 20
 };
 
-const buttonStyle = {
-    borderRadius: 5,
-    flex: 0.48,
-};
+// const buttonStyle = {
+//     borderRadius: 5,
+//     flex: 0.48,
+// };
 
 const captionStyle = {
     fontSize: 15
@@ -43,12 +43,17 @@ class Home extends Component {
         this.handleAddCounterData = this.handleAddCounterData.bind(this);
         this.state = {
             modalVisible: false,
+            isVisibleModalRemoveCounter: false,
         };
         this.actionSheet = React.createRef();
     }
 
     setModalVisible(visible) {
         this.setState({modalVisible: visible});
+    }
+
+    setVisibleModalRemove(visible) {
+        this.setState({isVisibleModalRemoveCounter: visible});
     }
 
     handleAddCounterData = (id) => {
@@ -114,10 +119,13 @@ class Home extends Component {
             // onLongPress={this.editCounter}
             title={item.counterName}
             onDelPress={() => {
-                this.props.removeCounter(item.id);
-                this.props.removeAllTariffsData(item.id);
-                this.props.removeCounterTariffs(item.id);
+                this.setVisibleModalRemove(true);
             }}
+            // onDelPress={() => {
+            //     this.props.removeCounter(item.id);
+            //     this.props.removeAllTariffsData(item.id);
+            //     this.props.removeCounterTariffs(item.id);
+            // }}
         />
     );
 
@@ -162,12 +170,12 @@ class Home extends Component {
                     />
                 </View>
                 <View style={styles.buttonsContainer}>
-                    <CommonButton style={buttonStyle}
+                    <CommonButton style={styles.buttonStyle}
                                   onPress={this.handleAddCounter}
                                   caption={'Создать счетчик'}
                                   captionStyle={captionStyle}
                                   icon={{...iconStyle, name: 'counter'}}/>
-                    <CommonButton style={buttonStyle}
+                    <CommonButton style={styles.buttonStyle}
                                   onPress={() => {
                                       if (isCounterSelectionComponentModal) {
                                           this.setModalVisible(!this.state.modalVisible)
@@ -198,6 +206,53 @@ class Home extends Component {
                         }}
                     />
                 }
+                <Overlay
+                    isVisible={this.state.isVisibleModalRemoveCounter}
+                    width="50%"
+                    height="auto"
+                >
+                    <View>
+                        <Text>Hello from Overlay!</Text>
+                        <View style={styles.modalButtonContainer}>
+                            <CommonButton
+                                style={styles.modalButton}
+                                onPress={() => {
+                                    this.setVisibleModalRemove(!this.state.isVisibleModalRemoveCounter);
+                                }}
+                                caption={'Удалить'}
+                                // captionStyle={captionStyle}
+                            />
+                            <CommonButton
+                                style={styles.modalButton}
+                                onPress={() => {
+                                    this.setVisibleModalRemove(!this.state.isVisibleModalRemoveCounter);
+                                }}
+                                caption={'Отмена'}
+                                // captionStyle={captionStyle}
+                            />
+                        </View>
+                    </View>
+                </Overlay>
+                {/*<Modal
+                    animationType="fade"
+                    transparent={false}
+                    visible={this.state.isVisibleModalRemoveCounter}
+                    onRequestClose={() => {
+                        // Alert.alert('Modal has been closed.');
+                    }}>
+                    <View style={{marginTop: 22}}>
+                        <View>
+                            <Text>Hello World!</Text>
+
+                            <TouchableHighlight
+                                onPress={() => {
+                                    this.setVisibleModalRemove(!this.state.isVisibleModalRemoveCounter);
+                                }}>
+                                <Text>Hide Modal</Text>
+                            </TouchableHighlight>
+                        </View>
+                    </View>
+                </Modal>*/}
             </View>
         )
     }

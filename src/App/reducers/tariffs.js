@@ -66,9 +66,8 @@ export default (state = initialState, action) => {
             const tariffsIds = Object.values(tariffsList)
                 .filter(tariff => tariff.counterId === counterId)
                 .map(tariff => tariff.id);
-            for (let id in tariffsIds) {
-                delete tariffsList[id];
-            }
+            tariffsIds.forEach(id => delete tariffsList[id])
+
             return {
                 ...state,
                 list: tariffsList

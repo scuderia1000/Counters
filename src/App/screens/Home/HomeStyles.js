@@ -21,5 +21,17 @@ export default StyleSheet.create({
         alignItems: 'flex-start',
         width: '100%',
         flex: 0.9,
+    },
+    buttonStyle: {
+        borderRadius: 5,
+        flex: 0.48,
+    },
+    modalButtonContainer: {
+        flexDirection: 'row'
+    },
+    modalButton: {
+        borderRadius: 5,
+        flex: 0.5,
+        // width: 60,
     }
 });
