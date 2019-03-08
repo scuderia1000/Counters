@@ -26,12 +26,5 @@ export default StyleSheet.create({
         borderRadius: 5,
         flex: 0.48,
     },
-    modalButtonContainer: {
-        flexDirection: 'row'
-    },
-    modalButton: {
-        borderRadius: 5,
-        flex: 0.5,
-        // width: 60,
-    }
+
 });

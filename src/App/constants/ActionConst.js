@@ -27,3 +27,8 @@ export const COUNTERS_VALUES = {
     UPDATE: "UPDATE_COUNTERS_VALUES",
     OPEN: "OPEN_COUNTERS_VALUES",
 };
+
+export const ALERT = {
+    SHOW: "ALERT_SHOW",
+    RESET: "ALERT_RESET",
+};

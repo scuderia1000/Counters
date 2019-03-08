@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import {View, FlatList, Modal, Text, TouchableHighlight} from 'react-native';
+import { View, FlatList, Modal, Text, TouchableHighlight, Alert } from 'react-native';
 import { Overlay } from 'react-native-elements';
-import {connect} from "react-redux";
+import { connect } from 'react-redux';
 import ActionSheet from 'react-native-actionsheet';
 // own components
 import CountersModal from '../CountersModal/CountersModal';
@@ -10,10 +10,11 @@ import CountersListItem from '../../components/countersList/CountersListItem';
 import { editCounter, removeCounter, removeCounterTariffs } from './actions/HomeActions';
 import { removeAllTariffsData } from '../TariffData/actions/TariffDataActions';
 // const
-import { ADD_COUNTER } from '../../constants/ProjectConst';
+import { ADD_COUNTER, REMOVE_COUNTER } from '../../constants/ProjectConst';
 import { calculateCounterValues, cloneObject, getCounterTariffsData } from '../../constants/FunctionConst';
-import {COUNTER, COUNTERS_VALUES, TARIFF_DATA} from "../../constants/ActionConst";
-import {createCounter} from "../AddCounter/actions/AddCounterActions";
+import { COUNTER, COUNTERS_VALUES, TARIFF_DATA } from '../../constants/ActionConst';
+import { createCounter } from '../AddCounter/actions/AddCounterActions';
+import { showAlert } from '../../actions/AlertActions';
 //style
 import styles from './HomeStyles';
 
@@ -49,11 +50,11 @@ class Home extends Component {
     }
 
     setModalVisible(visible) {
-        this.setState({modalVisible: visible});
+        this.setState({ modalVisible: visible });
     }
 
     setVisibleModalRemove(visible) {
-        this.setState({isVisibleModalRemoveCounter: visible});
+        this.setState({ isVisibleModalRemoveCounter: visible });
     }
 
     handleAddCounterData = (id) => {
@@ -80,7 +81,7 @@ class Home extends Component {
 
     handleAddCounter = () => {
         this.props.resetEditData();
-        this.props.navigation.navigate('AddCounter', {title: ADD_COUNTER.TITLE.CREATE});
+        this.props.navigation.navigate('AddCounter', { title: ADD_COUNTER.TITLE.CREATE });
     };
 
     openCounterData = (counterId) => {
@@ -108,36 +109,42 @@ class Home extends Component {
 
     editCounter = (id) => {
         this.props.editCounter(id);
-        this.props.navigation.navigate('AddCounter', {title: ADD_COUNTER.TITLE.EDIT});
+        this.props.navigation.navigate('AddCounter', { title: ADD_COUNTER.TITLE.EDIT });
     };
 
-    renderItem = ({item}) => (
-        <CountersListItem
-            id={item.id}
-            onPressItem={this.openCounterData}
-            onLongPress={this.openCounterData}
-            // onLongPress={this.editCounter}
-            title={item.counterName}
-            onDelPress={() => {
-                this.setVisibleModalRemove(true);
-            }}
-            // onDelPress={() => {
-            //     this.props.removeCounter(item.id);
-            //     this.props.removeAllTariffsData(item.id);
-            //     this.props.removeCounterTariffs(item.id);
-            // }}
-        />
-    );
+    removeCounter = (counterId) => {
+        this.props.removeCounter(counterId);
+        this.props.removeAllTariffsData(counterId);
+        this.props.removeCounterTariffs(counterId);
+    };
+
+    alertShow = (counterId) => {
+        const { showAlert } = this.props;
+        showAlert(REMOVE_COUNTER.MESSAGE, REMOVE_COUNTER.TITLE, this.removeCounter, [counterId]);
+    };
+
+    renderItem = ({ item }) => {
+        return (
+            <CountersListItem
+                id={item.id}
+                onPressItem={this.openCounterData}
+                // onLongPress={this.openCounterData}
+                onLongPress={this.editCounter}
+                title={item.counterName}
+                onDelPress={() => this.alertShow(item.id)}
+            />
+        );
+    };
 
     showActionSheet = () => {
-        this.actionSheet.current.show()
+        this.actionSheet.current.show();
     };
 
     actionSheetOptions = (counters) => {
         let options = [];
         if (counters.length) {
             options = counters.slice();
-            options.push({counterName: 'Отмена'});
+            options.push({ counterName: 'Отмена' });
         }
 
         return options;
@@ -160,13 +167,13 @@ class Home extends Component {
         const isCounterSelectionComponentModal = countersList.length > 10;
         // const isCounterSelectionComponentModal = countersArray.length > 10;
 
-        return(
+        return (
             <View style={styles.container}>
                 <View style={styles.countersListContainer}>
                     <FlatList renderItem={this.renderItem}
                               data={countersList}
                               keyExtractor={item => item.id.toString()}
-                              style={{width: '100%'}}
+                              style={{ width: '100%' }}
                     />
                 </View>
                 <View style={styles.buttonsContainer}>
@@ -174,18 +181,18 @@ class Home extends Component {
                                   onPress={this.handleAddCounter}
                                   caption={'Создать счетчик'}
                                   captionStyle={captionStyle}
-                                  icon={{...iconStyle, name: 'counter'}}/>
+                                  icon={{ ...iconStyle, name: 'counter' }}/>
                     <CommonButton style={styles.buttonStyle}
                                   onPress={() => {
                                       if (isCounterSelectionComponentModal) {
-                                          this.setModalVisible(!this.state.modalVisible)
+                                          this.setModalVisible(!this.state.modalVisible);
                                       } else {
                                           this.showActionSheet();
                                       }
                                   }}
                                   caption={'Внести данные'}
                                   captionStyle={captionStyle}
-                                  icon={{...iconStyle, name: 'plus'}}/>
+                                  icon={{ ...iconStyle, name: 'plus' }}/>
                 </View>
                 {isCounterSelectionComponentModal ?
                     <CountersModal visible={this.state.modalVisible}
@@ -200,13 +207,13 @@ class Home extends Component {
                         options={options.map(counter => counter.counterName)}
                         cancelButtonIndex={options.length - 1}
                         onPress={(index) => {
-                            if (index !== options.length - 1){
+                            if (index !== options.length - 1) {
                                 this.handleAddCounterData(options[index].id);
                             }
                         }}
                     />
                 }
-                <Overlay
+                {/*<Overlay
                     isVisible={this.state.isVisibleModalRemoveCounter}
                     width="50%"
                     height="auto"
@@ -232,7 +239,7 @@ class Home extends Component {
                             />
                         </View>
                     </View>
-                </Overlay>
+                </Overlay>*/}
                 {/*<Modal
                     animationType="fade"
                     transparent={false}
@@ -254,26 +261,26 @@ class Home extends Component {
                     </View>
                 </Modal>*/}
             </View>
-        )
+        );
     }
 }
+
 const mapStateToProps = state => ({
     counters: state.counters,
     tariffs: state.tariffs,
     tariffsValues: state.tariffsData,
-    // countersValues: state.countersValues,
 });
 const dispatchers = dispatch => ({
     editCounter: (counterId) => {
-        dispatch(editCounter(counterId))
+        dispatch(editCounter(counterId));
     },
     removeCounter: (counterId) => {
-        dispatch(removeCounter(counterId))
+        dispatch(removeCounter(counterId));
     },
     removeCounterTariffs: (counterId) => {
-        dispatch(removeCounterTariffs(counterId))
+        dispatch(removeCounterTariffs(counterId));
     },
-    removeAllTariffsData: (counterId)=> {
+    removeAllTariffsData: (counterId) => {
         dispatch(removeAllTariffsData(counterId));
     },
     setCounterId: (counterId) => {
@@ -282,12 +289,15 @@ const dispatchers = dispatch => ({
             payload: {
                 counterId: counterId
             }
-        })
+        });
     },
     resetEditData: () => {
         dispatch({
             type: COUNTER.RESET_COUNTER_EDIT_DATA
-        })
+        });
+    },
+    showAlert: (message, title, okAction, ids) => {
+        dispatch(showAlert({ message: message, title: title, okAction: okAction, ids: ids }));
     }
 });
 export default connect(mapStateToProps, dispatchers)(Home);

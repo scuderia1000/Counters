@@ -7,10 +7,11 @@ import AddCounterNew from '../screens/AddCounter/AddCounterNew';
 import TariffDataInput from '../screens/TariffDataInput/TariffDataInput';
 import TariffData from '../screens/TariffData/TariffData';
 import { colors } from '../constants/Colors';
+import { alertWrapper } from '../components/alert/alertWrapper';
 
 const MainNavigator = createStackNavigator(
     {
-        Home: Home,
+        Home: alertWrapper(Home),
         AddCounter: AddCounterNew,
         TariffDataInput: TariffDataInput,
         TariffData: TariffData,
