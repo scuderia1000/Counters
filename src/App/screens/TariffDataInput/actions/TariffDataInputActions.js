@@ -1,4 +1,4 @@
-import { TARIFF_DATA } from "../../../constants/ActionConst";
+import { COUNTER, TARIFF_DATA } from '../../../constants/ActionConst';
 import uuid from "uuid";
 // import {Database} from "react-native-firebase";
 
@@ -13,8 +13,11 @@ export const createTariffData = (values) => {
         const { tariffs = {} } = getState();
         const { list = {} } = tariffs;
         const now = Date.now();
+        let counterId = '';
         Object.keys(values).forEach(tariffId => {
             const tariff = list[tariffId];
+
+            if (!counterId) counterId = tariff.counterId;
 
             let dataId = uuid.v4();
 
@@ -33,7 +36,14 @@ export const createTariffData = (values) => {
                 // counterId: counterId,
                 tariffsData: tariffsData
             }
-        })
+        });
+        dispatch({
+            type: COUNTER.ADD_DATA,
+            payload: {
+                counterId: counterId,
+                dataIds: Object.keys(tariffsData)
+            }
+        });
     }
 };
 

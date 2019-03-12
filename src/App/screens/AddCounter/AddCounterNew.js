@@ -240,15 +240,17 @@ class AddCounterNew extends Component {
         });
     };
 
-    handleRemoveTariffField = (index) => {
+    handleRemoveTariffField = (index, type) => {
         const editedTariffsFields = cloneObject(this.state.editedTariffsFields);
 
         const fields = cloneObject(this.state.fields);
         const fieldsValues = cloneObject(this.state.fieldsValues);
         const errors = [...this.state.errors];
 
+        const fieldsPostfix = type.split('_')[1];
+
         Object.keys(TARIFF_COMPONENT).forEach(fieldName => {
-            const removedFieldName = `${fieldName}_${index}`;
+            const removedFieldName = `${fieldName}_${fieldsPostfix}`;
             delete fields[removedFieldName];
             delete fieldsValues[removedFieldName];
             errors.splice(errors.indexOf(removedFieldName), 1);

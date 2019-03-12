@@ -223,14 +223,18 @@ class TariffData extends Component {
 }
 
 const getCounterTariffData = (state, ownProps) => {
-    const { tariffsData = {}, tariffs = {} } = state;
+    const { tariffsData = {}, tariffs = {}, counters = {} } = state;
+    const { list = {} } = counters;
+
     const { list: tariffsList = {} } = tariffs;
     const { navigation } = ownProps;
     const counterId = navigation.getParam('counterId', '');
 
-    const tariffsIds = Object.values(tariffs.list)
-        .filter(tariff => tariff.counterId === counterId)
-        .map(tariff => tariff.id);
+    const dataIds = list[counterId].dataIds;
+
+    // const tariffsIds = Object.values(tariffs.list)
+    //     .filter(tariff => tariff.counterId === counterId)
+    //     .map(tariff => tariff.id);
     let countersValues = {/*
         {
             date1: {
@@ -244,7 +248,8 @@ const getCounterTariffData = (state, ownProps) => {
     */};
 
     Object.values(tariffsData.list)
-        .filter(data => tariffsIds.includes(data.tariffId))
+        .filter(data => dataIds.includes(data.id))
+        // .filter(data => tariffsIds.includes(data.tariffId))
         // .sort((dataA, dataB) => dataB.createTime - dataA.createTime)
         .map(data => {
             if (data.prevValue !== null) {

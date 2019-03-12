@@ -101,6 +101,14 @@ export const createCounterTariff = (counterId, data) => {
             }
         });
 
+        dispatch({
+            type: COUNTER.ADD_DATA,
+            payload: {
+                counterId: counterId,
+                dataIds: Object.keys(tariffsData)
+            }
+        });
+
     }
 };
 

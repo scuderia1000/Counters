@@ -41,7 +41,7 @@ const CounterField = React.forwardRef(({ field = {}, type, index, onChange, isEr
                 />
                 {hasDelButton &&
                     <RemoveButton containerStyle={{justifyContent: 'flex-start'}}
-                                  onPress={() => onDelPress(index)}/>
+                                  onPress={() => onDelPress(index, type)}/>
                 }
             </View>
             {isError && <Text style={[styles.errorText, errorStyle]}>{errorText}</Text>}

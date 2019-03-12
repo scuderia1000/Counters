@@ -57,6 +57,41 @@ export default (state = initState, action) => {
                 list: countersList
             }
         }
+        case COUNTER.ADD_DATA: {
+            const { counterId = '', dataIds = [] }= action.payload;
+            const { list = {} }= state;
+            const oldDataIds = list[counterId].dataIds || [];
+            // console.log('oldDataIds', oldDataIds)
+            // delete countersList[counterId];
+
+            return {
+                ...state,
+                list: {
+                    ...state.list,
+                    [counterId]: {
+                        ...state.list[counterId],
+                        dataIds: oldDataIds.concat(dataIds),
+                    }
+                }
+            }
+        }
+        case COUNTER.REMOVE_DATA: {
+            const { counterId = '', dataIds = [] }= action.payload;
+            const { list = {} } = state;
+            const oldDataIds = list[counterId].dataIds.slice();
+            dataIds.forEach(id => oldDataIds.splice(oldDataIds.indexOf(id), 1));
+
+            return {
+                ...state,
+                list: {
+                    ...state.list,
+                    [counterId]: {
+                        ...state.list[counterId],
+                        dataIds: oldDataIds,
+                    }
+                }
+            }
+        }
         default: return state;
     }
 }
