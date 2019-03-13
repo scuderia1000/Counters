@@ -94,14 +94,22 @@ class TariffDataInput extends Component {
     };
 
     checkFields = () => {
-        const { tariffsList, navigation } = this.props;
+        const { tariffsList, navigation, tariffsData = {} } = this.props;
+        const { editData = {} } = tariffsData;
         const { values } = this.state;
         const counterId = navigation.getParam('counterId', '');
 
-        const errorIds = Object.values(tariffsList)
-            .filter(tariff => tariff.counterId === counterId && !tariff.deleteTime)
-            .filter(tariff => !values[tariff.id] || !values[tariff.id].currentValue)
-            .map(tariff => tariff.id);
+        let errorIds = [];
+        const editTariffsIds = Object.keys(editData);
+        if (editTariffsIds.length) {
+            errorIds = editTariffsIds
+                .filter(tariffId => !values[tariffId] || !values[tariffId].currentValue)
+        } else {
+            errorIds = Object.values(tariffsList)
+                .filter(tariff => tariff.counterId === counterId && !tariff.deleteTime)
+                .filter(tariff => !values[tariff.id] || !values[tariff.id].currentValue)
+                .map(tariff => tariff.id);
+        }
 
         if (errorIds.length) {
             this.setState({ errorsTariff: errorIds });
@@ -145,13 +153,22 @@ class TariffDataInput extends Component {
     };
 
     getTariffsComponents = () => {
-        const { tariffsList, navigation } = this.props;
+        const { tariffsList, navigation, tariffsData = {} } = this.props;
+        const { editData = {} } = tariffsData;
+
         const { values, errorsTariff } = this.state;
         const counterId = navigation.getParam('counterId', '');
         if (counterId) {
-            const tariffIds = Object.values(tariffsList)
-                .filter(tariff => tariff.counterId === counterId && !tariff.deleteTime)
-                .map(tariff => tariff.id);
+            let tariffIds = [];
+            const editTariffsIds = Object.keys(editData);
+            if (editTariffsIds.length) {
+                tariffIds = editTariffsIds;
+            } else {
+                tariffIds = Object.values(tariffsList)
+                    .filter(tariff => tariff.counterId === counterId && !tariff.deleteTime)
+                    .map(tariff => tariff.id);
+            }
+
             return tariffIds.map((id, index) => {
                 const field = {
                     label: tariffsList[id].name,

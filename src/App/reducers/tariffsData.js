@@ -15,36 +15,6 @@ const initialState = {
     //             total: null,
     //             createTime: Date.now(),
     //         },
-    //         '2': {
-    //             id: '2',
-    //             tariffId: 'tariffId_1',
-    //             prevValue: 5,
-    //             currentValue: 15,
-    //             amount: 30.23,
-    //             difference: 10,
-    //             total: 302.3,
-    //             createTime: Date.now() + 100,
-    //         },
-    //         '3': {
-    //             id: '3',
-    //             tariffId: 'tariffId_2',
-    //             prevValue: null,
-    //             currentValue: 10,
-    //             amount: 130.03,
-    //             difference: null,
-    //             total: null,
-    //             createTime: Date.now(),
-    //         },
-    //         '4': {
-    //             id: '4',
-    //             tariffId: 'tariffId_2',
-    //             prevValue: 10,
-    //             currentValue: 30,
-    //             amount: 130.03,
-    //             difference: 20,
-    //             total: 2600.6,
-    //             createTime: Date.now() + 100,
-    //         },
     // }
 };
 
@@ -165,21 +135,24 @@ export default (state = initialState, action) => {
             };
         }
         case TARIFF_DATA.REMOVE: {
-            const dataIds = action.payload.dataIds;
-            if (!dataIds.length) return state;
-
-            const dataList = state.list ? cloneObject(state.list) : {};
-            const tariffsIds = Object.keys(dataList);
-            if (tariffsIds.length) {
-                dataIds.forEach(dataId => {
-                    tariffsIds.forEach(tariffId => {
-                        if (dataIds.includes(dataId)) {
-                            delete dataList[tariffId][dataId];
-                        }
-                    });
-                });
-
-            }
+            const { dataIds = [] } = action.payload;
+            const { list = {} } = state;
+            const dataList = cloneObject(list);
+            dataIds.forEach(id => delete dataList[id]);
+            // if (!dataIds.length) return state;
+            //
+            // const dataList = state.list ? cloneObject(state.list) : {};
+            // const tariffsIds = Object.keys(dataList);
+            // if (tariffsIds.length) {
+            //     dataIds.forEach(dataId => {
+            //         tariffsIds.forEach(tariffId => {
+            //             if (dataIds.includes(dataId)) {
+            //                 delete dataList[tariffId][dataId];
+            //             }
+            //         });
+            //     });
+            //
+            // }
 
             return {
                 ...state,

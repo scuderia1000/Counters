@@ -140,14 +140,15 @@ class TariffData extends Component {
     };
 
     getEditData = () => {
-        const { currentCounterId } = this.props;
+        const { navigation } = this.props;
         const { activeData } = this.state;
+        const counterId = navigation.getParam('counterId', '');
         const editData = {
-            counterId: currentCounterId,
+            counterId: counterId,
             dataIds: []
         };
 
-        editData.dataIds = Object.keys(activeData).map(tariffName => activeData[tariffName].dataId);
+        editData.dataIds = Object.values(activeData).map(data => data.id);
         return editData;
     };
 
@@ -156,7 +157,8 @@ class TariffData extends Component {
         const { activeData } = this.state;
         const counterId = navigation.getParam('counterId', '');
 
-        const editDataIds = Object.keys(activeData).map(name => activeData[name].id);
+        const editDataIds = Object.values(activeData).map(data => data.id);
+        // const editDataIds = Object.keys(activeData).map(name => activeData[name].id);
         // const editData = this.getEditData();
 
         this.props.editData(editDataIds);
@@ -231,10 +233,6 @@ const getCounterTariffData = (state, ownProps) => {
     const counterId = navigation.getParam('counterId', '');
 
     const dataIds = list[counterId].dataIds;
-
-    // const tariffsIds = Object.values(tariffs.list)
-    //     .filter(tariff => tariff.counterId === counterId)
-    //     .map(tariff => tariff.id);
     let countersValues = {/*
         {
             date1: {
@@ -250,7 +248,7 @@ const getCounterTariffData = (state, ownProps) => {
     Object.values(tariffsData.list)
         .filter(data => dataIds.includes(data.id))
         // .filter(data => tariffsIds.includes(data.tariffId))
-        // .sort((dataA, dataB) => dataB.createTime - dataA.createTime)
+        .sort((dataA, dataB) => dataB.createTime - dataA.createTime)
         .map(data => {
             if (data.prevValue !== null) {
                 if (countersValues[data.createTime]) {
