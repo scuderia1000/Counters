@@ -99,8 +99,8 @@ class TariffDataInput extends Component {
         const counterId = navigation.getParam('counterId', '');
 
         const errorIds = Object.values(tariffsList)
-            .filter(tariff =>
-                tariff.counterId === counterId && !values[tariff.id] || !values[tariff.id].currentValue)
+            .filter(tariff => tariff.counterId === counterId && !tariff.deleteTime)
+            .filter(tariff => !values[tariff.id] || !values[tariff.id].currentValue)
             .map(tariff => tariff.id);
 
         if (errorIds.length) {
@@ -150,7 +150,7 @@ class TariffDataInput extends Component {
         const counterId = navigation.getParam('counterId', '');
         if (counterId) {
             const tariffIds = Object.values(tariffsList)
-                .filter(tariff => tariff.counterId === counterId)
+                .filter(tariff => tariff.counterId === counterId && !tariff.deleteTime)
                 .map(tariff => tariff.id);
             return tariffIds.map((id, index) => {
                 const field = {

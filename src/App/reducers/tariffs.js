@@ -32,6 +32,18 @@ export default (state = initialState, action) => {
             }
         }
         case TARIFF.UPDATE: {
+            /*
+            const { list = {} } = state;
+            const { counterTariffs = {}, counterId = '' } = action.payload;
+            const oldTariffs = cloneObject(list);
+            const oldTariffsIds = Object.keys(list).filter(id => list[id].counterId === counterId);
+            const newTariffsIds = Object.keys(counterTariffs);
+            oldTariffsIds.forEach(id => {
+                if (!newTariffsIds.includes(id)) {
+                    oldTariffs[id]['deleteTime'] = Date.now();
+                }
+            });
+             */
             return {
                 ...state,
                 list: {
@@ -44,7 +56,8 @@ export default (state = initialState, action) => {
             const { tariffId = '' } = action.payload;
             const tariffsList = cloneObject(state.list);
 
-            delete tariffsList[tariffId];
+            tariffsList[tariffId]['deleteTime'] = Date.now();
+            // delete tariffsList[tariffId];
             return {
                 ...state,
                 list: tariffsList
@@ -54,7 +67,10 @@ export default (state = initialState, action) => {
             const { tariffIds = [] } = action.payload;
             const tariffsList = cloneObject(state.list);
 
-            tariffIds.forEach(id => delete tariffsList[id]);
+            tariffIds.forEach(id => {
+                tariffsList[id]['deleteTime'] = Date.now();
+            });
+            // tariffIds.forEach(id => delete tariffsList[id]);
             return {
                 ...state,
                 list: tariffsList

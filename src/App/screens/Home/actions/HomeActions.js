@@ -7,7 +7,7 @@ export const editCounter = (counterId) => {
 
         const counterTariffs = {};
         Object.values(tariffs.list)
-            .filter(tariff => tariff.counterId === counterId)
+            .filter(tariff => tariff.counterId === counterId && !tariff.deleteTime)
             .map(tariff => {
                 counterTariffs[tariff.id] = {
                     name: tariff.name,

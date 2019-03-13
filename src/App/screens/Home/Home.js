@@ -95,15 +95,6 @@ class Home extends Component {
             .sort((dataA, dataB) => dataB.createTime - dataA.createTime)
             .some(data => data.prevValue !== null);
 
-        // const tariffsIds = Object.values(tariffs.list)
-        //     .filter(tariff => tariff.counterId === counterId)
-        //     .map(tariff => tariff.id);
-
-        // let isDataExists = Object.values(tariffsValues.list)
-        //     .filter(data => tariffsIds.includes(data.tariffId))
-        //     .sort((dataA, dataB) => dataB.createTime - dataA.createTime)
-        //     .some(data => data.prevValue !== null);
-
         if (isDataExists) {
             this.props.navigation.navigate(
                 'TariffData',
@@ -221,53 +212,6 @@ class Home extends Component {
                         }}
                     />
                 }
-                {/*<Overlay
-                    isVisible={this.state.isVisibleModalRemoveCounter}
-                    width="50%"
-                    height="auto"
-                >
-                    <View>
-                        <Text>Hello from Overlay!</Text>
-                        <View style={styles.modalButtonContainer}>
-                            <CommonButton
-                                style={styles.modalButton}
-                                onPress={() => {
-                                    this.setVisibleModalRemove(!this.state.isVisibleModalRemoveCounter);
-                                }}
-                                caption={'Удалить'}
-                                // captionStyle={captionStyle}
-                            />
-                            <CommonButton
-                                style={styles.modalButton}
-                                onPress={() => {
-                                    this.setVisibleModalRemove(!this.state.isVisibleModalRemoveCounter);
-                                }}
-                                caption={'Отмена'}
-                                // captionStyle={captionStyle}
-                            />
-                        </View>
-                    </View>
-                </Overlay>*/}
-                {/*<Modal
-                    animationType="fade"
-                    transparent={false}
-                    visible={this.state.isVisibleModalRemoveCounter}
-                    onRequestClose={() => {
-                        // Alert.alert('Modal has been closed.');
-                    }}>
-                    <View style={{marginTop: 22}}>
-                        <View>
-                            <Text>Hello World!</Text>
-
-                            <TouchableHighlight
-                                onPress={() => {
-                                    this.setVisibleModalRemove(!this.state.isVisibleModalRemoveCounter);
-                                }}>
-                                <Text>Hide Modal</Text>
-                            </TouchableHighlight>
-                        </View>
-                    </View>
-                </Modal>*/}
             </View>
         );
     }
