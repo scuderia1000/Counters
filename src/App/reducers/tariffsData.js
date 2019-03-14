@@ -139,20 +139,6 @@ export default (state = initialState, action) => {
             const { list = {} } = state;
             const dataList = cloneObject(list);
             dataIds.forEach(id => delete dataList[id]);
-            // if (!dataIds.length) return state;
-            //
-            // const dataList = state.list ? cloneObject(state.list) : {};
-            // const tariffsIds = Object.keys(dataList);
-            // if (tariffsIds.length) {
-            //     dataIds.forEach(dataId => {
-            //         tariffsIds.forEach(tariffId => {
-            //             if (dataIds.includes(dataId)) {
-            //                 delete dataList[tariffId][dataId];
-            //             }
-            //         });
-            //     });
-            //
-            // }
 
             return {
                 ...state,
@@ -161,13 +147,7 @@ export default (state = initialState, action) => {
         }
         case TARIFF_DATA.REMOVE_ALL_TARIFFS_DATA: {
             const { tariffsIds = [] } = action.payload;
-            // const counterId = action.payload.counterId;
-            // if (!counterId) return state;
-            //
-            // const removedTariffIds = Object.values(tariffs)
-            //     .filter(tariff => tariff.counterId === counterId)
-            //     .map(tariff => tariff.id);
-            //
+
             const dataList = cloneObject(state.list);
             const removedDataIds = Object.values(dataList)
                 .filter(data => tariffsIds.includes(data.tariffId))

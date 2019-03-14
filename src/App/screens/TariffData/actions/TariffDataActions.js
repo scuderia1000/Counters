@@ -9,6 +9,13 @@ export const removeTariffData = (counterId, dataIds) => {
                 dataIds: dataIds,
             }
         });
+        dispatch({
+            type: COUNTER.REMOVE_DATA,
+            payload: {
+                counterId: counterId,
+                dataIds: dataIds,
+            }
+        });
     }
 };
 

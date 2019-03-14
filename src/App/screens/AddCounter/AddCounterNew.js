@@ -87,6 +87,10 @@ class AddCounterNew extends Component {
         }
     }
 
+    componentWillUnmount(): void {
+        this.props.resetEditData();
+    }
+
     handleCreateCounter = () => {
         const { editedTariffsFields, fieldsValues } = this.state;
         const values = cloneObject(fieldsValues);
@@ -138,8 +142,6 @@ class AddCounterNew extends Component {
                 const initialEditedTariffsIds = Object.keys(tariffs);
                 const removedTariffIds = initialEditedTariffsIds.filter(id => !editedTariffIds.includes(id));
                 if (removedTariffIds.length) removeTariffs(removedTariffIds);
-
-                resetEditData();
 
             } else {
                 id = uuid.v4();

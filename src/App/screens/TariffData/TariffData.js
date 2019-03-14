@@ -99,7 +99,10 @@ class TariffData extends Component {
     };
 
     actionSheetOptions = () => {
-        const { counters = {}, navigation } = this.props;
+        const { counters = {}, navigation, countersValues } = this.props;
+
+        const { activeData = '' } = this.state;
+
         const counterId = navigation.getParam('counterId', '');
         const { list } = counters;
         let options = [
@@ -111,13 +114,21 @@ class TariffData extends Component {
                 }
             },
             {
-                title: 'Удалить',
-                action: this.removeData
-            },
-            {
                 title: 'Отмена',
             }
         ];
+
+        // удалить можно только последние данные
+        if (activeData) {
+            const valuesDates = countersValues.map(data => Number(Object.keys(data)[0]));
+            const selectedDate = Object.values(activeData)[0].createTime;
+            if (valuesDates.indexOf(selectedDate) === 0) {
+                options.splice(1, 0, {
+                    title: 'Удалить',
+                    action: this.removeData
+                })
+            }
+        }
 
         if (list && list[counterId] && list[counterId].emailAddress) {
             options.splice(options.length - 1, 0, {
